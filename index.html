@@ -172,7 +172,7 @@
           <span class="pericias-info">Treinadas: <strong id="pericias-count">0</strong> / <strong id="pericias-max">0</strong></span>
         </div>
         <div class="pericias-list" id="pericias-list"></div>
-        <p class="hint">Use o seletor: <strong>0</strong> (não treinado), <strong>5</strong> (treinado), <strong>10</strong> (veterano) ou <strong>15</strong> (expert). Campo Outros para bônus extras. Perícias com * só se treinadas.</p>
+        <p class="hint">Seletor: <strong>0</strong> / <strong>5</strong> / <strong>10</strong> / <strong>15</strong> + campo Outros. * = só treinada.</p>
       </section>
 
       <aside class="right-panel">
@@ -185,16 +185,16 @@
         </nav>
 
         <div class="tab-content active" id="tab-descricao">
-          <div class="field"><label>Aparência</label><textarea id="aparencia" placeholder="Nome, gênero, idade, descrição física..."></textarea></div>
-          <div class="field"><label>Personalidade</label><textarea id="personalidade" placeholder="Traços marcantes, opiniões, ideais..."></textarea></div>
-          <div class="field"><label>Histórico</label><textarea id="historico" placeholder="Infância, família, contato com o Paranormal..."></textarea></div>
-          <div class="field"><label>Objetivo</label><textarea id="objetivo" placeholder="Por que faz parte da Ordem?"></textarea></div>
-          <div class="field"><label>Anotações</label><textarea id="anotacoes" placeholder="Anotações pessoais do agente..."></textarea></div>
+          <div class="field"><label>Aparência</label><textarea id="aparencia" placeholder="Descrição física..."></textarea></div>
+          <div class="field"><label>Personalidade</label><textarea id="personalidade" placeholder="Traços..."></textarea></div>
+          <div class="field"><label>Histórico</label><textarea id="historico" placeholder="História..."></textarea></div>
+          <div class="field"><label>Objetivo</label><textarea id="objetivo" placeholder="Objetivo..."></textarea></div>
+          <div class="field"><label>Anotações</label><textarea id="anotacoes" placeholder="Anotações..."></textarea></div>
         </div>
 
         <div class="tab-content" id="tab-habilidades">
           <div class="list-header">
-            <h3>Habilidades de Classe / Origem</h3>
+            <h3>Habilidades</h3>
             <button type="button" class="btn small" id="btn-add-hab">+ Adicionar</button>
           </div>
           <div id="habilidades-list" class="item-list"></div>
@@ -204,7 +204,7 @@
           <div class="list-header">
             <h3>Rituais</h3>
             <div>
-              <span class="dt-rituais">DT de Rituais: <strong id="dt-rituais">12</strong></span>
+              <span class="dt-rituais">DT: <strong id="dt-rituais">12</strong></span>
               <button type="button" class="btn small" id="btn-add-ritual">+ Novo Ritual</button>
             </div>
           </div>
@@ -230,10 +230,10 @@
             <div class="inv-limits-row">
               <label>Limite de Itens</label>
               <div class="cat-boxes">
-                <input type="number" id="limite-I" value="2" min="0" title="Categoria I" />
-                <input type="number" id="limite-II" value="0" min="0" title="Categoria II" />
-                <input type="number" id="limite-III" value="0" min="0" title="Categoria III" />
-                <input type="number" id="limite-IV" value="0" min="0" title="Categoria IV" />
+                <input type="number" id="limite-I" value="2" min="0" />
+                <input type="number" id="limite-II" value="0" min="0" />
+                <input type="number" id="limite-III" value="0" min="0" />
+                <input type="number" id="limite-IV" value="0" min="0" />
               </div>
             </div>
             <div class="inv-limits-row">
@@ -251,7 +251,7 @@
               <label>Limite de Crédito</label>
               <input type="text" id="credito" value="Baixo" />
             </div>
-            <div class="inv-field carga-field">
+            <div class="inv-field">
               <label>Carga Máx.</label>
               <div class="carga-row">
                 <span id="carga-atual">0</span>
@@ -282,8 +282,99 @@
     </main>
 
     <footer class="footer">
-      <p>Sistema não-oficial de fichas para Ordem Paranormal RPG • Baseado nas regras da Jambô Editora</p>
+      <p>Sistema não-oficial de fichas para Ordem Paranormal RPG</p>
+      <p class="save-status" id="save-status">Salvo automaticamente</p>
     </footer>
+  </div>
+
+  <div class="modal-overlay" id="modal-ataque" hidden>
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modal-ataque-title">Novo Ataque</h2>
+        <button type="button" class="modal-close" data-close="modal-ataque" aria-label="Fechar">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="field">
+          <label>Nome*</label>
+          <input type="text" id="atk-nome" placeholder="Novo Ataque" />
+        </div>
+        <div class="modal-row">
+          <div class="field">
+            <label>Dano*</label>
+            <input type="text" id="atk-dano" placeholder="1d4" />
+          </div>
+          <div class="field">
+            <label>Crítico*</label>
+            <input type="number" id="atk-critico" value="20" min="1" max="20" />
+          </div>
+          <div class="field">
+            <label>Multiplicador*</label>
+            <input type="number" id="atk-mult" value="2" min="1" max="10" />
+          </div>
+        </div>
+        <div class="modal-row">
+          <div class="field">
+            <label>Ataque Bônus</label>
+            <input type="number" id="atk-bonus" value="0" />
+          </div>
+          <div class="field">
+            <label>Tipo de Dano</label>
+            <input type="text" id="atk-tipo" placeholder="Balístico" list="lista-tipo-dano" />
+            <datalist id="lista-tipo-dano">
+              <option value="Balístico"></option>
+              <option value="Cortante"></option>
+              <option value="Perfurante"></option>
+              <option value="Contundente"></option>
+              <option value="Fogo"></option>
+              <option value="Elétrico"></option>
+              <option value="Mental"></option>
+              <option value="Conhecimento"></option>
+              <option value="Morte"></option>
+              <option value="Energia"></option>
+              <option value="Sangue"></option>
+            </datalist>
+          </div>
+        </div>
+        <div class="modal-row">
+          <div class="field">
+            <label>Alcance</label>
+            <input type="text" id="atk-alcance" placeholder="—" />
+          </div>
+          <div class="field">
+            <label>Perícia</label>
+            <select id="atk-pericia">
+              <option value="Luta">Luta</option>
+              <option value="Pontaria">Pontaria</option>
+              <option value="Ocultismo">Ocultismo</option>
+              <option value="Outro">Outro</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Atributo Dano</label>
+            <select id="atk-atributo">
+              <option value="Força">Força</option>
+              <option value="Agilidade">Agilidade</option>
+              <option value="Intelecto">Intelecto</option>
+              <option value="Presença">Presença</option>
+              <option value="Vigor">Vigor</option>
+              <option value="Nenhum">Nenhum</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>Dano extra</label>
+          <input type="text" id="atk-dano-extra" placeholder="Ex: +1d6 de fogo" />
+        </div>
+        <div class="field">
+          <label>Anotações</label>
+          <textarea id="atk-notas" placeholder="Observações do ataque..." rows="3"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn secondary" data-close="modal-ataque">Cancelar</button>
+        <button type="button" class="btn primary" id="btn-salvar-ataque">Adicionar</button>
+      </div>
+    </div>
   </div>
 
   <script src="data.js"></script>
