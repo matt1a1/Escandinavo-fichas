@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Escandinavo Fichas — Ordem Paranormal</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Cinzel:wght@500;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div id="app">
+    <!-- Header -->
+    <header class="top-bar">
+      <div class="brand">
+        <span class="logo">◈</span>
+        <div>
+          <h1>Escandinavo Fichas</h1>
+          <p>Ordem Paranormal RPG</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="btn-new" class="btn secondary">Nova Ficha</button>
+        <button id="btn-export" class="btn secondary">Exportar JSON</button>
+        <button id="btn-import" class="btn secondary">Importar JSON</button>
+        <input type="file" id="import-file" accept=".json" hidden />
+        <button id="btn-print" class="btn primary">Imprimir / PDF</button>
+      </div>
+    </header>
+
+    <main class="sheet">
+      <!-- LEFT COLUMN: Attributes + Resources -->
+      <aside class="left-panel">
+        <!-- Identity -->
+        <section class="card identity">
+          <div class="identity-row">
+            <label>Personagem</label>
+            <input type="text" id="nome" placeholder="Nome do Agente" />
+          </div>
+          <div class="identity-row">
+            <label>Jogador</label>
+            <input type="text" id="jogador" placeholder="Seu nome" />
+          </div>
+          <div class="identity-grid">
+            <div>
+              <label>Origem</label>
+              <select id="origem"></select>
+            </div>
+            <div>
+              <label>Classe</label>
+              <select id="classe">
+                <option value="combatente">Combatente</option>
+                <option value="especialista">Especialista</option>
+                <option value="ocultista" selected>Ocultista</option>
+              </select>
+            </div>
+          </div>
+          <div class="identity-grid">
+            <div>
+              <label>NEX</label>
+              <div class="nex-control">
+                <button type="button" class="nex-btn" data-delta="-5">−</button>
+                <span id="nex-display">5%</span>
+                <button type="button" class="nex-btn" data-delta="5">+</button>
+              </div>
+            </div>
+            <div>
+              <label>Patente</label>
+              <input type="text" id="patente" value="Recruta" />
+            </div>
+          </div>
+        </section>
+
+        <!-- Attributes Pentagram -->
+        <section class="card attributes">
+          <h2>Atributos</h2>
+          <p class="points-left">Pontos restantes: <strong id="attr-points">4</strong></p>
+          <div class="attr-grid">
+            <div class="attr-item" data-attr="for">
+              <span class="attr-label">FORÇA</span>
+              <div class="attr-controls">
+                <button type="button" class="attr-btn" data-delta="-1">−</button>
+                <span class="attr-value">1</span>
+                <button type="button" class="attr-btn" data-delta="1">+</button>
+              </div>
+            </div>
+            <div class="attr-item" data-attr="agi">
+              <span class="attr-label">AGILIDADE</span>
+              <div class="attr-controls">
+                <button type="button" class="attr-btn" data-delta="-1">−</button>
+                <span class="attr-value">1</span>
+                <button type="button" class="attr-btn" data-delta="1">+</button>
+              </div>
+            </div>
+            <div class="attr-item" data-attr="int">
+              <span class="attr-label">INTELECTO</span>
+              <div class="attr-controls">
+                <button type="button" class="attr-btn" data-delta="-1">−</button>
+                <span class="attr-value">1</span>
+                <button type="button" class="attr-btn" data-delta="1">+</button>
+              </div>
+            </div>
+            <div class="attr-item" data-attr="pre">
+              <span class="attr-label">PRESENÇA</span>
+              <div class="attr-controls">
+                <button type="button" class="attr-btn" data-delta="-1">−</button>
+                <span class="attr-value">1</span>
+                <button type="button" class="attr-btn" data-delta="1">+</button>
+              </div>
+            </div>
+            <div class="attr-item" data-attr="vig">
+              <span class="attr-label">VIGOR</span>
+              <div class="attr-controls">
+                <button type="button" class="attr-btn" data-delta="-1">−</button>
+                <span class="attr-value">1</span>
+                <button type="button" class="attr-btn" data-delta="1">+</button>
+              </div>
+            </div>
+          </div>
+          <p class="hint">Começa em 1. 4 pontos para distribuir. Pode baixar um atributo para 0 (+1 ponto). Máximo inicial: 3.</p>
+        </section>
+
+        <!-- Resources -->
+        <section class="card resources">
+          <div class="resource vida">
+            <label>VIDA</label>
+            <div class="resource-bar">
+              <button type="button" class="res-btn" data-res="vida" data-delta="-1">«</button>
+              <button type="button" class="res-btn" data-res="vida" data-delta="-1">‹</button>
+              <span class="res-value"><span id="vida-atual">13</span> / <span id="vida-max">13</span></span>
+              <button type="button" class="res-btn" data-res="vida" data-delta="1">›</button>
+              <button type="button" class="res-btn" data-res="vida" data-delta="1">»</button>
+            </div>
+          </div>
+          <div class="resource sanidade">
+            <label>SANIDADE</label>
+            <div class="resource-bar">
+              <button type="button" class="res-btn" data-res="sanidade" data-delta="-1">«</button>
+              <button type="button" class="res-btn" data-res="sanidade" data-delta="-1">‹</button>
+              <span class="res-value"><span id="san-atual">20</span> / <span id="san-max">20</span></span>
+              <button type="button" class="res-btn" data-res="sanidade" data-delta="1">›</button>
+              <button type="button" class="res-btn" data-res="sanidade" data-delta="1">»</button>
+            </div>
+          </div>
+          <div class="resource esforco">
+            <label>ESFORÇO</label>
+            <div class="resource-bar">
+              <button type="button" class="res-btn" data-res="esforco" data-delta="-1">«</button>
+              <button type="button" class="res-btn" data-res="esforco" data-delta="-1">‹</button>
+              <span class="res-value"><span id="pe-atual">5</span> / <span id="pe-max">5</span></span>
+              <button type="button" class="res-btn" data-res="esforco" data-delta="1">›</button>
+              <button type="button" class="res-btn" data-res="esforco" data-delta="1">»</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Combat Stats -->
+        <section class="card combat-stats">
+          <div class="stat-row">
+            <div class="stat">
+              <label>Defesa</label>
+              <span id="defesa">11</span>
+            </div>
+            <div class="stat">
+              <label>Bloqueio</label>
+              <span id="bloqueio">0</span>
+            </div>
+            <div class="stat">
+              <label>Esquiva</label>
+              <span id="esquiva">11</span>
+            </div>
+          </div>
+          <div class="stat-row">
+            <div class="stat">
+              <label>Deslocamento</label>
+              <span>9 m / 6 □</span>
+            </div>
+            <div class="stat">
+              <label>PE / Turno</label>
+              <span id="pe-turno">1</span>
+            </div>
+          </div>
+          <div class="stat-row">
+            <div class="stat full">
+              <label>Proficiências</label>
+              <span id="proficiencias">Armas simples</span>
+            </div>
+          </div>
+        </section>
+      </aside>
+
+      <!-- CENTER: Perícias -->
+      <section class="center-panel card">
+        <div class="panel-header">
+          <h2>Perícias</h2>
+          <span class="pericias-info">Treinadas: <strong id="pericias-count">0</strong> / <strong id="pericias-max">0</strong></span>
+        </div>
+        <div class="pericias-list" id="pericias-list"></div>
+        <p class="hint">Clique no nome da perícia para alternar treinamento (+5). Perícias marcadas com * só podem ser usadas se treinadas.</p>
+      </section>
+
+      <!-- RIGHT: Tabs -->
+      <aside class="right-panel">
+        <nav class="tabs">
+          <button class="tab active" data-tab="descricao">Descrição</button>
+          <button class="tab" data-tab="habilidades">Habilidades</button>
+          <button class="tab" data-tab="rituais">Rituais</button>
+          <button class="tab" data-tab="inventario">Inventário</button>
+          <button class="tab" data-tab="combate">Combate</button>
+        </nav>
+
+        <div class="tab-content active" id="tab-descricao">
+          <div class="field">
+            <label>Aparência</label>
+            <textarea id="aparencia" placeholder="Nome, gênero, idade, descrição física..."></textarea>
+          </div>
+          <div class="field">
+            <label>Personalidade</label>
+            <textarea id="personalidade" placeholder="Traços marcantes, opiniões, ideais..."></textarea>
+          </div>
+          <div class="field">
+            <label>Histórico</label>
+            <textarea id="historico" placeholder="Infância, relação com a família, contato com o Paranormal, eventos bons e ruins..."></textarea>
+          </div>
+          <div class="field">
+            <label>Objetivo</label>
+            <textarea id="objetivo" placeholder="Por que ele faz parte da Ordem? Por que luta contra o Outro Lado?"></textarea>
+          </div>
+          <div class="field">
+            <label>Anotações</label>
+            <textarea id="anotacoes" placeholder="Anotações pessoais do agente..."></textarea>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-habilidades">
+          <div class="list-header">
+            <h3>Habilidades de Classe / Origem</h3>
+            <button type="button" class="btn small" id="btn-add-hab">+ Adicionar</button>
+          </div>
+          <div id="habilidades-list" class="item-list"></div>
+        </div>
+
+        <div class="tab-content" id="tab-rituais">
+          <div class="list-header">
+            <h3>Rituais</h3>
+            <div>
+              <span class="dt-rituais">DT de Rituais: <strong id="dt-rituais">12</strong></span>
+              <button type="button" class="btn small" id="btn-add-ritual">+ Novo Ritual</button>
+            </div>
+          </div>
+          <div id="rituais-list" class="item-list"></div>
+        </div>
+
+        <div class="tab-content" id="tab-inventario">
+          <div class="inventario-meta">
+            <div>
+              <label>Pontos de Prestígio</label>
+              <input type="number" id="pp" value="0" min="0" />
+            </div>
+            <div>
+              <label>Limite de Crédito</label>
+              <input type="text" id="credito" value="Baixo" />
+            </div>
+            <div>
+              <label>Carga Máx.</label>
+              <span id="carga-max">5</span>
+            </div>
+          </div>
+          <div class="list-header">
+            <h3>Itens</h3>
+            <button type="button" class="btn small" id="btn-add-item">+ Adicionar Item</button>
+          </div>
+          <div id="itens-list" class="item-list"></div>
+        </div>
+
+        <div class="tab-content" id="tab-combate">
+          <div class="list-header">
+            <h3>Ataques</h3>
+            <button type="button" class="btn small" id="btn-add-ataque">+ Novo Ataque</button>
+          </div>
+          <div id="ataques-list" class="item-list"></div>
+        </div>
+      </aside>
+    </main>
+
+    <footer class="footer">
+      <p>Sistema não-oficial de fichas para Ordem Paranormal RPG • Baseado nas regras da Jambô Editora</p>
+    </footer>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
