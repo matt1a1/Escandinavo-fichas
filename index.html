@@ -11,7 +11,6 @@
 </head>
 <body>
   <div id="app">
-    <!-- Header -->
     <header class="top-bar">
       <div class="brand">
         <span class="logo">◈</span>
@@ -30,9 +29,7 @@
     </header>
 
     <main class="sheet">
-      <!-- LEFT COLUMN: Attributes + Resources -->
       <aside class="left-panel">
-        <!-- Identity -->
         <section class="card identity">
           <div class="identity-row">
             <label>Personagem</label>
@@ -72,7 +69,6 @@
           </div>
         </section>
 
-        <!-- Attributes Pentagram -->
         <section class="card attributes">
           <h2>Atributos</h2>
           <p class="points-left">Pontos restantes: <strong id="attr-points">4</strong></p>
@@ -121,7 +117,6 @@
           <p class="hint">Começa em 1. 4 pontos para distribuir. Pode baixar um atributo para 0 (+1 ponto). Máximo inicial: 3.</p>
         </section>
 
-        <!-- Resources -->
         <section class="card resources">
           <div class="resource vida">
             <label>VIDA</label>
@@ -155,52 +150,31 @@
           </div>
         </section>
 
-        <!-- Combat Stats -->
         <section class="card combat-stats">
           <div class="stat-row">
-            <div class="stat">
-              <label>Defesa</label>
-              <span id="defesa">11</span>
-            </div>
-            <div class="stat">
-              <label>Bloqueio</label>
-              <span id="bloqueio">0</span>
-            </div>
-            <div class="stat">
-              <label>Esquiva</label>
-              <span id="esquiva">11</span>
-            </div>
+            <div class="stat"><label>Defesa</label><span id="defesa">11</span></div>
+            <div class="stat"><label>Bloqueio</label><span id="bloqueio">0</span></div>
+            <div class="stat"><label>Esquiva</label><span id="esquiva">11</span></div>
           </div>
           <div class="stat-row">
-            <div class="stat">
-              <label>Deslocamento</label>
-              <span>9 m / 6 □</span>
-            </div>
-            <div class="stat">
-              <label>PE / Turno</label>
-              <span id="pe-turno">1</span>
-            </div>
+            <div class="stat"><label>Deslocamento</label><span>9 m / 6 □</span></div>
+            <div class="stat"><label>PE / Turno</label><span id="pe-turno">1</span></div>
           </div>
           <div class="stat-row">
-            <div class="stat full">
-              <label>Proficiências</label>
-              <span id="proficiencias">Armas simples</span>
-            </div>
+            <div class="stat full"><label>Proficiências</label><span id="proficiencias">Armas simples</span></div>
           </div>
         </section>
       </aside>
 
-      <!-- CENTER: Perícias -->
       <section class="center-panel card">
         <div class="panel-header">
           <h2>Perícias</h2>
           <span class="pericias-info">Treinadas: <strong id="pericias-count">0</strong> / <strong id="pericias-max">0</strong></span>
         </div>
         <div class="pericias-list" id="pericias-list"></div>
-        <p class="hint">Clique no nome da perícia para alternar treinamento (+5). Perícias marcadas com * só podem ser usadas se treinadas.</p>
+        <p class="hint">Use o seletor: <strong>0</strong> (não treinado), <strong>5</strong> (treinado), <strong>10</strong> (veterano) ou <strong>15</strong> (expert). Campo Outros para bônus extras. Perícias com * só se treinadas.</p>
       </section>
 
-      <!-- RIGHT: Tabs -->
       <aside class="right-panel">
         <nav class="tabs">
           <button class="tab active" data-tab="descricao">Descrição</button>
@@ -211,26 +185,11 @@
         </nav>
 
         <div class="tab-content active" id="tab-descricao">
-          <div class="field">
-            <label>Aparência</label>
-            <textarea id="aparencia" placeholder="Nome, gênero, idade, descrição física..."></textarea>
-          </div>
-          <div class="field">
-            <label>Personalidade</label>
-            <textarea id="personalidade" placeholder="Traços marcantes, opiniões, ideais..."></textarea>
-          </div>
-          <div class="field">
-            <label>Histórico</label>
-            <textarea id="historico" placeholder="Infância, relação com a família, contato com o Paranormal, eventos bons e ruins..."></textarea>
-          </div>
-          <div class="field">
-            <label>Objetivo</label>
-            <textarea id="objetivo" placeholder="Por que ele faz parte da Ordem? Por que luta contra o Outro Lado?"></textarea>
-          </div>
-          <div class="field">
-            <label>Anotações</label>
-            <textarea id="anotacoes" placeholder="Anotações pessoais do agente..."></textarea>
-          </div>
+          <div class="field"><label>Aparência</label><textarea id="aparencia" placeholder="Nome, gênero, idade, descrição física..."></textarea></div>
+          <div class="field"><label>Personalidade</label><textarea id="personalidade" placeholder="Traços marcantes, opiniões, ideais..."></textarea></div>
+          <div class="field"><label>Histórico</label><textarea id="historico" placeholder="Infância, família, contato com o Paranormal..."></textarea></div>
+          <div class="field"><label>Objetivo</label><textarea id="objetivo" placeholder="Por que faz parte da Ordem?"></textarea></div>
+          <div class="field"><label>Anotações</label><textarea id="anotacoes" placeholder="Anotações pessoais do agente..."></textarea></div>
         </div>
 
         <div class="tab-content" id="tab-habilidades">
@@ -253,23 +212,61 @@
         </div>
 
         <div class="tab-content" id="tab-inventario">
-          <div class="inventario-meta">
-            <div>
+          <div class="list-header inventario-header">
+            <h3></h3>
+            <button type="button" class="btn primary small" id="btn-add-item">Adicionar</button>
+          </div>
+          <div class="inv-grid">
+            <div class="inv-field">
               <label>Pontos de Prestígio</label>
               <input type="number" id="pp" value="0" min="0" />
             </div>
-            <div>
+            <div class="inv-field">
+              <label>Patente</label>
+              <input type="text" id="patente-inv" value="Recruta" />
+            </div>
+          </div>
+          <div class="inv-limits">
+            <div class="inv-limits-row">
+              <label>Limite de Itens</label>
+              <div class="cat-boxes">
+                <input type="number" id="limite-I" value="2" min="0" title="Categoria I" />
+                <input type="number" id="limite-II" value="0" min="0" title="Categoria II" />
+                <input type="number" id="limite-III" value="0" min="0" title="Categoria III" />
+                <input type="number" id="limite-IV" value="0" min="0" title="Categoria IV" />
+              </div>
+            </div>
+            <div class="inv-limits-row">
+              <label>No Inventário</label>
+              <div class="cat-boxes readonly">
+                <span id="count-I">0</span>
+                <span id="count-II">0</span>
+                <span id="count-III">0</span>
+                <span id="count-IV">0</span>
+              </div>
+            </div>
+          </div>
+          <div class="inv-grid">
+            <div class="inv-field">
               <label>Limite de Crédito</label>
               <input type="text" id="credito" value="Baixo" />
             </div>
-            <div>
+            <div class="inv-field carga-field">
               <label>Carga Máx.</label>
-              <span id="carga-max">5</span>
+              <div class="carga-row">
+                <span id="carga-atual">0</span>
+                <span class="carga-sep">/</span>
+                <span id="carga-max">5</span>
+              </div>
             </div>
           </div>
-          <div class="list-header">
-            <h3>Itens</h3>
-            <button type="button" class="btn small" id="btn-add-item">+ Adicionar Item</button>
+          <div class="item-type-btns">
+            <span class="novo-label">Novo</span>
+            <button type="button" class="btn-type" data-tipo="arma">Arma</button>
+            <button type="button" class="btn-type" data-tipo="municao">Munição</button>
+            <button type="button" class="btn-type" data-tipo="protecao">Proteção</button>
+            <button type="button" class="btn-type" data-tipo="geral">Geral</button>
+            <button type="button" class="btn-type" data-tipo="amaldicoado">Item Amald.</button>
           </div>
           <div id="itens-list" class="item-list"></div>
         </div>
