@@ -73,106 +73,32 @@
           <h2>Atributos</h2>
           <p class="points-left">Pontos restantes: <strong id="attr-points">4</strong></p>
           <div class="attr-grid">
-            <div class="attr-item" data-attr="for">
-              <span class="attr-label">FORÇA</span>
-              <div class="attr-controls">
-                <button type="button" class="attr-btn" data-delta="-1">−</button>
-                <span class="attr-value">1</span>
-                <button type="button" class="attr-btn" data-delta="1">+</button>
-              </div>
-            </div>
-            <div class="attr-item" data-attr="agi">
-              <span class="attr-label">AGILIDADE</span>
-              <div class="attr-controls">
-                <button type="button" class="attr-btn" data-delta="-1">−</button>
-                <span class="attr-value">1</span>
-                <button type="button" class="attr-btn" data-delta="1">+</button>
-              </div>
-            </div>
-            <div class="attr-item" data-attr="int">
-              <span class="attr-label">INTELECTO</span>
-              <div class="attr-controls">
-                <button type="button" class="attr-btn" data-delta="-1">−</button>
-                <span class="attr-value">1</span>
-                <button type="button" class="attr-btn" data-delta="1">+</button>
-              </div>
-            </div>
-            <div class="attr-item" data-attr="pre">
-              <span class="attr-label">PRESENÇA</span>
-              <div class="attr-controls">
-                <button type="button" class="attr-btn" data-delta="-1">−</button>
-                <span class="attr-value">1</span>
-                <button type="button" class="attr-btn" data-delta="1">+</button>
-              </div>
-            </div>
-            <div class="attr-item" data-attr="vig">
-              <span class="attr-label">VIGOR</span>
-              <div class="attr-controls">
-                <button type="button" class="attr-btn" data-delta="-1">−</button>
-                <span class="attr-value">1</span>
-                <button type="button" class="attr-btn" data-delta="1">+</button>
-              </div>
-            </div>
+            <div class="attr-item" data-attr="for"><span class="attr-label">FORÇA</span><div class="attr-controls"><button type="button" class="attr-btn" data-delta="-1">−</button><span class="attr-value">1</span><button type="button" class="attr-btn" data-delta="1">+</button></div></div>
+            <div class="attr-item" data-attr="agi"><span class="attr-label">AGILIDADE</span><div class="attr-controls"><button type="button" class="attr-btn" data-delta="-1">−</button><span class="attr-value">1</span><button type="button" class="attr-btn" data-delta="1">+</button></div></div>
+            <div class="attr-item" data-attr="int"><span class="attr-label">INTELECTO</span><div class="attr-controls"><button type="button" class="attr-btn" data-delta="-1">−</button><span class="attr-value">1</span><button type="button" class="attr-btn" data-delta="1">+</button></div></div>
+            <div class="attr-item" data-attr="pre"><span class="attr-label">PRESENÇA</span><div class="attr-controls"><button type="button" class="attr-btn" data-delta="-1">−</button><span class="attr-value">1</span><button type="button" class="attr-btn" data-delta="1">+</button></div></div>
+            <div class="attr-item" data-attr="vig"><span class="attr-label">VIGOR</span><div class="attr-controls"><button type="button" class="attr-btn" data-delta="-1">−</button><span class="attr-value">1</span><button type="button" class="attr-btn" data-delta="1">+</button></div></div>
           </div>
-          <p class="hint">Começa em 1. 4 pontos para distribuir. Pode baixar um atributo para 0 (+1 ponto). Máximo inicial: 3.</p>
+          <p class="hint">Começa em 1. 4 pontos para distribuir.</p>
         </section>
 
         <section class="card resources">
-          <div class="resource vida">
-            <label>VIDA</label>
-            <div class="resource-bar">
-              <button type="button" class="res-btn" data-res="vida" data-delta="-1">«</button>
-              <button type="button" class="res-btn" data-res="vida" data-delta="-1">‹</button>
-              <span class="res-value"><span id="vida-atual">13</span> / <span id="vida-max">13</span></span>
-              <button type="button" class="res-btn" data-res="vida" data-delta="1">›</button>
-              <button type="button" class="res-btn" data-res="vida" data-delta="1">»</button>
-            </div>
-          </div>
-          <div class="resource sanidade">
-            <label>SANIDADE</label>
-            <div class="resource-bar">
-              <button type="button" class="res-btn" data-res="sanidade" data-delta="-1">«</button>
-              <button type="button" class="res-btn" data-res="sanidade" data-delta="-1">‹</button>
-              <span class="res-value"><span id="san-atual">20</span> / <span id="san-max">20</span></span>
-              <button type="button" class="res-btn" data-res="sanidade" data-delta="1">›</button>
-              <button type="button" class="res-btn" data-res="sanidade" data-delta="1">»</button>
-            </div>
-          </div>
-          <div class="resource esforco">
-            <label>ESFORÇO</label>
-            <div class="resource-bar">
-              <button type="button" class="res-btn" data-res="esforco" data-delta="-1">«</button>
-              <button type="button" class="res-btn" data-res="esforco" data-delta="-1">‹</button>
-              <span class="res-value"><span id="pe-atual">5</span> / <span id="pe-max">5</span></span>
-              <button type="button" class="res-btn" data-res="esforco" data-delta="1">›</button>
-              <button type="button" class="res-btn" data-res="esforco" data-delta="1">»</button>
-            </div>
-          </div>
+          <div class="resource vida"><label>VIDA</label><div class="resource-bar"><button type="button" class="res-btn" data-res="vida" data-delta="-1">«</button><button type="button" class="res-btn" data-res="vida" data-delta="-1">‹</button><span class="res-value"><span id="vida-atual">13</span> / <span id="vida-max">13</span></span><button type="button" class="res-btn" data-res="vida" data-delta="1">›</button><button type="button" class="res-btn" data-res="vida" data-delta="1">»</button></div></div>
+          <div class="resource sanidade"><label>SANIDADE</label><div class="resource-bar"><button type="button" class="res-btn" data-res="sanidade" data-delta="-1">«</button><button type="button" class="res-btn" data-res="sanidade" data-delta="-1">‹</button><span class="res-value"><span id="san-atual">20</span> / <span id="san-max">20</span></span><button type="button" class="res-btn" data-res="sanidade" data-delta="1">›</button><button type="button" class="res-btn" data-res="sanidade" data-delta="1">»</button></div></div>
+          <div class="resource esforco"><label>ESFORÇO</label><div class="resource-bar"><button type="button" class="res-btn" data-res="esforco" data-delta="-1">«</button><button type="button" class="res-btn" data-res="esforco" data-delta="-1">‹</button><span class="res-value"><span id="pe-atual">5</span> / <span id="pe-max">5</span></span><button type="button" class="res-btn" data-res="esforco" data-delta="1">›</button><button type="button" class="res-btn" data-res="esforco" data-delta="1">»</button></div></div>
         </section>
 
         <section class="card combat-stats">
-          <div class="stat-row">
-            <div class="stat"><label>Defesa</label><span id="defesa">11</span></div>
-            <div class="stat"><label>Bloqueio</label><span id="bloqueio">0</span></div>
-            <div class="stat"><label>Esquiva</label><span id="esquiva">11</span></div>
-          </div>
-          <div class="stat-row">
-            <div class="stat"><label>Deslocamento</label><span>9 m / 6 □</span></div>
-            <div class="stat"><label>PE / Turno</label><span id="pe-turno">1</span></div>
-          </div>
-          <div class="stat-row">
-            <div class="stat full"><label>Proficiências</label><span id="proficiencias">Armas simples</span></div>
-          </div>
+          <div class="stat-row"><div class="stat"><label>Defesa</label><span id="defesa">11</span></div><div class="stat"><label>Bloqueio</label><span id="bloqueio">0</span></div><div class="stat"><label>Esquiva</label><span id="esquiva">11</span></div></div>
+          <div class="stat-row"><div class="stat"><label>Deslocamento</label><span>9 m / 6 □</span></div><div class="stat"><label>PE / Turno</label><span id="pe-turno">1</span></div></div>
+          <div class="stat-row"><div class="stat full"><label>Proficiências</label><span id="proficiencias">Armas simples</span></div></div>
         </section>
       </aside>
 
       <section class="center-panel card">
-        <div class="panel-header">
-          <h2>Perícias</h2>
-          <span class="pericias-info">Treinadas: <strong id="pericias-count">0</strong> / <strong id="pericias-max">0</strong></span>
-        </div>
+        <div class="panel-header"><h2>Perícias</h2><span class="pericias-info">Treinadas: <strong id="pericias-count">0</strong> / <strong id="pericias-max">0</strong></span></div>
         <div class="pericias-list" id="pericias-list"></div>
-        <p class="hint">Seletor: <strong>0</strong> / <strong>5</strong> / <strong>10</strong> / <strong>15</strong> + campo Outros. * = só treinada.</p>
+        <p class="hint">0 / 5 / 10 / 15 + Outros. * = só treinada.</p>
       </section>
 
       <aside class="right-panel">
@@ -183,82 +109,34 @@
           <button class="tab" data-tab="inventario">Inventário</button>
           <button class="tab" data-tab="combate">Combate</button>
         </nav>
-
         <div class="tab-content active" id="tab-descricao">
-          <div class="field"><label>Aparência</label><textarea id="aparencia" placeholder="Descrição física..."></textarea></div>
-          <div class="field"><label>Personalidade</label><textarea id="personalidade" placeholder="Traços..."></textarea></div>
-          <div class="field"><label>Histórico</label><textarea id="historico" placeholder="História..."></textarea></div>
-          <div class="field"><label>Objetivo</label><textarea id="objetivo" placeholder="Objetivo..."></textarea></div>
-          <div class="field"><label>Anotações</label><textarea id="anotacoes" placeholder="Anotações..."></textarea></div>
+          <div class="field"><label>Aparência</label><textarea id="aparencia"></textarea></div>
+          <div class="field"><label>Personalidade</label><textarea id="personalidade"></textarea></div>
+          <div class="field"><label>Histórico</label><textarea id="historico"></textarea></div>
+          <div class="field"><label>Objetivo</label><textarea id="objetivo"></textarea></div>
+          <div class="field"><label>Anotações</label><textarea id="anotacoes"></textarea></div>
         </div>
-
         <div class="tab-content" id="tab-habilidades">
-          <div class="list-header">
-            <h3>Habilidades</h3>
-            <button type="button" class="btn small" id="btn-add-hab">+ Adicionar</button>
-          </div>
+          <div class="list-header"><h3>Habilidades</h3><button type="button" class="btn small" id="btn-add-hab">+ Adicionar</button></div>
           <div id="habilidades-list" class="item-list"></div>
         </div>
-
         <div class="tab-content" id="tab-rituais">
-          <div class="list-header">
-            <h3>Rituais</h3>
-            <div>
-              <span class="dt-rituais">DT: <strong id="dt-rituais">12</strong></span>
-              <button type="button" class="btn small" id="btn-add-ritual">+ Novo Ritual</button>
-            </div>
-          </div>
+          <div class="list-header"><h3>Rituais</h3><div><span class="dt-rituais">DT: <strong id="dt-rituais">12</strong></span><button type="button" class="btn small" id="btn-add-ritual">+ Novo Ritual</button></div></div>
           <div id="rituais-list" class="item-list"></div>
         </div>
-
         <div class="tab-content" id="tab-inventario">
-          <div class="list-header inventario-header">
-            <h3></h3>
-            <button type="button" class="btn primary small" id="btn-add-item">Adicionar</button>
-          </div>
+          <div class="list-header inventario-header"><h3></h3><button type="button" class="btn primary small" id="btn-add-item">Adicionar</button></div>
           <div class="inv-grid">
-            <div class="inv-field">
-              <label>Pontos de Prestígio</label>
-              <input type="number" id="pp" value="0" min="0" />
-            </div>
-            <div class="inv-field">
-              <label>Patente</label>
-              <input type="text" id="patente-inv" value="Recruta" />
-            </div>
+            <div class="inv-field"><label>Pontos de Prestígio</label><input type="number" id="pp" value="0" min="0" /></div>
+            <div class="inv-field"><label>Patente</label><input type="text" id="patente-inv" value="Recruta" /></div>
           </div>
           <div class="inv-limits">
-            <div class="inv-limits-row">
-              <label>Limite de Itens</label>
-              <div class="cat-boxes">
-                <input type="number" id="limite-I" value="2" min="0" />
-                <input type="number" id="limite-II" value="0" min="0" />
-                <input type="number" id="limite-III" value="0" min="0" />
-                <input type="number" id="limite-IV" value="0" min="0" />
-              </div>
-            </div>
-            <div class="inv-limits-row">
-              <label>No Inventário</label>
-              <div class="cat-boxes readonly">
-                <span id="count-I">0</span>
-                <span id="count-II">0</span>
-                <span id="count-III">0</span>
-                <span id="count-IV">0</span>
-              </div>
-            </div>
+            <div class="inv-limits-row"><label>Limite de Itens</label><div class="cat-boxes"><input type="number" id="limite-I" value="2" min="0" /><input type="number" id="limite-II" value="0" min="0" /><input type="number" id="limite-III" value="0" min="0" /><input type="number" id="limite-IV" value="0" min="0" /></div></div>
+            <div class="inv-limits-row"><label>No Inventário</label><div class="cat-boxes readonly"><span id="count-I">0</span><span id="count-II">0</span><span id="count-III">0</span><span id="count-IV">0</span></div></div>
           </div>
           <div class="inv-grid">
-            <div class="inv-field">
-              <label>Limite de Crédito</label>
-              <input type="text" id="credito" value="Baixo" />
-            </div>
-            <div class="inv-field">
-              <label>Carga Máx.</label>
-              <div class="carga-row">
-                <span id="carga-atual">0</span>
-                <span class="carga-sep">/</span>
-                <span id="carga-max">5</span>
-              </div>
-            </div>
+            <div class="inv-field"><label>Limite de Crédito</label><input type="text" id="credito" value="Baixo" /></div>
+            <div class="inv-field"><label>Carga Máx.</label><div class="carga-row"><span id="carga-atual">0</span><span class="carga-sep">/</span><span id="carga-max">5</span></div></div>
           </div>
           <div class="item-type-btns">
             <span class="novo-label">Novo</span>
@@ -270,12 +148,8 @@
           </div>
           <div id="itens-list" class="item-list"></div>
         </div>
-
         <div class="tab-content" id="tab-combate">
-          <div class="list-header">
-            <h3>Ataques</h3>
-            <button type="button" class="btn small" id="btn-add-ataque">+ Novo Ataque</button>
-          </div>
+          <div class="list-header"><h3>Ataques</h3><button type="button" class="btn small" id="btn-add-ataque">+ Novo Ataque</button></div>
           <div id="ataques-list" class="item-list"></div>
         </div>
       </aside>
@@ -299,71 +173,56 @@
           <input type="text" id="atk-nome" placeholder="Novo Ataque" />
         </div>
         <div class="modal-row">
-          <div class="field">
-            <label>Dano*</label>
-            <input type="text" id="atk-dano" placeholder="1d4" />
-          </div>
-          <div class="field">
-            <label>Crítico*</label>
-            <input type="number" id="atk-critico" value="20" min="1" max="20" />
-          </div>
-          <div class="field">
-            <label>Multiplicador*</label>
-            <input type="number" id="atk-mult" value="2" min="1" max="10" />
-          </div>
+          <div class="field"><label>Dano*</label><input type="text" id="atk-dano" placeholder="1d4" /></div>
+          <div class="field"><label>Crítico*</label><input type="number" id="atk-critico" value="20" min="1" max="20" /></div>
+          <div class="field"><label>Multiplicador*</label><input type="number" id="atk-mult" value="2" min="1" max="10" /></div>
         </div>
         <div class="modal-row">
-          <div class="field">
-            <label>Ataque Bônus</label>
-            <input type="number" id="atk-bonus" value="0" />
-          </div>
+          <div class="field"><label>Ataque Bônus</label><input type="number" id="atk-bonus" value="0" /></div>
           <div class="field">
             <label>Tipo de Dano</label>
             <input type="text" id="atk-tipo" placeholder="Balístico" list="lista-tipo-dano" />
             <datalist id="lista-tipo-dano">
-              <option value="Balístico"></option>
-              <option value="Cortante"></option>
-              <option value="Perfurante"></option>
-              <option value="Contundente"></option>
-              <option value="Fogo"></option>
-              <option value="Elétrico"></option>
-              <option value="Mental"></option>
-              <option value="Conhecimento"></option>
-              <option value="Morte"></option>
-              <option value="Energia"></option>
-              <option value="Sangue"></option>
+              <option value="Balístico"></option><option value="Cortante"></option><option value="Perfurante"></option>
+              <option value="Contundente"></option><option value="Fogo"></option><option value="Elétrico"></option>
+              <option value="Mental"></option><option value="Conhecimento"></option><option value="Morte"></option>
+              <option value="Energia"></option><option value="Sangue"></option>
             </datalist>
           </div>
         </div>
         <div class="modal-row">
-          <div class="field">
-            <label>Alcance</label>
-            <input type="text" id="atk-alcance" placeholder="—" />
-          </div>
+          <div class="field"><label>Alcance</label><input type="text" id="atk-alcance" placeholder="-" /></div>
           <div class="field">
             <label>Perícia</label>
             <select id="atk-pericia">
-              <option value="Luta">Luta</option>
-              <option value="Pontaria">Pontaria</option>
-              <option value="Ocultismo">Ocultismo</option>
-              <option value="Outro">Outro</option>
+              <option value="Luta">Luta</option><option value="Pontaria">Pontaria</option>
+              <option value="Ocultismo">Ocultismo</option><option value="Outro">Outro</option>
             </select>
           </div>
           <div class="field">
             <label>Atributo Dano</label>
             <select id="atk-atributo">
-              <option value="Força">Força</option>
-              <option value="Agilidade">Agilidade</option>
-              <option value="Intelecto">Intelecto</option>
-              <option value="Presença">Presença</option>
-              <option value="Vigor">Vigor</option>
-              <option value="Nenhum">Nenhum</option>
+              <option value="Força">Força</option><option value="Agilidade">Agilidade</option>
+              <option value="Intelecto">Intelecto</option><option value="Presença">Presença</option>
+              <option value="Vigor">Vigor</option><option value="Nenhum">Nenhum</option>
             </select>
           </div>
         </div>
-        <div class="field">
-          <label>Dano extra</label>
+        <div class="field dano-extra-field">
+          <div class="dano-extra-header">
+            <label>Dano extra:</label>
+            <button type="button" class="btn primary small" id="btn-add-dano-extra">Adicionar</button>
+          </div>
+          <div id="atk-dano-extra-list" class="dano-extra-list"></div>
           <input type="text" id="atk-dano-extra" placeholder="Ex: +1d6 de fogo" />
+        </div>
+        <div class="field">
+          <label>Imagem</label>
+          <div class="img-upload" id="atk-img-box">
+            <input type="file" id="atk-imagem" accept="image/*" hidden />
+            <img id="atk-img-preview" alt="" hidden />
+            <div class="img-placeholder" id="atk-img-placeholder"><span class="img-icon">🖼</span></div>
+          </div>
         </div>
         <div class="field">
           <label>Anotações</label>
