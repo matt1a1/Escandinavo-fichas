@@ -28,7 +28,7 @@ function getFilteredRituals() {
     if (el && r.elemento !== el) return false;
     if (cir && String(r.circulo) !== String(cir)) return false;
     if (!q) return true;
-    const blob = [r.nome, r.elemento, r.efeito, r.desc, r.alvo].join(' ').toLowerCase();
+    const blob = [r.nome, r.elemento, r.efeito, r.desc, r.alvo, r.dados, r.dadosDiscente, r.dadosVerdadeiro].join(' ').toLowerCase();
     return blob.includes(q);
   });
 }
@@ -49,6 +49,10 @@ function renderRitualCatalog() {
     const card = document.createElement('div');
     card.className = 'catalog-item';
     const elClass = 'el-' + (r.elemento || '').replace(/\s+/g, '');
+    const versions = [];
+    if (r.dados) versions.push('<div class="rit-ver"><strong>Normal:</strong> ' + escapeHtml(r.dados) + (r.efeito ? ' — ' + escapeHtml(r.efeito) : '') + '</div>');
+    if (r.dadosDiscente) versions.push('<div class="rit-ver"><strong>Discente:</strong> ' + escapeHtml(r.dadosDiscente) + '</div>');
+    if (r.dadosVerdadeiro) versions.push('<div class="rit-ver"><strong>Verdadeiro:</strong> ' + escapeHtml(r.dadosVerdadeiro) + '</div>');
     card.innerHTML =
       '<div class="catalog-item-main"><h5>' + escapeHtml(r.nome) + '</h5>' +
       '<div class="catalog-item-meta">' +
@@ -56,12 +60,12 @@ function renderRitualCatalog() {
       '<span class="catalog-tag">' + escapeHtml(String(r.circulo)) + 'º círculo</span>' +
       (r.execucao ? '<span class="catalog-tag">' + escapeHtml(r.execucao) + '</span>' : '') +
       (r.alcance ? '<span class="catalog-tag">' + escapeHtml(r.alcance) + '</span>' : '') +
-      (r.dados ? '<span class="catalog-tag">' + escapeHtml(r.dados) + '</span>' : '') +
       '</div></div>' +
       '<div class="catalog-item-actions">' +
       '<button type="button" class="btn primary small" data-add-catalog="' + idx + '">Adicionar</button>' +
       '<button type="button" class="btn small" data-view-catalog="' + idx + '">Ver</button></div>' +
-      (r.efeito || r.desc ? '<p class="catalog-item-desc">' + escapeHtml(r.efeito || r.desc) + '</p>' : '');
+      (versions.length ? '<div class="catalog-item-desc rit-versions">' + versions.join('') + '</div>' : '') +
+      (r.desc ? '<p class="catalog-item-desc" style="white-space:pre-wrap;margin-top:6px;">' + escapeHtml(r.desc) + '</p>' : '');
     list.appendChild(card);
   });
   list.querySelectorAll('[data-add-catalog]').forEach((btn) => {
