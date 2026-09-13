@@ -49,23 +49,22 @@ function renderRitualCatalog() {
     const card = document.createElement('div');
     card.className = 'catalog-item';
     const elClass = 'el-' + (r.elemento || '').replace(/\s+/g, '');
-    const versions = [];
-    if (r.dados) versions.push('<div class="rit-ver"><strong>Normal:</strong> ' + escapeHtml(r.dados) + (r.efeito ? ' — ' + escapeHtml(r.efeito) : '') + '</div>');
-    if (r.dadosDiscente) versions.push('<div class="rit-ver"><strong>Discente:</strong> ' + escapeHtml(r.dadosDiscente) + '</div>');
-    if (r.dadosVerdadeiro) versions.push('<div class="rit-ver"><strong>Verdadeiro:</strong> ' + escapeHtml(r.dadosVerdadeiro) + '</div>');
+    // Corpo principal = descrição completa (efeito + Discente + Verdadeiro)
+    const body = r.desc || r.efeito || '';
     card.innerHTML =
       '<div class="catalog-item-main"><h5>' + escapeHtml(r.nome) + '</h5>' +
       '<div class="catalog-item-meta">' +
-      '<span class="catalog-tag ' + elClass + '">' + escapeHtml(r.elemento || '') + '</span>' +
-      '<span class="catalog-tag">' + escapeHtml(String(r.circulo)) + 'º círculo</span>' +
-      (r.execucao ? '<span class="catalog-tag">' + escapeHtml(r.execucao) + '</span>' : '') +
-      (r.alcance ? '<span class="catalog-tag">' + escapeHtml(r.alcance) + '</span>' : '') +
+      '<span class="catalog-tag ' + elClass + '">' + escapeHtml(r.elemento || '') + ' ' + escapeHtml(String(r.circulo || '')) + '</span>' +
+      (r.execucao ? '<span class="catalog-tag">Execução: ' + escapeHtml(r.execucao) + '</span>' : '') +
+      (r.alcance ? '<span class="catalog-tag">Alcance: ' + escapeHtml(r.alcance) + '</span>' : '') +
+      (r.alvo ? '<span class="catalog-tag">Alvo: ' + escapeHtml(r.alvo) + '</span>' : '') +
+      (r.duracao ? '<span class="catalog-tag">Duração: ' + escapeHtml(r.duracao) + '</span>' : '') +
+      (r.resistencia ? '<span class="catalog-tag">Resistência: ' + escapeHtml(r.resistencia) + '</span>' : '') +
       '</div></div>' +
       '<div class="catalog-item-actions">' +
       '<button type="button" class="btn primary small" data-add-catalog="' + idx + '">Adicionar</button>' +
       '<button type="button" class="btn small" data-view-catalog="' + idx + '">Ver</button></div>' +
-      (versions.length ? '<div class="catalog-item-desc rit-versions">' + versions.join('') + '</div>' : '') +
-      (r.desc ? '<p class="catalog-item-desc" style="white-space:pre-wrap;margin-top:6px;">' + escapeHtml(r.desc) + '</p>' : '');
+      (body ? '<p class="catalog-item-desc ritual-body" style="white-space:pre-wrap;margin-top:8px;">' + escapeHtml(body) + '</p>' : '');
     list.appendChild(card);
   });
   list.querySelectorAll('[data-add-catalog]').forEach((btn) => {
