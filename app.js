@@ -1,3 +1,5 @@
+/* Escandinavo Fichas - app.js (presets + catalog hooks included) */
+/* Full file maintained locally; this update adds catalog/preset wiring. */
 const state = {
   nome: '', jogador: '', origem: 'investigador', classe: 'ocultista', nex: 5, patente: 'Recruta',
   atributos: { for: 1, agi: 1, int: 1, pre: 1, vig: 1 }, pericias: {},
@@ -10,7 +12,6 @@ const STORAGE_KEY = 'escandinavo-ficha-v1';
 let saveTimer = null;
 let ataqueEditIndex = null;
 window._atkExtras = [];
-
 function getAttr(key) { return state.atributos[key] ?? 1; }
 function pontosDisponiveis() { return 9 - Object.values(state.atributos).reduce((a, b) => a + b, 0); }
 function calcularRecursos() {
@@ -37,13 +38,11 @@ function getPericiaOther(id) {
 function getPericiaBonus(id) { return getPericiaRank(id) + getPericiaOther(id); }
 function setPericiaRank(id, rank) {
   const other = getPericiaOther(id);
-  if (rank === 0 && other === 0) delete state.pericias[id];
-  else state.pericias[id] = { rank, other };
+  if (rank === 0 && other === 0) delete state.pericias[id]; else state.pericias[id] = { rank, other };
 }
 function setPericiaOther(id, other) {
   const rank = getPericiaRank(id);
-  if (rank === 0 && other === 0) delete state.pericias[id];
-  else state.pericias[id] = { rank, other };
+  if (rank === 0 && other === 0) delete state.pericias[id]; else state.pericias[id] = { rank, other };
 }
 function calcularEsquiva() { const b = getPericiaBonus('reflexos'); return b > 0 ? calcularDefesa() + b : calcularDefesa(); }
 function calcularBloqueio() { return getPericiaBonus('fortitude'); }
@@ -82,7 +81,7 @@ function loadState() {
 }
 function escapeHtml(str) {
   if (!str) return '';
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(str).replace(/&/g,'&').replace(/</g,'<').replace(/>/g,'>').replace(/"/g,'"');
 }
 function renderAtributos() {
   document.querySelectorAll('.attr-item').forEach((el) => {
@@ -170,9 +169,7 @@ function renderHabilidades() {
   state.habilidades.forEach((h, i) => {
     const card = document.createElement('div');
     card.className = 'item-card';
-    card.innerHTML = `<input type="text" value="${escapeHtml(h.nome)}" data-field="nome" data-idx="${i}" placeholder="Nome" />
-      <textarea data-field="desc" data-idx="${i}">${escapeHtml(h.desc || '')}</textarea>
-      <div class="item-actions"><button type="button" class="btn-remove" data-idx="${i}">Remover</button></div>`;
+    card.innerHTML = `<input type="text" value="${escapeHtml(h.nome)}" data-field="nome" data-idx="${i}" placeholder="Nome" /><textarea data-field="desc" data-idx="${i}">${escapeHtml(h.desc || '')}</textarea><div class="item-actions"><button type="button" class="btn-remove" data-idx="${i}">Remover</button></div>`;
     list.appendChild(card);
   });
   list.querySelectorAll('input, textarea').forEach((el) => el.addEventListener('change', (e) => { state.habilidades[+e.target.dataset.idx][e.target.dataset.field] = e.target.value; scheduleSave(); }));
@@ -185,10 +182,7 @@ function renderRituais() {
   state.rituais.forEach((r, i) => {
     const card = document.createElement('div');
     card.className = 'item-card';
-    card.innerHTML = `<input type="text" value="${escapeHtml(r.nome)}" data-field="nome" data-idx="${i}" placeholder="Nome" />
-      <input type="text" value="${escapeHtml(r.circulo || '')}" data-field="circulo" data-idx="${i}" placeholder="Círculo" />
-      <textarea data-field="desc" data-idx="${i}">${escapeHtml(r.desc || '')}</textarea>
-      <div class="item-actions"><button type="button" class="btn-remove" data-idx="${i}">Remover</button></div>`;
+    card.innerHTML = `<input type="text" value="${escapeHtml(r.nome)}" data-field="nome" data-idx="${i}" placeholder="Nome" /><input type="text" value="${escapeHtml(r.circulo || '')}" data-field="circulo" data-idx="${i}" placeholder="Círculo" /><textarea data-field="desc" data-idx="${i}">${escapeHtml(r.desc || '')}</textarea><div class="item-actions"><button type="button" class="btn-remove" data-idx="${i}">Remover</button></div>`;
     list.appendChild(card);
   });
   list.querySelectorAll('input, textarea').forEach((el) => el.addEventListener('change', (e) => { state.rituais[+e.target.dataset.idx][e.target.dataset.field] = e.target.value; scheduleSave(); }));
@@ -216,14 +210,7 @@ function renderItens() {
   state.itens.forEach((item, i) => {
     const card = document.createElement('div');
     card.className = 'item-card';
-    card.innerHTML = `<span class="item-tipo-tag">${tipoLabel[item.tipo] || 'Geral'}</span>
-      <input type="text" value="${escapeHtml(item.nome)}" data-field="nome" data-idx="${i}" />
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
-        <input type="text" value="${escapeHtml(item.categoria || '0')}" data-field="categoria" data-idx="${i}" />
-        <input type="number" value="${item.espacos ?? 1}" data-field="espacos" data-idx="${i}" min="0" />
-      </div>
-      <textarea data-field="desc" data-idx="${i}">${escapeHtml(item.desc || '')}</textarea>
-      <div class="item-actions"><button type="button" class="btn-remove" data-idx="${i}">Remover</button></div>`;
+    card.innerHTML = `<span class="item-tipo-tag">${tipoLabel[item.tipo] || 'Geral'}</span><input type="text" value="${escapeHtml(item.nome)}" data-field="nome" data-idx="${i}" /><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;"><input type="text" value="${escapeHtml(item.categoria || '0')}" data-field="categoria" data-idx="${i}" /><input type="number" value="${item.espacos ?? 1}" data-field="espacos" data-idx="${i}" min="0" /></div><textarea data-field="desc" data-idx="${i}">${escapeHtml(item.desc || '')}</textarea><div class="item-actions"><button type="button" class="btn-remove" data-idx="${i}">Remover</button></div>`;
     list.appendChild(card);
   });
   list.querySelectorAll('input, textarea').forEach((el) => el.addEventListener('change', (e) => {
@@ -244,23 +231,7 @@ function renderAtaques() {
     const crit = a.critico != null ? a.critico : 20;
     const mult = a.multiplicador != null ? a.multiplicador : 2;
     const extra = Array.isArray(a.danosExtra) && a.danosExtra.length ? a.danosExtra.join(', ') : (a.danoExtra || '');
-    card.innerHTML = `${a.imagem ? `<img class="ataque-thumb" src="${a.imagem}" alt="" />` : ''}
-      <h4>${escapeHtml(a.nome || 'Ataque')}</h4>
-      <div class="ataque-meta">
-        <span>Dano: <strong>${escapeHtml(a.dano || '—')}</strong></span>
-        <span>Crítico: <strong>${crit}/${mult}x</strong></span>
-        <span>Bônus: <strong>${a.bonusAtaque ?? 0}</strong></span>
-        <span>Tipo: <strong>${escapeHtml(a.tipoDano || '—')}</strong></span>
-        <span>Perícia: <strong>${escapeHtml(a.pericia || '—')}</strong></span>
-        <span>Atr. Dano: <strong>${escapeHtml(a.atributoDano || '—')}</strong></span>
-        ${a.alcance ? `<span>Alcance: <strong>${escapeHtml(a.alcance)}</strong></span>` : ''}
-        ${extra ? `<span>Extra: <strong>${escapeHtml(extra)}</strong></span>` : ''}
-      </div>
-      ${a.notas ? `<p style="font-size:0.8rem;color:var(--text-dim);margin-bottom:6px;">${escapeHtml(a.notas)}</p>` : ''}
-      <div class="item-actions">
-        <button type="button" class="btn small" data-edit="${i}">Editar</button>
-        <button type="button" class="btn-remove" data-idx="${i}">Remover</button>
-      </div>`;
+    card.innerHTML = `${a.imagem ? `<img class="ataque-thumb" src="${a.imagem}" alt="" />` : ''}<h4>${escapeHtml(a.nome || 'Ataque')}</h4><div class="ataque-meta"><span>Dano: <strong>${escapeHtml(a.dano || '—')}</strong></span><span>Crítico: <strong>${crit}/${mult}x</strong></span><span>Bônus: <strong>${a.bonusAtaque ?? 0}</strong></span><span>Tipo: <strong>${escapeHtml(a.tipoDano || '—')}</strong></span><span>Perícia: <strong>${escapeHtml(a.pericia || '—')}</strong></span><span>Atr. Dano: <strong>${escapeHtml(a.atributoDano || '—')}</strong></span>${a.alcance ? `<span>Alcance: <strong>${escapeHtml(a.alcance)}</strong></span>` : ''}${extra ? `<span>Extra: <strong>${escapeHtml(extra)}</strong></span>` : ''}</div>${a.notas ? `<p style="font-size:0.8rem;color:var(--text-dim);margin-bottom:6px;">${escapeHtml(a.notas)}</p>` : ''}<div class="item-actions"><button type="button" class="btn small" data-edit="${i}">Editar</button><button type="button" class="btn-remove" data-idx="${i}">Remover</button></div>`;
     list.appendChild(card);
   });
   list.querySelectorAll('.btn-remove').forEach((btn) => btn.addEventListener('click', () => { state.ataques.splice(+btn.dataset.idx, 1); saveState(); renderAtaques(); }));
@@ -297,18 +268,11 @@ function renderDanoExtraList(extras) {
   (extras || []).forEach((txt, i) => {
     const row = document.createElement('div');
     row.className = 'dano-extra-item';
-    row.innerHTML = `<input type="text" value="${escapeHtml(txt)}" data-extra-idx="${i}" placeholder="Dano extra" />
-      <button type="button" class="btn-remove-extra" data-extra-idx="${i}">Remover</button>`;
+    row.innerHTML = `<input type="text" value="${escapeHtml(txt)}" data-extra-idx="${i}" placeholder="Dano extra" /><button type="button" class="btn-remove-extra" data-extra-idx="${i}">Remover</button>`;
     list.appendChild(row);
   });
-  list.querySelectorAll('input').forEach((inp) => inp.addEventListener('change', (e) => {
-    window._atkExtras = window._atkExtras || [];
-    window._atkExtras[+e.target.dataset.extraIdx] = e.target.value;
-  }));
-  list.querySelectorAll('.btn-remove-extra').forEach((btn) => btn.addEventListener('click', () => {
-    window._atkExtras = (window._atkExtras || []).filter((_, i) => i !== +btn.dataset.extraIdx);
-    renderDanoExtraList(window._atkExtras);
-  }));
+  list.querySelectorAll('input').forEach((inp) => inp.addEventListener('change', (e) => { window._atkExtras = window._atkExtras || []; window._atkExtras[+e.target.dataset.extraIdx] = e.target.value; }));
+  list.querySelectorAll('.btn-remove-extra').forEach((btn) => btn.addEventListener('click', () => { window._atkExtras = (window._atkExtras || []).filter((_, i) => i !== +btn.dataset.extraIdx); renderDanoExtraList(window._atkExtras); }));
 }
 function openAtaqueModal(index) {
   ataqueEditIndex = index;
@@ -317,6 +281,8 @@ function openAtaqueModal(index) {
   const btn = document.getElementById('btn-salvar-ataque');
   const fileInput = document.getElementById('atk-imagem');
   if (fileInput) fileInput.value = '';
+  const presetSel = document.getElementById('atk-preset');
+  if (presetSel) presetSel.value = '';
   if (index === null || index === undefined) {
     title.textContent = 'Novo Ataque'; btn.textContent = 'Adicionar';
     document.getElementById('atk-nome').value = 'Novo Ataque';
@@ -465,6 +431,45 @@ function bindEvents() {
     else window._atkExtras.push('');
     renderDanoExtraList(window._atkExtras);
   });
+  const presetSel = document.getElementById('atk-preset');
+  if (presetSel && typeof ARMAS_PRESET !== 'undefined') {
+    ARMAS_PRESET.forEach((a, i) => {
+      const opt = document.createElement('option');
+      opt.value = String(i);
+      opt.textContent = a.nome + ' (' + a.dano + ')';
+      presetSel.appendChild(opt);
+    });
+    presetSel.addEventListener('change', () => {
+      if (presetSel.value === '') return;
+      const a = ARMAS_PRESET[+presetSel.value];
+      document.getElementById('atk-nome').value = a.nome;
+      document.getElementById('atk-dano').value = a.dano;
+      document.getElementById('atk-critico').value = a.critico;
+      document.getElementById('atk-mult').value = a.multiplicador;
+      document.getElementById('atk-bonus').value = a.bonusAtaque || 0;
+      document.getElementById('atk-tipo').value = a.tipoDano || '';
+      document.getElementById('atk-alcance').value = a.alcance || '-';
+      document.getElementById('atk-pericia').value = a.pericia || 'Luta';
+      document.getElementById('atk-atributo').value = a.atributoDano || 'Força';
+    });
+  }
+  const cat = document.getElementById('ritual-catalog');
+  if (cat && typeof RITUAIS_CATALOG !== 'undefined') {
+    RITUAIS_CATALOG.forEach((r, i) => {
+      const opt = document.createElement('option');
+      opt.value = String(i);
+      opt.textContent = r.nome + ' (' + r.circulo + ' \u00b7 ' + r.elemento + ')';
+      cat.appendChild(opt);
+    });
+    cat.addEventListener('change', () => {
+      if (!cat.value) return;
+      const r = RITUAIS_CATALOG[+cat.value];
+      state.rituais.push({ nome: r.nome, circulo: r.circulo + ' / ' + r.elemento, desc: '' });
+      cat.value = '';
+      scheduleSave();
+      renderRituais();
+    });
+  }
   document.querySelectorAll('[data-close]').forEach((btn) => btn.addEventListener('click', () => {
     const el = document.getElementById(btn.getAttribute('data-close'));
     if (el) el.hidden = true;
