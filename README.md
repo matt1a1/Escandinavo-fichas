@@ -1,24 +1,23 @@
 # Escandinavo Fichas — Ordem Paranormal RPG
 
-Sistema funcional de **criação e personalização de fichas** para o RPG **Ordem Paranormal** (1ª edição – Jambô Editora).
+Sistema funcional de criação e personalização de fichas para **Ordem Paranormal RPG**.
 
 ## Como usar
 
-1. Abra o arquivo `index.html` no navegador.
-2. Funciona 100% offline. As mudanças são **salvas automaticamente** no navegador.
+Abra `index.html` no navegador. As mudanças são salvas automaticamente.
 
 ```bash
 python -m http.server 8080
-# depois: http://localhost:8080
 ```
 
 ## Funcionalidades
 
 - Atributos, classes, origens e NEX
-- Perícias com níveis **0 / 5 / 10 / 15** + campo Outros
-- Inventário estilo C.R.I.S. (limites I–IV, carga, tipos de item)
-- Modal **Novo Ataque** completo (dano, crítico, multiplicador, perícia, etc.)
-- **Auto-save** no localStorage
+- Perícias 0 / 5 / 10 / 15 + Outros
+- Modal **Novo Ataque** (dano, crítico, imagem, presets)
+- Modal **Novo Ritual** (elemento, círculo, execução, dados, imagem)
+- Inventário estilo C.R.I.S.
+- Auto-save (localStorage)
 - Exportar / Importar JSON
 
 ## Créditos
