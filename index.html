@@ -75,8 +75,31 @@
           <div class="field"><label>Anotações</label><textarea id="anotacoes"></textarea></div>
         </div>
         <div class="tab-content" id="tab-habilidades">
-          <div class="list-header"><h3>Habilidades</h3><button type="button" class="btn small" id="btn-add-hab">+ Adicionar</button></div>
-          <div id="habilidades-list" class="item-list"></div>
+          <div class="hab-subtabs">
+            <button type="button" class="hab-subtab active" data-hab-view="catalog">Habilidades</button>
+            <button type="button" class="hab-subtab" data-hab-view="mine">Minhas Habilidades</button>
+          </div>
+          <div id="hab-view-catalog">
+            <div class="hab-class-tabs" id="hab-class-tabs">
+              <button type="button" class="hab-class-tab active" data-hab-class="Combatente">Combatente</button>
+              <button type="button" class="hab-class-tab" data-hab-class="Especialista">Especialista</button>
+              <button type="button" class="hab-class-tab" data-hab-class="Ocultista">Ocultista</button>
+              <button type="button" class="hab-class-tab" data-hab-class="Origens">Origens</button>
+              <button type="button" class="hab-class-tab" data-hab-class="Poderes Paranormais">Poderes Paranormais</button>
+            </div>
+            <div class="hab-cat-chips" id="hab-cat-chips"></div>
+            <div class="catalog-filters">
+              <input type="search" id="hab-search" placeholder="Buscar..." autocomplete="off" />
+            </div>
+            <div id="hab-catalog-list" class="catalog-list hab-catalog-list"></div>
+          </div>
+          <div id="hab-view-mine" hidden>
+            <div class="list-header">
+              <h3>Minhas Habilidades</h3>
+              <button type="button" class="btn small" id="btn-add-hab">+ Personalizada</button>
+            </div>
+            <div id="habilidades-list" class="item-list"></div>
+          </div>
         </div>
         <div class="tab-content" id="tab-rituais">
           <div class="list-header">
@@ -207,7 +230,9 @@
   <script src="data.js"></script>
   <script src="rituais-catalog.js"></script>
   <script src="rituais-extra.js"></script>
+  <script src="habilidades-catalog.js"></script>
   <script src="app.js"></script>
   <script src="catalog-ui.js"></script>
+  <script src="habilidades-ui.js"></script>
 </body>
 </html>
