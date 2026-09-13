@@ -194,17 +194,18 @@
           <div class="field"><label>Resistência</label><input type="text" id="rit-resistencia" /></div>
         </div>
         <div class="modal-row">
-          <div class="field"><label>Dados</label><input type="text" id="rit-dados" /></div>
-          <div class="field"><label>Dados Discente</label><input type="text" id="rit-dados-discente" /></div>
-          <div class="field"><label>Dados Verdadeiro</label><input type="text" id="rit-dados-verdadeiro" /></div>
+          <div class="field"><label>Dados (Normal)</label><input type="text" id="rit-dados" placeholder="Efeito normal" /></div>
+          <div class="field"><label>Discente</label><input type="text" id="rit-dados-discente" placeholder="+PE e efeito" /></div>
+          <div class="field"><label>Verdadeiro</label><input type="text" id="rit-dados-verdadeiro" placeholder="+PE e efeito" /></div>
         </div>
         <div class="field"><label>Imagem</label><div class="img-upload" id="rit-img-box"><input type="file" id="rit-imagem" accept="image/*" hidden /><img id="rit-img-preview" hidden /><div class="img-placeholder" id="rit-img-placeholder">🖼</div></div></div>
-        <div class="field"><label>Descrição</label><textarea id="rit-desc" rows="3"></textarea></div>
+        <div class="field"><label>Descrição (Normal / Discente / Verdadeiro)</label><textarea id="rit-desc" rows="6" placeholder="COMO USAR&#10;• Normal: ...&#10;• Discente (+X PE): ...&#10;• Verdadeiro (+Y PE): ..."></textarea></div>
       </div>
       <div class="modal-footer"><button type="button" class="btn secondary" data-close="modal-ritual">Cancelar</button><button type="button" class="btn primary" id="btn-salvar-ritual">Adicionar</button></div>
     </div>
   </div>
   <script src="data.js"></script>
+  <script src="rituais-catalog.js"></script>
   <script src="app.js"></script>
   <script src="catalog-ui.js"></script>
 </body>
