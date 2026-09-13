@@ -1,46 +1,26 @@
-// ===== ESTADO DA FICHA =====
 const state = {
-  nome: '',
-  jogador: '',
-  origem: 'investigador',
-  classe: 'ocultista',
-  nex: 5,
-  patente: 'Recruta',
-  atributos: { for: 1, agi: 1, int: 1, pre: 1, vig: 1 },
-  pericias: {},
-  vidaAtual: null,
-  sanAtual: null,
-  peAtual: null,
-  aparencia: '',
-  personalidade: '',
-  historico: '',
-  objetivo: '',
-  anotacoes: '',
-  habilidades: [],
-  rituais: [],
-  itens: [],
-  ataques: [],
-  pp: 0,
-  credito: 'Baixo',
+  nome: '', jogador: '', origem: 'investigador', classe: 'ocultista', nex: 5, patente: 'Recruta',
+  atributos: { for: 1, agi: 1, int: 1, pre: 1, vig: 1 }, pericias: {},
+  vidaAtual: null, sanAtual: null, peAtual: null,
+  aparencia: '', personalidade: '', historico: '', objetivo: '', anotacoes: '',
+  habilidades: [], rituais: [], itens: [], ataques: [], pp: 0, credito: 'Baixo',
   itensLimite: { I: 2, II: 0, III: 0, IV: 0 },
 };
-
 const STORAGE_KEY = 'escandinavo-ficha-v1';
 let saveTimer = null;
 let ataqueEditIndex = null;
+window._atkExtras = [];
 
 function getAttr(key) { return state.atributos[key] ?? 1; }
-function pontosDisponiveis() {
-  const soma = Object.values(state.atributos).reduce((a, b) => a + b, 0);
-  return 9 - soma;
-}
+function pontosDisponiveis() { return 9 - Object.values(state.atributos).reduce((a, b) => a + b, 0); }
 function calcularRecursos() {
   const cls = CLASSES[state.classe];
-  const nexSteps = Math.floor(state.nex / 5);
-  const pv = cls.pvBase + getAttr('vig') + (nexSteps - 1) * (cls.pvPorNex + getAttr('vig'));
-  const san = cls.sanBase + (nexSteps - 1) * cls.sanPorNex;
-  const pe = cls.peBase + getAttr('pre') + (nexSteps - 1) * (cls.pePorNex + getAttr('pre'));
-  return { pvMax: Math.max(1, pv), sanMax: Math.max(1, san), peMax: Math.max(1, pe) };
+  const n = Math.floor(state.nex / 5);
+  return {
+    pvMax: Math.max(1, cls.pvBase + getAttr('vig') + (n - 1) * (cls.pvPorNex + getAttr('vig'))),
+    sanMax: Math.max(1, cls.sanBase + (n - 1) * cls.sanPorNex),
+    peMax: Math.max(1, cls.peBase + getAttr('pre') + (n - 1) * (cls.pePorNex + getAttr('pre'))),
+  };
 }
 function calcularDefesa() { return 10 + getAttr('agi'); }
 function getPericiaRank(id) {
@@ -65,20 +45,15 @@ function setPericiaOther(id, other) {
   if (rank === 0 && other === 0) delete state.pericias[id];
   else state.pericias[id] = { rank, other };
 }
-function calcularEsquiva() {
-  const base = calcularDefesa();
-  const bonus = getPericiaBonus('reflexos');
-  return bonus > 0 ? base + bonus : base;
-}
+function calcularEsquiva() { const b = getPericiaBonus('reflexos'); return b > 0 ? calcularDefesa() + b : calcularDefesa(); }
 function calcularBloqueio() { return getPericiaBonus('fortitude'); }
 function calcularCargaMax() { return Math.max(1, getAttr('for')) * 5; }
 function calcularDTRituais() { return 10 + getAttr('pre') + Math.floor(state.nex / 10); }
 function periciasMax() {
   const cls = CLASSES[state.classe];
-  const origem = ORIGENS[state.origem];
-  return (cls.periciasBase || 1) + getAttr('int') + (origem?.pericias?.length ?? 2);
+  const o = ORIGENS[state.origem];
+  return (cls.periciasBase || 1) + getAttr('int') + (o?.pericias?.length ?? 2);
 }
-
 function setSaveStatus(text, cls) {
   const el = document.getElementById('save-status');
   if (!el) return;
@@ -86,12 +61,8 @@ function setSaveStatus(text, cls) {
   el.className = 'save-status' + (cls ? ' ' + cls : '');
 }
 function saveState() {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    setSaveStatus('Salvo automaticamente', 'saved');
-  } catch (e) {
-    setSaveStatus('Erro ao salvar', '');
-  }
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); setSaveStatus('Salvo automaticamente', 'saved'); }
+  catch (e) { setSaveStatus('Erro ao salvar', ''); }
 }
 function scheduleSave() {
   setSaveStatus('Salvando…', 'saving');
@@ -109,7 +80,10 @@ function loadState() {
     return true;
   } catch (e) { return false; }
 }
-
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 function renderAtributos() {
   document.querySelectorAll('.attr-item').forEach((el) => {
     el.querySelector('.attr-value').textContent = state.atributos[el.dataset.attr];
@@ -145,8 +119,7 @@ function renderRecursos() {
 function renderPericias() {
   const list = document.getElementById('pericias-list');
   list.innerHTML = '';
-  const treinadas = Object.keys(state.pericias).filter((k) => getPericiaRank(k) > 0).length;
-  document.getElementById('pericias-count').textContent = treinadas;
+  document.getElementById('pericias-count').textContent = Object.keys(state.pericias).filter((k) => getPericiaRank(k) > 0).length;
   document.getElementById('pericias-max').textContent = periciasMax();
   const ranks = [0, 5, 10, 15];
   PERICIAS.forEach((p) => {
@@ -165,21 +138,13 @@ function renderPericias() {
       const novo = parseInt(e.target.value, 10);
       if (rank === 0 && novo > 0) {
         const atuais = Object.keys(state.pericias).filter((k) => getPericiaRank(k) > 0).length;
-        if (atuais >= periciasMax()) {
-          alert('Limite de perícias treinadas atingido (' + periciasMax() + ').');
-          e.target.value = '0';
-          return;
-        }
+        if (atuais >= periciasMax()) { alert('Limite de perícias atingido.'); e.target.value = '0'; return; }
       }
-      setPericiaRank(p.id, novo);
-      renderPericias(); renderRecursos(); scheduleSave();
+      setPericiaRank(p.id, novo); renderPericias(); renderRecursos(); scheduleSave();
     });
-    const otherInput = row.querySelector('.other-input');
-    otherInput.addEventListener('click', (e) => e.stopPropagation());
-    otherInput.addEventListener('change', (e) => {
-      setPericiaOther(p.id, parseInt(e.target.value, 10) || 0);
-      renderPericias(); renderRecursos(); scheduleSave();
-    });
+    const oi = row.querySelector('.other-input');
+    oi.addEventListener('click', (e) => e.stopPropagation());
+    oi.addEventListener('change', (e) => { setPericiaOther(p.id, parseInt(e.target.value, 10) || 0); renderPericias(); renderRecursos(); scheduleSave(); });
     list.appendChild(row);
   });
 }
@@ -194,9 +159,9 @@ function renderOrigemSelect() {
   }
 }
 function applyOrigemPericias() {
-  const origem = ORIGENS[state.origem];
-  if (!origem) return;
-  origem.pericias.forEach((id) => { if (getPericiaRank(id) === 0) setPericiaRank(id, 5); });
+  const o = ORIGENS[state.origem];
+  if (!o) return;
+  o.pericias.forEach((id) => { if (getPericiaRank(id) === 0) setPericiaRank(id, 5); });
 }
 function renderHabilidades() {
   const list = document.getElementById('habilidades-list');
@@ -205,17 +170,13 @@ function renderHabilidades() {
   state.habilidades.forEach((h, i) => {
     const card = document.createElement('div');
     card.className = 'item-card';
-    card.innerHTML = `<input type="text" value="${escapeHtml(h.nome)}" placeholder="Nome" data-field="nome" data-idx="${i}" />
-      <textarea placeholder="Descrição..." data-field="desc" data-idx="${i}">${escapeHtml(h.desc || '')}</textarea>
+    card.innerHTML = `<input type="text" value="${escapeHtml(h.nome)}" data-field="nome" data-idx="${i}" placeholder="Nome" />
+      <textarea data-field="desc" data-idx="${i}">${escapeHtml(h.desc || '')}</textarea>
       <div class="item-actions"><button type="button" class="btn-remove" data-idx="${i}">Remover</button></div>`;
     list.appendChild(card);
   });
-  list.querySelectorAll('input, textarea').forEach((el) => {
-    el.addEventListener('change', (e) => { state.habilidades[+e.target.dataset.idx][e.target.dataset.field] = e.target.value; scheduleSave(); });
-  });
-  list.querySelectorAll('.btn-remove').forEach((btn) => {
-    btn.addEventListener('click', () => { state.habilidades.splice(+btn.dataset.idx, 1); scheduleSave(); renderHabilidades(); });
-  });
+  list.querySelectorAll('input, textarea').forEach((el) => el.addEventListener('change', (e) => { state.habilidades[+e.target.dataset.idx][e.target.dataset.field] = e.target.value; scheduleSave(); }));
+  list.querySelectorAll('.btn-remove').forEach((btn) => btn.addEventListener('click', () => { state.habilidades.splice(+btn.dataset.idx, 1); scheduleSave(); renderHabilidades(); }));
 }
 function renderRituais() {
   const list = document.getElementById('rituais-list');
@@ -224,18 +185,14 @@ function renderRituais() {
   state.rituais.forEach((r, i) => {
     const card = document.createElement('div');
     card.className = 'item-card';
-    card.innerHTML = `<input type="text" value="${escapeHtml(r.nome)}" placeholder="Nome" data-field="nome" data-idx="${i}" />
-      <input type="text" value="${escapeHtml(r.circulo || '')}" placeholder="Círculo / Elemento" data-field="circulo" data-idx="${i}" />
-      <textarea placeholder="Efeito..." data-field="desc" data-idx="${i}">${escapeHtml(r.desc || '')}</textarea>
+    card.innerHTML = `<input type="text" value="${escapeHtml(r.nome)}" data-field="nome" data-idx="${i}" placeholder="Nome" />
+      <input type="text" value="${escapeHtml(r.circulo || '')}" data-field="circulo" data-idx="${i}" placeholder="Círculo" />
+      <textarea data-field="desc" data-idx="${i}">${escapeHtml(r.desc || '')}</textarea>
       <div class="item-actions"><button type="button" class="btn-remove" data-idx="${i}">Remover</button></div>`;
     list.appendChild(card);
   });
-  list.querySelectorAll('input, textarea').forEach((el) => {
-    el.addEventListener('change', (e) => { state.rituais[+e.target.dataset.idx][e.target.dataset.field] = e.target.value; scheduleSave(); });
-  });
-  list.querySelectorAll('.btn-remove').forEach((btn) => {
-    btn.addEventListener('click', () => { state.rituais.splice(+btn.dataset.idx, 1); scheduleSave(); renderRituais(); });
-  });
+  list.querySelectorAll('input, textarea').forEach((el) => el.addEventListener('change', (e) => { state.rituais[+e.target.dataset.idx][e.target.dataset.field] = e.target.value; scheduleSave(); }));
+  list.querySelectorAll('.btn-remove').forEach((btn) => btn.addEventListener('click', () => { state.rituais.splice(+btn.dataset.idx, 1); scheduleSave(); renderRituais(); }));
 }
 function renderItens() {
   const list = document.getElementById('itens-list');
@@ -248,26 +205,19 @@ function renderItens() {
     carga += Number(item.espacos) || 0;
   });
   if (document.getElementById('count-I')) {
-    document.getElementById('count-I').textContent = counts.I;
-    document.getElementById('count-II').textContent = counts.II;
-    document.getElementById('count-III').textContent = counts.III;
-    document.getElementById('count-IV').textContent = counts.IV;
+    ['I','II','III','IV'].forEach((c) => { document.getElementById('count-' + c).textContent = counts[c]; document.getElementById('limite-' + c).value = state.itensLimite[c] ?? 0; });
     document.getElementById('carga-atual').textContent = carga;
     document.getElementById('carga-max').textContent = calcularCargaMax();
-    document.getElementById('limite-I').value = state.itensLimite.I ?? 2;
-    document.getElementById('limite-II').value = state.itensLimite.II ?? 0;
-    document.getElementById('limite-III').value = state.itensLimite.III ?? 0;
-    document.getElementById('limite-IV').value = state.itensLimite.IV ?? 0;
   }
-  const patenteInv = document.getElementById('patente-inv');
-  if (patenteInv) patenteInv.value = state.patente;
+  const pi = document.getElementById('patente-inv');
+  if (pi) pi.value = state.patente;
   if (!state.itens.length) { list.innerHTML = '<p class="empty-msg">Você ainda não possui itens.</p>'; return; }
   const tipoLabel = { arma: 'Arma', municao: 'Munição', protecao: 'Proteção', geral: 'Geral', amaldicoado: 'Item Amaldiçoado' };
   state.itens.forEach((item, i) => {
     const card = document.createElement('div');
     card.className = 'item-card';
     card.innerHTML = `<span class="item-tipo-tag">${tipoLabel[item.tipo] || 'Geral'}</span>
-      <input type="text" value="${escapeHtml(item.nome)}" placeholder="Nome" data-field="nome" data-idx="${i}" />
+      <input type="text" value="${escapeHtml(item.nome)}" data-field="nome" data-idx="${i}" />
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
         <input type="text" value="${escapeHtml(item.categoria || '0')}" data-field="categoria" data-idx="${i}" />
         <input type="number" value="${item.espacos ?? 1}" data-field="espacos" data-idx="${i}" min="0" />
@@ -276,17 +226,13 @@ function renderItens() {
       <div class="item-actions"><button type="button" class="btn-remove" data-idx="${i}">Remover</button></div>`;
     list.appendChild(card);
   });
-  list.querySelectorAll('input, textarea').forEach((el) => {
-    el.addEventListener('change', (e) => {
-      let val = e.target.value;
-      if (e.target.dataset.field === 'espacos') val = parseInt(val) || 0;
-      state.itens[+e.target.dataset.idx][e.target.dataset.field] = val;
-      scheduleSave(); renderItens();
-    });
-  });
-  list.querySelectorAll('.btn-remove').forEach((btn) => {
-    btn.addEventListener('click', () => { state.itens.splice(+btn.dataset.idx, 1); scheduleSave(); renderItens(); });
-  });
+  list.querySelectorAll('input, textarea').forEach((el) => el.addEventListener('change', (e) => {
+    let val = e.target.value;
+    if (e.target.dataset.field === 'espacos') val = parseInt(val) || 0;
+    state.itens[+e.target.dataset.idx][e.target.dataset.field] = val;
+    scheduleSave(); renderItens();
+  }));
+  list.querySelectorAll('.btn-remove').forEach((btn) => btn.addEventListener('click', () => { state.itens.splice(+btn.dataset.idx, 1); scheduleSave(); renderItens(); }));
 }
 function renderAtaques() {
   const list = document.getElementById('ataques-list');
@@ -297,7 +243,9 @@ function renderAtaques() {
     card.className = 'ataque-card';
     const crit = a.critico != null ? a.critico : 20;
     const mult = a.multiplicador != null ? a.multiplicador : 2;
-    card.innerHTML = `<h4>${escapeHtml(a.nome || 'Ataque')}</h4>
+    const extra = Array.isArray(a.danosExtra) && a.danosExtra.length ? a.danosExtra.join(', ') : (a.danoExtra || '');
+    card.innerHTML = `${a.imagem ? `<img class="ataque-thumb" src="${a.imagem}" alt="" />` : ''}
+      <h4>${escapeHtml(a.nome || 'Ataque')}</h4>
       <div class="ataque-meta">
         <span>Dano: <strong>${escapeHtml(a.dano || '—')}</strong></span>
         <span>Crítico: <strong>${crit}/${mult}x</strong></span>
@@ -306,7 +254,7 @@ function renderAtaques() {
         <span>Perícia: <strong>${escapeHtml(a.pericia || '—')}</strong></span>
         <span>Atr. Dano: <strong>${escapeHtml(a.atributoDano || '—')}</strong></span>
         ${a.alcance ? `<span>Alcance: <strong>${escapeHtml(a.alcance)}</strong></span>` : ''}
-        ${a.danoExtra ? `<span>Extra: <strong>${escapeHtml(a.danoExtra)}</strong></span>` : ''}
+        ${extra ? `<span>Extra: <strong>${escapeHtml(extra)}</strong></span>` : ''}
       </div>
       ${a.notas ? `<p style="font-size:0.8rem;color:var(--text-dim);margin-bottom:6px;">${escapeHtml(a.notas)}</p>` : ''}
       <div class="item-actions">
@@ -315,16 +263,8 @@ function renderAtaques() {
       </div>`;
     list.appendChild(card);
   });
-  list.querySelectorAll('.btn-remove').forEach((btn) => {
-    btn.addEventListener('click', () => { state.ataques.splice(+btn.dataset.idx, 1); saveState(); renderAtaques(); });
-  });
-  list.querySelectorAll('[data-edit]').forEach((btn) => {
-    btn.addEventListener('click', () => openAtaqueModal(+btn.dataset.edit));
-  });
-}
-function escapeHtml(str) {
-  if (!str) return '';
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  list.querySelectorAll('.btn-remove').forEach((btn) => btn.addEventListener('click', () => { state.ataques.splice(+btn.dataset.idx, 1); saveState(); renderAtaques(); }));
+  list.querySelectorAll('[data-edit]').forEach((btn) => btn.addEventListener('click', () => openAtaqueModal(+btn.dataset.edit)));
 }
 function renderAll() {
   document.getElementById('nome').value = state.nome;
@@ -342,11 +282,41 @@ function renderAll() {
   renderOrigemSelect(); renderAtributos(); renderRecursos();
   renderPericias(); renderHabilidades(); renderRituais(); renderItens(); renderAtaques();
 }
+function setAtaqueImagePreview(dataUrl) {
+  const preview = document.getElementById('atk-img-preview');
+  const placeholder = document.getElementById('atk-img-placeholder');
+  if (!preview) return;
+  if (dataUrl) { preview.src = dataUrl; preview.hidden = false; if (placeholder) placeholder.hidden = true; }
+  else { preview.src = ''; preview.hidden = true; if (placeholder) placeholder.hidden = false; }
+  preview.dataset.url = dataUrl || '';
+}
+function renderDanoExtraList(extras) {
+  const list = document.getElementById('atk-dano-extra-list');
+  if (!list) return;
+  list.innerHTML = '';
+  (extras || []).forEach((txt, i) => {
+    const row = document.createElement('div');
+    row.className = 'dano-extra-item';
+    row.innerHTML = `<input type="text" value="${escapeHtml(txt)}" data-extra-idx="${i}" placeholder="Dano extra" />
+      <button type="button" class="btn-remove-extra" data-extra-idx="${i}">Remover</button>`;
+    list.appendChild(row);
+  });
+  list.querySelectorAll('input').forEach((inp) => inp.addEventListener('change', (e) => {
+    window._atkExtras = window._atkExtras || [];
+    window._atkExtras[+e.target.dataset.extraIdx] = e.target.value;
+  }));
+  list.querySelectorAll('.btn-remove-extra').forEach((btn) => btn.addEventListener('click', () => {
+    window._atkExtras = (window._atkExtras || []).filter((_, i) => i !== +btn.dataset.extraIdx);
+    renderDanoExtraList(window._atkExtras);
+  }));
+}
 function openAtaqueModal(index) {
   ataqueEditIndex = index;
   const modal = document.getElementById('modal-ataque');
   const title = document.getElementById('modal-ataque-title');
   const btn = document.getElementById('btn-salvar-ataque');
+  const fileInput = document.getElementById('atk-imagem');
+  if (fileInput) fileInput.value = '';
   if (index === null || index === undefined) {
     title.textContent = 'Novo Ataque'; btn.textContent = 'Adicionar';
     document.getElementById('atk-nome').value = 'Novo Ataque';
@@ -355,11 +325,13 @@ function openAtaqueModal(index) {
     document.getElementById('atk-mult').value = 2;
     document.getElementById('atk-bonus').value = 0;
     document.getElementById('atk-tipo').value = 'Balístico';
-    document.getElementById('atk-alcance').value = '';
+    document.getElementById('atk-alcance').value = '-';
     document.getElementById('atk-pericia').value = 'Luta';
     document.getElementById('atk-atributo').value = 'Força';
     document.getElementById('atk-dano-extra').value = '';
     document.getElementById('atk-notas').value = '';
+    window._atkExtras = [];
+    setAtaqueImagePreview('');
   } else {
     const a = state.ataques[index];
     title.textContent = 'Editar Ataque'; btn.textContent = 'Salvar';
@@ -369,18 +341,26 @@ function openAtaqueModal(index) {
     document.getElementById('atk-mult').value = a.multiplicador ?? 2;
     document.getElementById('atk-bonus').value = a.bonusAtaque ?? 0;
     document.getElementById('atk-tipo').value = a.tipoDano || '';
-    document.getElementById('atk-alcance').value = a.alcance || '';
+    document.getElementById('atk-alcance').value = a.alcance || '-';
     document.getElementById('atk-pericia').value = a.pericia || 'Luta';
     document.getElementById('atk-atributo').value = a.atributoDano || 'Força';
-    document.getElementById('atk-dano-extra').value = a.danoExtra || '';
+    document.getElementById('atk-dano-extra').value = '';
     document.getElementById('atk-notas').value = a.notas || '';
+    window._atkExtras = Array.isArray(a.danosExtra) ? [...a.danosExtra] : (a.danoExtra ? [a.danoExtra] : []);
+    setAtaqueImagePreview(a.imagem || '');
   }
+  renderDanoExtraList(window._atkExtras);
   modal.hidden = false;
   document.getElementById('atk-nome').focus();
 }
 function salvarAtaqueModal() {
   const nome = document.getElementById('atk-nome').value.trim();
   if (!nome) { alert('Informe o nome do ataque.'); return; }
+  const extras = [...(window._atkExtras || [])];
+  const single = document.getElementById('atk-dano-extra').value.trim();
+  if (single) extras.push(single);
+  const preview = document.getElementById('atk-img-preview');
+  const imagem = (preview && preview.dataset.url) ? preview.dataset.url : '';
   const ataque = {
     nome,
     dano: document.getElementById('atk-dano').value.trim() || '1d4',
@@ -391,7 +371,9 @@ function salvarAtaqueModal() {
     alcance: document.getElementById('atk-alcance').value.trim(),
     pericia: document.getElementById('atk-pericia').value,
     atributoDano: document.getElementById('atk-atributo').value,
-    danoExtra: document.getElementById('atk-dano-extra').value.trim(),
+    danoExtra: extras.join(', '),
+    danosExtra: extras,
+    imagem,
     notas: document.getElementById('atk-notas').value.trim(),
   };
   if (ataqueEditIndex === null || ataqueEditIndex === undefined) state.ataques.push(ataque);
@@ -402,66 +384,53 @@ function salvarAtaqueModal() {
 function bindEvents() {
   document.querySelectorAll('.attr-item').forEach((el) => {
     const key = el.dataset.attr;
-    el.querySelectorAll('.attr-btn').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        let val = state.atributos[key] + +btn.dataset.delta;
-        if (val < 0) val = 0; if (val > 5) val = 5;
-        state.atributos[key] = val;
-        state.vidaAtual = null; state.peAtual = null;
-        renderAtributos(); renderRecursos(); renderPericias(); scheduleSave();
-      });
-    });
+    el.querySelectorAll('.attr-btn').forEach((btn) => btn.addEventListener('click', () => {
+      let val = state.atributos[key] + +btn.dataset.delta;
+      if (val < 0) val = 0; if (val > 5) val = 5;
+      state.atributos[key] = val; state.vidaAtual = null; state.peAtual = null;
+      renderAtributos(); renderRecursos(); renderPericias(); scheduleSave();
+    }));
   });
-  document.querySelectorAll('.nex-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      state.nex = Math.max(5, Math.min(99, state.nex + +btn.dataset.delta));
-      document.getElementById('nex-display').textContent = state.nex + '%';
-      state.vidaAtual = null; state.sanAtual = null; state.peAtual = null;
-      renderRecursos(); scheduleSave();
-    });
-  });
-  document.querySelectorAll('.res-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const res = btn.dataset.res; const delta = +btn.dataset.delta;
-      const { pvMax, sanMax, peMax } = calcularRecursos();
-      if (res === 'vida') state.vidaAtual = Math.max(0, Math.min(pvMax, (state.vidaAtual ?? pvMax) + delta));
-      else if (res === 'sanidade') state.sanAtual = Math.max(0, Math.min(sanMax, (state.sanAtual ?? sanMax) + delta));
-      else if (res === 'esforco') state.peAtual = Math.max(0, Math.min(peMax, (state.peAtual ?? peMax) + delta));
-      renderRecursos(); scheduleSave();
-    });
-  });
-  document.getElementById('classe').addEventListener('change', (e) => {
-    state.classe = e.target.value;
+  document.querySelectorAll('.nex-btn').forEach((btn) => btn.addEventListener('click', () => {
+    state.nex = Math.max(5, Math.min(99, state.nex + +btn.dataset.delta));
+    document.getElementById('nex-display').textContent = state.nex + '%';
     state.vidaAtual = null; state.sanAtual = null; state.peAtual = null;
+    renderRecursos(); scheduleSave();
+  }));
+  document.querySelectorAll('.res-btn').forEach((btn) => btn.addEventListener('click', () => {
+    const res = btn.dataset.res; const delta = +btn.dataset.delta;
+    const { pvMax, sanMax, peMax } = calcularRecursos();
+    if (res === 'vida') state.vidaAtual = Math.max(0, Math.min(pvMax, (state.vidaAtual ?? pvMax) + delta));
+    else if (res === 'sanidade') state.sanAtual = Math.max(0, Math.min(sanMax, (state.sanAtual ?? sanMax) + delta));
+    else if (res === 'esforco') state.peAtual = Math.max(0, Math.min(peMax, (state.peAtual ?? peMax) + delta));
+    renderRecursos(); scheduleSave();
+  }));
+  document.getElementById('classe').addEventListener('change', (e) => {
+    state.classe = e.target.value; state.vidaAtual = null; state.sanAtual = null; state.peAtual = null;
     if (!state.habilidades.length) state.habilidades = CLASSES[state.classe].habilidadesIniciais.map((n) => ({ nome: n, desc: '' }));
     scheduleSave(); renderAll();
   });
   document.getElementById('origem').addEventListener('change', (e) => {
-    state.origem = e.target.value; applyOrigemPericias();
-    renderPericias(); renderRecursos(); scheduleSave();
+    state.origem = e.target.value; applyOrigemPericias(); renderPericias(); renderRecursos(); scheduleSave();
   });
   ['nome','jogador','patente','aparencia','personalidade','historico','objetivo','anotacoes','credito'].forEach((id) => {
     document.getElementById(id).addEventListener('input', (e) => { state[id] = e.target.value; scheduleSave(); });
   });
   document.getElementById('pp').addEventListener('input', (e) => { state.pp = parseInt(e.target.value) || 0; scheduleSave(); });
-  document.querySelectorAll('.tab').forEach((tab) => {
-    tab.addEventListener('click', () => {
-      document.querySelectorAll('.tab').forEach((t) => t.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach((c) => c.classList.remove('active'));
-      tab.classList.add('active');
-      document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
-    });
-  });
+  document.querySelectorAll('.tab').forEach((tab) => tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach((t) => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach((c) => c.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+  }));
   document.getElementById('btn-add-hab').addEventListener('click', () => { state.habilidades.push({ nome: '', desc: '' }); renderHabilidades(); scheduleSave(); });
   document.getElementById('btn-add-ritual').addEventListener('click', () => { state.rituais.push({ nome: '', circulo: '', desc: '' }); renderRituais(); scheduleSave(); });
   document.getElementById('btn-add-item').addEventListener('click', () => { state.itens.push({ nome: '', tipo: 'geral', categoria: '0', espacos: 1, desc: '' }); renderItens(); scheduleSave(); });
-  document.querySelectorAll('.btn-type').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const tipo = btn.dataset.tipo;
-      state.itens.push({ nome: '', tipo, categoria: tipo === 'amaldicoado' ? 'I' : '0', espacos: 1, desc: '' });
-      renderItens(); scheduleSave();
-    });
-  });
+  document.querySelectorAll('.btn-type').forEach((btn) => btn.addEventListener('click', () => {
+    const tipo = btn.dataset.tipo;
+    state.itens.push({ nome: '', tipo, categoria: tipo === 'amaldicoado' ? 'I' : '0', espacos: 1, desc: '' });
+    renderItens(); scheduleSave();
+  }));
   ['I','II','III','IV'].forEach((cat) => {
     const el = document.getElementById('limite-' + cat);
     if (el) el.addEventListener('input', (e) => { state.itensLimite[cat] = parseInt(e.target.value) || 0; scheduleSave(); });
@@ -475,9 +444,31 @@ function bindEvents() {
   });
   document.getElementById('btn-add-ataque').addEventListener('click', () => openAtaqueModal(null));
   document.getElementById('btn-salvar-ataque').addEventListener('click', salvarAtaqueModal);
-  document.querySelectorAll('[data-close]').forEach((btn) => {
-    btn.addEventListener('click', () => { const el = document.getElementById(btn.getAttribute('data-close')); if (el) el.hidden = true; });
+  const imgBox = document.getElementById('atk-img-box');
+  const imgInput = document.getElementById('atk-imagem');
+  if (imgBox && imgInput) {
+    imgBox.addEventListener('click', () => imgInput.click());
+    imgInput.addEventListener('change', (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      if (file.size > 800000) { alert('Imagem muito grande (máx. ~800KB).'); return; }
+      const reader = new FileReader();
+      reader.onload = () => setAtaqueImagePreview(reader.result);
+      reader.readAsDataURL(file);
+    });
+  }
+  const btnExtra = document.getElementById('btn-add-dano-extra');
+  if (btnExtra) btnExtra.addEventListener('click', () => {
+    const val = document.getElementById('atk-dano-extra').value.trim();
+    window._atkExtras = window._atkExtras || [];
+    if (val) { window._atkExtras.push(val); document.getElementById('atk-dano-extra').value = ''; }
+    else window._atkExtras.push('');
+    renderDanoExtraList(window._atkExtras);
   });
+  document.querySelectorAll('[data-close]').forEach((btn) => btn.addEventListener('click', () => {
+    const el = document.getElementById(btn.getAttribute('data-close'));
+    if (el) el.hidden = true;
+  }));
   document.getElementById('modal-ataque')?.addEventListener('click', (e) => { if (e.target.id === 'modal-ataque') e.target.hidden = true; });
   document.getElementById('btn-export').addEventListener('click', exportJSON);
   document.getElementById('btn-import').addEventListener('click', () => document.getElementById('import-file').click());
