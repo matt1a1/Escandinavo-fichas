@@ -1,5 +1,6 @@
 // Catálogo de Habilidades — Ordem Paranormal RPG 1ª Edição (livro de regras 0.2)
 // Campos: nome, classe, categoria, nex, pe, desc
+// CORREÇÃO: Médico de Campo 99% = Reanimação; Eu Conheço um Cara = Negociador 65%
 const HABILIDADES_CATALOG = [
   // ===== COMBATENTE — HABILIDADE BASE + PODERES =====
   { nome: 'Ataque Especial', classe: 'Combatente', categoria: 'Poderes de Combatente', nex: '5%', pe: '2+ PE',
@@ -151,33 +152,33 @@ const HABILIDADES_CATALOG = [
 
   // ===== ESPECIALISTA — MÉDICO DE CAMPO =====
   { nome: 'Paramédico', classe: 'Especialista', categoria: 'Médico de Campo', nex: '10%', pe: '2+ PE',
-    desc: 'Ação padrão + 2 PE: cura 2d10 PV de aliado adjacente. Em NEX 40/65/99% pode curar +1d10 gastando +1 PE por dado. Requer treinado em Medicina.' },
+    desc: 'Você pode usar uma ação padrão e 2 PE para curar 2d10 pontos de vida de um aliado adjacente. Pode curar +1d10 PV em NEX 40%, 65% e 99%, gastando +1 PE por dado adicional. Especial: precisa ser treinado em Medicina.' },
   { nome: 'Equipe de Trauma', classe: 'Especialista', categoria: 'Médico de Campo', nex: '40%', pe: '2 PE',
-    desc: 'Ação padrão + 2 PE: remove uma condição negativa (exceto morrendo) de aliado adjacente.' },
+    desc: 'Você pode usar uma ação padrão e 2 PE para remover uma condição negativa (exceto morrendo) de um aliado adjacente.' },
   { nome: 'Resgate', classe: 'Especialista', categoria: 'Médico de Campo', nex: '65%', pe: '—',
-    desc: '1x por rodada: pode se aproximar de aliado machucado/morrendo com ação livre. Ao curar ou remover condição, você e o aliado recebem +5 Defesa até seu próximo turno.' },
-  { nome: 'Eu Conheço um Cara', classe: 'Especialista', categoria: 'Médico de Campo', nex: '99%', pe: '—',
-    desc: '1x por missão: ativa rede de contatos para pedir um favor (equipamento, descanso, resgate). Mestre decide.' },
+    desc: 'Uma vez por rodada, se estiver em alcance curto de um aliado machucado ou morrendo, você pode se aproximar do aliado com uma ação livre. Além disso, sempre que curar PV ou remover condições do aliado, você e o aliado recebem +5 na Defesa até o início de seu próximo turno. Carregar um personagem ocupa metade dos espaços.' },
+  { nome: 'Reanimação', classe: 'Especialista', categoria: 'Médico de Campo', nex: '99%', pe: '10 PE',
+    desc: 'Uma vez por cena, você pode gastar uma ação completa e 10 PE para trazer de volta à vida um personagem que tenha morrido na mesma cena (exceto morte por dano massivo).' },
 
   // ===== ESPECIALISTA — NEGOCIADOR =====
   { nome: 'Lábia de Ouro', classe: 'Especialista', categoria: 'Negociador', nex: '10%', pe: '—',
-    desc: '+5 em Diplomacia, Enganação e Intimidação.' },
+    desc: 'Você recebe +5 em testes de Diplomacia, Enganação e Intimidação.' },
   { nome: 'Argumento Irrefutável', classe: 'Especialista', categoria: 'Negociador', nex: '40%', pe: '2 PE',
-    desc: 'Em teste social, gaste 2 PE para forçar Vontade (DT Int). Se falhar, alvo fica abalado ou persuadido.' },
-  { nome: 'Rede de Contatos', classe: 'Especialista', categoria: 'Negociador', nex: '65%', pe: '—',
-    desc: '1x por missão: consegue informações, favores ou equipamentos através de contatos.' },
+    desc: 'Quando faz um teste de Diplomacia, Enganação ou Intimidação, você pode gastar 2 PE para forçar o alvo a fazer um teste de Vontade (DT Int). Se falhar, o alvo fica abalado ou persuadido conforme a intenção.' },
+  { nome: 'Eu Conheço um Cara', classe: 'Especialista', categoria: 'Negociador', nex: '65%', pe: '—',
+    desc: 'Uma vez por missão, você pode ativar sua rede de contatos para pedir um favor (trocar equipamento do grupo, local de descanso, resgate etc.). O mestre tem a palavra final.' },
   { nome: 'Truque de Mestre', classe: 'Especialista', categoria: 'Negociador', nex: '99%', pe: '5 PE',
-    desc: 'Gaste 5 PE para simular o efeito de qualquer habilidade que um aliado usou na cena (ainda paga custos).' },
+    desc: 'Você pode gastar 5 PE para simular o efeito de qualquer habilidade que você tenha visto um de seus aliados usar durante a cena. Você ignora pré-requisitos, mas ainda paga os custos (ações, PE, materiais).' },
 
   // ===== ESPECIALISTA — TÉCNICO =====
   { nome: 'Ferramentas Improvisadas', classe: 'Especialista', categoria: 'Técnico', nex: '10%', pe: '—',
-    desc: 'Pode improvisar kits e recebe +5 em Ofício/Tecnologia para manutenção e reparo.' },
+    desc: 'Você pode improvisar kits de perícia com materiais disponíveis e recebe +5 em testes de Ofício e Tecnologia relacionados a manutenção e reparo.' },
   { nome: 'Remendão', classe: 'Especialista', categoria: 'Técnico', nex: '40%', pe: '2 PE',
-    desc: 'Ação padrão + 2 PE: repara item danificado ou restaura equipamentos.' },
+    desc: 'Você pode gastar uma ação padrão e 2 PE para reparar um item danificado ou restaurar equipamentos.' },
   { nome: 'Sabotagem', classe: 'Especialista', categoria: 'Técnico', nex: '65%', pe: '2 PE',
-    desc: 'Ação padrão + 2 PE: sabota equipamento ou arma em alcance curto.' },
+    desc: 'Você pode gastar uma ação padrão e 2 PE para sabotar um equipamento ou arma em alcance curto.' },
   { nome: 'Engenheiro de Campo', classe: 'Especialista', categoria: 'Técnico', nex: '99%', pe: '—',
-    desc: 'Improvisa modificações temporárias em armas/equipamentos e reduz pela metade o tempo de reparos.' },
+    desc: 'Você improvisamodificações temporárias em armas/equipamentos e reduz pela metade o tempo de reparos.' },
 
   // ===== OCULTISTA — BASE + PODERES =====
   { nome: 'Escolhido pelo Outro Lado', classe: 'Ocultista', categoria: 'Poderes de Ocultista', nex: '5%', pe: '—',
