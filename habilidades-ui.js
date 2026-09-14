@@ -24,6 +24,10 @@
     if (!box) return;
     const cats = getCategorias(currentClass);
     if (!currentCat || !cats.includes(currentCat)) currentCat = cats[0] || '';
+    if (cats.length === 0) {
+      box.innerHTML = '';
+      return;
+    }
     box.innerHTML = cats.map(c =>
       '<button type="button" class="hab-chip' + (c === currentCat ? ' active' : '') + '" data-hab-cat="' + escapeAttr(c) + '">' + escapeHtml(c) + '</button>'
     ).join('');
@@ -56,7 +60,12 @@
     if (!list) return;
     const items = filtered();
     if (items.length === 0) {
-      list.innerHTML = '<p class="empty-msg">Nenhuma habilidade encontrada.</p>';
+      const hasAnyForClass = getCatalog().some(h => h.classe === currentClass);
+      if (!hasAnyForClass) {
+        list.innerHTML = '<p class="empty-msg">Catálogo desta seção ainda não disponível.<br><small>Use Combatente, Especialista ou Ocultista.</small></p>';
+      } else {
+        list.innerHTML = '<p class="empty-msg">Nenhuma habilidade encontrada.</p>';
+      }
       return;
     }
     list.innerHTML = items.map((h) => {
@@ -81,19 +90,18 @@
       );
     }).join('');
 
-    // Expand/collapse card
     list.querySelectorAll('.hab-card-head').forEach(head => {
       head.addEventListener('click', (e) => {
         if (e.target.closest('.btn-add-hab')) return;
         const card = head.parentElement;
         const body = card.querySelector('.hab-card-body');
+        if (!body) return;
         const open = !body.hidden;
         body.hidden = open;
         card.classList.toggle('open', !open);
       });
     });
 
-    // Add ability button
     list.querySelectorAll('.btn-add-hab').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.preventDefault();
@@ -102,6 +110,7 @@
         const item = getCatalog().find(x => x.nome === nome);
         if (!item || typeof state === 'undefined') return;
         if (alreadyHave(nome)) return;
+        if (!Array.isArray(state.habilidades)) state.habilidades = [];
         const meta = [
           item.nex ? 'NEX ' + item.nex : '',
           item.pe && item.pe !== '—' && item.pe !== '—' ? 'Custo: ' + item.pe : '',
@@ -132,7 +141,6 @@
   }
 
   function bind() {
-    // Subtabs: Catálogo / Minhas Habilidades
     qsa('.hab-subtab').forEach(btn => {
       btn.addEventListener('click', () => {
         qsa('.hab-subtab').forEach(b => b.classList.remove('active'));
@@ -153,32 +161,34 @@
       });
     });
 
-    // Class tabs: Combatente / Especialista / Ocultista / Origens / Poderes
     qsa('.hab-class-tab').forEach(btn => {
       btn.addEventListener('click', () => {
         qsa('.hab-class-tab').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        currentClass = btn.dataset.habClass;
+        currentClass = btn.dataset.habClass || 'Combatente';
         currentCat = '';
         renderChips();
         renderList();
       });
     });
 
-    // Search
     const searchEl = qs('#hab-search');
     if (searchEl) {
       searchEl.addEventListener('input', () => {
-        search = searchEl.value;
+        search = searchEl.value || '';
         renderList();
       });
     }
   }
 
   function init() {
-    bind();
-    renderChips();
-    renderList();
+    try {
+      bind();
+      renderChips();
+      renderList();
+    } catch (err) {
+      console.error('habilidades-ui init error:', err);
+    }
   }
 
   if (document.readyState === 'loading') {
