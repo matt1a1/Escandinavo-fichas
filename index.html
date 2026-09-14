@@ -5,14 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <title>Escandinavo Fichas — Ordem Paranormal</title>
-  <link rel="stylesheet" href="styles.css?v=fix7" />
+  <link rel="stylesheet" href="styles.css?v=fix8" />
   <style>
+    /* habilidades */
     #hab-catalog-list { display:flex !important; flex-direction:column !important; gap:8px !important; max-height:420px; overflow-y:auto; }
     .hab-card { background:#14141c !important; border:1px solid #2a2a35 !important; border-radius:10px !important; flex-shrink:0 !important; min-height:48px !important; height:auto !important; overflow:visible !important; }
     .hab-card.open { border-color:rgba(124,92,255,.45) !important; background:#16161f !important; }
     .hab-card-head { display:flex !important; align-items:center !important; justify-content:space-between !important; gap:10px !important; padding:12px 14px !important; cursor:pointer !important; min-height:48px !important; }
     .hab-card-left { display:flex !important; align-items:center !important; flex-wrap:wrap !important; gap:8px !important; flex:1 !important; min-width:0 !important; }
-    .hab-card-title { font-weight:600 !important; color:#f0f0f5 !important; font-size:.9rem !important; line-height:1.35 !important; display:inline !important; visibility:visible !important; opacity:1 !important; }
+    .hab-card-title { font-weight:600 !important; color:#f0f0f5 !important; font-size:.9rem !important; line-height:1.35 !important; }
     .hab-nex { display:inline-block !important; color:#c4b5fd !important; font-weight:600 !important; font-size:.72rem !important; background:rgba(124,92,255,.15) !important; border:1px solid rgba(124,92,255,.35) !important; padding:2px 7px !important; border-radius:6px !important; }
     .hab-pe { display:inline-block !important; color:#34d399 !important; font-weight:600 !important; font-size:.72rem !important; background:rgba(52,211,153,.15) !important; border:1px solid rgba(52,211,153,.35) !important; padding:2px 7px !important; border-radius:6px !important; }
     .btn-add-hab { width:28px !important; height:28px !important; border-radius:8px !important; border:none !important; background:#7c5cff !important; color:#fff !important; font-size:1.05rem !important; cursor:pointer !important; flex-shrink:0 !important; display:inline-flex !important; align-items:center !important; justify-content:center !important; }
@@ -21,6 +22,22 @@
     .hab-card-body[hidden] { display:none !important; }
     .hab-cat-label { color:#a78bfa !important; font-size:.68rem !important; margin:0 0 6px !important; font-weight:600 !important; text-transform:uppercase !important; }
     .hab-card-desc { margin:0 !important; color:#b0b0c0 !important; font-size:.82rem !important; line-height:1.5 !important; }
+    /* rituais — cards do catálogo */
+    .catalog-item { display:flex !important; flex-direction:column !important; gap:8px !important; background:#14141c !important; border:1px solid #2a2a35 !important; border-radius:10px !important; padding:12px 14px !important; }
+    .catalog-item:hover { border-color:#3d3d4d !important; }
+    .catalog-item-main h5 { margin:0 0 8px !important; font-size:.95rem !important; font-weight:600 !important; color:#f0f0f5 !important; line-height:1.3 !important; }
+    .catalog-item-meta { display:flex !important; flex-wrap:wrap !important; gap:6px !important; margin-bottom:2px !important; }
+    .catalog-tag { display:inline-block !important; font-size:.72rem !important; font-weight:500 !important; padding:3px 9px !important; border-radius:999px !important; background:rgba(255,255,255,.06) !important; border:1px solid #2a2a35 !important; color:#b0b0c0 !important; white-space:nowrap !important; }
+    .catalog-tag.el-Conhecimento { color:#9ecbff !important; border-color:rgba(158,203,255,.4) !important; background:rgba(158,203,255,.12) !important; }
+    .catalog-tag.el-Energia { color:#c9a0ff !important; border-color:rgba(201,160,255,.4) !important; background:rgba(201,160,255,.12) !important; }
+    .catalog-tag.el-Morte { color:#c0c0c0 !important; border-color:rgba(160,160,160,.4) !important; background:rgba(160,160,160,.12) !important; }
+    .catalog-tag.el-Sangue { color:#ff8a8a !important; border-color:rgba(255,122,122,.4) !important; background:rgba(255,122,122,.12) !important; }
+    .catalog-tag.el-Medo { color:#ffe08a !important; border-color:rgba(255,224,138,.4) !important; background:rgba(255,224,138,.12) !important; }
+    .catalog-item-actions { display:flex !important; gap:8px !important; margin-top:2px !important; }
+    .catalog-item-desc { margin:0 !important; font-size:.82rem !important; color:#b0b0c0 !important; line-height:1.5 !important; }
+    .catalog-item-desc.ritual-body { white-space:pre-wrap !important; margin-top:4px !important; padding-top:8px !important; border-top:1px solid #2a2a35 !important; }
+    .rit-ver { font-size:.78rem !important; color:#9a9aaa !important; line-height:1.4 !important; }
+    .rit-ver strong { color:#a78bfa !important; }
   </style>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Cinzel:wght@500;600&display=swap" rel="stylesheet" />
 </head>
@@ -238,12 +255,12 @@
     </div>
   </div>
 
-  <script src="data.js?v=fix7"></script>
-  <script src="rituais-catalog.js?v=fix7"></script>
-  <script src="rituais-extra.js?v=fix7"></script>
-  <script src="habilidades-catalog.js?v=fix7"></script>
-  <script src="app.js?v=fix7"></script>
-  <script src="catalog-ui.js?v=fix7"></script>
-  <script src="habilidades-ui.js?v=fix7"></script>
+  <script src="data.js?v=fix8"></script>
+  <script src="rituais-catalog.js?v=fix8"></script>
+  <script src="rituais-extra.js?v=fix8"></script>
+  <script src="habilidades-catalog.js?v=fix8"></script>
+  <script src="app.js?v=fix8"></script>
+  <script src="catalog-ui.js?v=fix8"></script>
+  <script src="habilidades-ui.js?v=fix8"></script>
 </body>
 </html>
