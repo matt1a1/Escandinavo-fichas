@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <title>Escandinavo Fichas — Ordem Paranormal</title>
-  <link rel="stylesheet" href="styles.css?v=fix6" />
+  <link rel="stylesheet" href="styles.css?v=fix7" />
   <style>
     #hab-catalog-list { display:flex !important; flex-direction:column !important; gap:8px !important; max-height:420px; overflow-y:auto; }
     .hab-card { background:#14141c !important; border:1px solid #2a2a35 !important; border-radius:10px !important; flex-shrink:0 !important; min-height:48px !important; height:auto !important; overflow:visible !important; }
@@ -224,7 +225,7 @@
           <div class="field"><label>Elemento</label><select id="ritual-elemento"><option>Conhecimento</option><option>Energia</option><option>Morte</option><option>Sangue</option><option>Medo</option></select></div>
           <div class="field"><label>Custo PE</label><input type="text" id="ritual-pe" value="1" /></div>
         </div>
-        <div class="field"><label>Execução</label><input type="text" id="ritual-execucao" placeholder="Padrão / Completa / ..." /></div>
+        <div class="field"><label>Execução</label><input type="text" id="ritual-execucao" /></div>
         <div class="field"><label>Alcance / Alvo / Duração</label><input type="text" id="ritual-alcance" /></div>
         <div class="field"><label>Descrição / Efeito</label><textarea id="ritual-desc" rows="5"></textarea></div>
         <div class="field"><label>Discente</label><textarea id="ritual-discente" rows="2"></textarea></div>
@@ -237,12 +238,12 @@
     </div>
   </div>
 
-  <script src="data.js"></script>
-  <script src="rituais-catalog.js"></script>
-  <script src="rituais-extra.js"></script>
-  <script src="habilidades-catalog.js?v=fix6"></script>
-  <script src="app.js"></script>
-  <script src="catalog-ui.js"></script>
-  <script src="habilidades-ui.js?v=fix6"></script>
+  <script src="data.js?v=fix7"></script>
+  <script src="rituais-catalog.js?v=fix7"></script>
+  <script src="rituais-extra.js?v=fix7"></script>
+  <script src="habilidades-catalog.js?v=fix7"></script>
+  <script src="app.js?v=fix7"></script>
+  <script src="catalog-ui.js?v=fix7"></script>
+  <script src="habilidades-ui.js?v=fix7"></script>
 </body>
 </html>
