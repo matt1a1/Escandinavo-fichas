@@ -42,7 +42,7 @@
       if (h.classe !== currentClass) return false;
       if (currentCat && h.categoria !== currentCat) return false;
       if (!q) return true;
-      return (h.nome + ' ' + h.desc + ' ' + (h.nex || '')).toLowerCase().includes(q);
+      return (h.nome + ' ' + h.desc + ' ' + (h.nex || '') + ' ' + (h.pe || '')).toLowerCase().includes(q);
     });
   }
 
@@ -62,17 +62,18 @@
     list.innerHTML = items.map((h) => {
       const have = alreadyHave(h.nome);
       const nexBadge = h.nex ? '<span class="hab-nex">' + escapeHtml(h.nex) + '</span>' : '';
+      const peBadge = h.pe && h.pe !== '\u2014' && h.pe !== '—' ? '<span class="hab-pe">' + escapeHtml(h.pe) + '</span>' : '';
       return (
         '<div class="hab-card">' +
           '<div class="hab-card-head">' +
             '<div class="hab-card-left">' +
               '<span class="hab-card-title">' + escapeHtml(h.nome) + '</span>' +
-              nexBadge +
+              nexBadge + peBadge +
             '</div>' +
-            '<button type="button" class="btn-add-hab' + (have ? ' have' : '') + '" data-nome="' + escapeAttr(h.nome) + '" title="' + (have ? 'Já adicionada' : 'Adicionar') + '">' + (have ? '✓' : '+') + '</button>' +
+            '<button type="button" class="btn-add-hab' + (have ? ' have' : '') + '" data-nome="' + escapeAttr(h.nome) + '" title="' + (have ? 'Já adicionada' : 'Adicionar') + '">' + (have ? '\u2713' : '+') + '</button>' +
           '</div>' +
           '<div class="hab-card-body" hidden>' +
-            '<div class="hab-cat-label">' + escapeHtml(h.categoria) + '</div>' +
+            '<div class="hab-cat-label">' + escapeHtml(h.categoria) + (h.pe ? ' \u00b7 Custo: ' + escapeHtml(h.pe) : '') + '</div>' +
             '<p class="hab-card-desc">' + escapeHtml(h.desc) + '</p>' +
           '</div>' +
         '</div>'
@@ -98,9 +99,10 @@
         const item = getCatalog().find(x => x.nome === nome);
         if (!item || typeof state === 'undefined') return;
         if (alreadyHave(nome)) return;
+        const meta = [item.nex ? 'NEX ' + item.nex : '', item.pe && item.pe !== '\u2014' && item.pe !== '—' ? 'Custo: ' + item.pe : '', item.categoria].filter(Boolean).join(' \u00b7 ');
         state.habilidades.push({
           nome: item.nome,
-          desc: item.desc + (item.nex ? '\n(NEX ' + item.nex + ' · ' + item.categoria + ')' : '\n(' + item.categoria + ')'),
+          desc: item.desc + (meta ? '\n(' + meta + ')' : ''),
         });
         if (typeof saveState === 'function') saveState();
         if (typeof renderHabilidades === 'function') renderHabilidades();
@@ -110,7 +112,7 @@
   }
 
   function escapeHtml(s) {
-    return String(s == null ? '' : s)
+    return String(s == null ? '')
       .replace(/&/g, '&')
       .replace(/</g, '<')
       .replace(/>/g, '>')
