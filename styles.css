@@ -7,6 +7,7 @@
   --text-dim: #9a9690;
   --accent: #8b5cf6;
   --accent-hover: #a78bfa;
+  --accent-2: #a78bfa;
   --vida: #dc2626;
   --sanidade: #7c3aed;
   --esforco: #ea580c;
@@ -82,6 +83,7 @@ textarea { min-height: 70px; resize: vertical; }
 
 .list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .list-header h3 { margin: 0; font-size: 0.95rem; }
+.dt-rituais { font-size: 0.8rem; color: var(--text-dim); margin-right: 8px; }
 .item-list { display: flex; flex-direction: column; gap: 8px; }
 .item-card, .ataque-card { background: var(--bg-input); border: 1px solid var(--border); border-radius: 8px; padding: 10px; }
 .empty-msg { color: var(--text-dim); font-size: 0.85rem; text-align: center; padding: 16px; }
@@ -111,13 +113,68 @@ textarea { min-height: 70px; resize: vertical; }
 .item-type-btns { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 10px; }
 .btn-type { background: var(--bg-input); border: 1px solid var(--border); color: var(--text); border-radius: 6px; padding: 5px 8px; font-size: 0.75rem; cursor: pointer; }
 
-/* Catalog common */
+/* Catalog common + RITUAIS */
 .catalog-panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 8px; }
 .catalog-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
 .catalog-header h4 { margin: 0; font-size: 0.95rem; }
 .catalog-count { font-size: 0.8rem; color: var(--text-dim); background: var(--bg-input); padding: 2px 8px; border-radius: 999px; }
 .catalog-filters { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
 .catalog-list { max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
+
+.catalog-item {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.catalog-item:hover { border-color: #3d3d4d; }
+.catalog-item-main h5 {
+  margin: 0 0 6px;
+  font-size: 0.95rem;
+  color: #f0f0f5;
+}
+.catalog-item-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+.catalog-tag {
+  display: inline-block;
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+}
+.catalog-tag.el-Conhecimento { color: #9ecbff; border-color: rgba(158,203,255,0.35); }
+.catalog-tag.el-Energia { color: #c9a0ff; border-color: rgba(201,160,255,0.35); }
+.catalog-tag.el-Morte { color: #a0a0a0; border-color: rgba(160,160,160,0.35); }
+.catalog-tag.el-Sangue { color: #ff7a7a; border-color: rgba(255,122,122,0.35); }
+.catalog-tag.el-Medo { color: #ffe08a; border-color: rgba(255,224,138,0.35); }
+.catalog-item-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+.catalog-item .btn { font-size: 0.78rem; }
+.catalog-item-desc {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #b0b0c0;
+  line-height: 1.45;
+}
+.catalog-item-desc.ritual-body {
+  white-space: pre-wrap;
+  margin-top: 6px;
+}
+.rit-versions { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
+.rit-ver { font-size: 0.78rem; color: var(--text-dim); line-height: 1.35; }
+.rit-ver strong { color: var(--accent-2); }
 
 /* ===== HABILIDADES ===== */
 .hab-subtabs { display: flex; gap: 0; margin-bottom: 14px; background: #121218; border: 1px solid var(--border); border-radius: 10px; padding: 3px; }
