@@ -59,18 +59,21 @@
       list.innerHTML = '<p class="empty-msg">Nenhuma habilidade encontrada.</p>';
       return;
     }
-    list.innerHTML = items.map((h, i) => {
-      const open = i === 0 && items.length < 8 ? ' open' : '';
+    list.innerHTML = items.map((h) => {
       const have = alreadyHave(h.nome);
+      const nexBadge = h.nex ? `<span class="hab-nex">${escapeHtml(h.nex)}</span>` : '';
       return `
-      <details class="hab-card catalog-card"${open}>
-        <summary>
-          <span class="hab-card-title">${escapeHtml(h.nome)}${h.nex ? ` <small class="hab-nex">${escapeHtml(h.nex)}</small>` : ''}</span>
+      <details class="hab-card">
+        <summary class="hab-card-summary">
+          <div class="hab-card-left">
+            <span class="hab-card-title">${escapeHtml(h.nome)}</span>
+            ${nexBadge}
+          </div>
           <button type="button" class="btn-add-hab ${have ? 'have' : ''}" data-nome="${escapeAttr(h.nome)}" title="${have ? 'Já adicionada' : 'Adicionar'}">${have ? '✓' : '+'}</button>
         </summary>
         <div class="hab-card-body">
-          <p class="hab-cat-label">${escapeHtml(h.categoria)}</p>
-          <p>${escapeHtml(h.desc)}</p>
+          <div class="hab-cat-label">${escapeHtml(h.categoria)}</div>
+          <p class="hab-card-desc">${escapeHtml(h.desc)}</p>
         </div>
       </details>`;
     }).join('');
@@ -96,10 +99,10 @@
 
   function escapeHtml(s) {
     return String(s || '')
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
+      .replace(/&/g, '&')
+      .replace(/</g, '<')
+      .replace(/>/g, '>')
+      .replace(/"/g, '"');
   }
   function escapeAttr(s) {
     return escapeHtml(s).replace(/'/g, '&#39;');
