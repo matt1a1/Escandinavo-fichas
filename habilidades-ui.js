@@ -25,7 +25,7 @@
     const cats = getCategorias(currentClass);
     if (!currentCat || !cats.includes(currentCat)) currentCat = cats[0] || '';
     box.innerHTML = cats.map(c =>
-      `<button type="button" class="hab-chip${c === currentCat ? ' active' : ''}" data-hab-cat="${escapeAttr(c)}">${escapeHtml(c)}</button>`
+      '<button type="button" class="hab-chip' + (c === currentCat ? ' active' : '') + '" data-hab-cat="' + escapeAttr(c) + '">' + escapeHtml(c) + '</button>'
     ).join('');
     box.querySelectorAll('.hab-chip').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -61,22 +61,34 @@
     }
     list.innerHTML = items.map((h) => {
       const have = alreadyHave(h.nome);
-      const nexBadge = h.nex ? `<span class="hab-nex">${escapeHtml(h.nex)}</span>` : '';
-      return `
-      <details class="hab-card">
-        <summary class="hab-card-summary">
-          <div class="hab-card-left">
-            <span class="hab-card-title">${escapeHtml(h.nome)}</span>
-            ${nexBadge}
-          </div>
-          <button type="button" class="btn-add-hab ${have ? 'have' : ''}" data-nome="${escapeAttr(h.nome)}" title="${have ? 'Já adicionada' : 'Adicionar'}">${have ? '✓' : '+'}</button>
-        </summary>
-        <div class="hab-card-body">
-          <div class="hab-cat-label">${escapeHtml(h.categoria)}</div>
-          <p class="hab-card-desc">${escapeHtml(h.desc)}</p>
-        </div>
-      </details>`;
+      const nexBadge = h.nex ? '<span class="hab-nex">' + escapeHtml(h.nex) + '</span>' : '';
+      return (
+        '<div class="hab-card">' +
+          '<div class="hab-card-head">' +
+            '<div class="hab-card-left">' +
+              '<span class="hab-card-title">' + escapeHtml(h.nome) + '</span>' +
+              nexBadge +
+            '</div>' +
+            '<button type="button" class="btn-add-hab' + (have ? ' have' : '') + '" data-nome="' + escapeAttr(h.nome) + '" title="' + (have ? 'Já adicionada' : 'Adicionar') + '">' + (have ? '✓' : '+') + '</button>' +
+          '</div>' +
+          '<div class="hab-card-body" hidden>' +
+            '<div class="hab-cat-label">' + escapeHtml(h.categoria) + '</div>' +
+            '<p class="hab-card-desc">' + escapeHtml(h.desc) + '</p>' +
+          '</div>' +
+        '</div>'
+      );
     }).join('');
+
+    list.querySelectorAll('.hab-card-head').forEach(head => {
+      head.addEventListener('click', (e) => {
+        if (e.target.closest('.btn-add-hab')) return;
+        const card = head.parentElement;
+        const body = card.querySelector('.hab-card-body');
+        const open = !body.hidden;
+        body.hidden = open;
+        card.classList.toggle('open', !open);
+      });
+    });
 
     list.querySelectorAll('.btn-add-hab').forEach(btn => {
       btn.addEventListener('click', (e) => {
@@ -88,7 +100,7 @@
         if (alreadyHave(nome)) return;
         state.habilidades.push({
           nome: item.nome,
-          desc: item.desc + (item.nex ? `\n(NEX ${item.nex} · ${item.categoria})` : `\n(${item.categoria})`),
+          desc: item.desc + (item.nex ? '\n(NEX ' + item.nex + ' · ' + item.categoria + ')' : '\n(' + item.categoria + ')'),
         });
         if (typeof saveState === 'function') saveState();
         if (typeof renderHabilidades === 'function') renderHabilidades();
@@ -98,7 +110,7 @@
   }
 
   function escapeHtml(s) {
-    return String(s || '')
+    return String(s == null ? '' : s)
       .replace(/&/g, '&')
       .replace(/</g, '<')
       .replace(/>/g, '>')
