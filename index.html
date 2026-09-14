@@ -4,25 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Escandinavo Fichas — Ordem Paranormal</title>
-  <link rel="stylesheet" href="styles.css?v=pefix5" />
+  <link rel="stylesheet" href="styles.css?v=fix6" />
   <style>
-    /* critical fix: cards de habilidades */
     #hab-catalog-list { display:flex !important; flex-direction:column !important; gap:8px !important; max-height:420px; overflow-y:auto; }
-    .hab-card { background:#14141c !important; border:1px solid #2a2a35 !important; border-radius:10px !important;
-      flex-shrink:0 !important; min-height:48px !important; height:auto !important; overflow:visible !important; }
+    .hab-card { background:#14141c !important; border:1px solid #2a2a35 !important; border-radius:10px !important; flex-shrink:0 !important; min-height:48px !important; height:auto !important; overflow:visible !important; }
     .hab-card.open { border-color:rgba(124,92,255,.45) !important; background:#16161f !important; }
-    .hab-card-head { display:flex !important; align-items:center !important; justify-content:space-between !important;
-      gap:10px !important; padding:12px 14px !important; cursor:pointer !important; min-height:48px !important; }
+    .hab-card-head { display:flex !important; align-items:center !important; justify-content:space-between !important; gap:10px !important; padding:12px 14px !important; cursor:pointer !important; min-height:48px !important; }
     .hab-card-left { display:flex !important; align-items:center !important; flex-wrap:wrap !important; gap:8px !important; flex:1 !important; min-width:0 !important; }
-    .hab-card-title { font-weight:600 !important; color:#f0f0f5 !important; font-size:.9rem !important; line-height:1.35 !important;
-      display:inline !important; visibility:visible !important; opacity:1 !important; }
-    .hab-nex { display:inline-block !important; color:#c4b5fd !important; font-weight:600 !important; font-size:.72rem !important;
-      background:rgba(124,92,255,.15) !important; border:1px solid rgba(124,92,255,.35) !important; padding:2px 7px !important; border-radius:6px !important; }
-    .hab-pe { display:inline-block !important; color:#34d399 !important; font-weight:600 !important; font-size:.72rem !important;
-      background:rgba(52,211,153,.15) !important; border:1px solid rgba(52,211,153,.35) !important; padding:2px 7px !important; border-radius:6px !important; }
-    .btn-add-hab { width:28px !important; height:28px !important; border-radius:8px !important; border:none !important;
-      background:#7c5cff !important; color:#fff !important; font-size:1.05rem !important; cursor:pointer !important;
-      flex-shrink:0 !important; display:inline-flex !important; align-items:center !important; justify-content:center !important; }
+    .hab-card-title { font-weight:600 !important; color:#f0f0f5 !important; font-size:.9rem !important; line-height:1.35 !important; display:inline !important; visibility:visible !important; opacity:1 !important; }
+    .hab-nex { display:inline-block !important; color:#c4b5fd !important; font-weight:600 !important; font-size:.72rem !important; background:rgba(124,92,255,.15) !important; border:1px solid rgba(124,92,255,.35) !important; padding:2px 7px !important; border-radius:6px !important; }
+    .hab-pe { display:inline-block !important; color:#34d399 !important; font-weight:600 !important; font-size:.72rem !important; background:rgba(52,211,153,.15) !important; border:1px solid rgba(52,211,153,.35) !important; padding:2px 7px !important; border-radius:6px !important; }
+    .btn-add-hab { width:28px !important; height:28px !important; border-radius:8px !important; border:none !important; background:#7c5cff !important; color:#fff !important; font-size:1.05rem !important; cursor:pointer !important; flex-shrink:0 !important; display:inline-flex !important; align-items:center !important; justify-content:center !important; }
     .btn-add-hab.have { background:rgba(34,197,94,.2) !important; color:#6ee7b7 !important; border:1px solid rgba(34,197,94,.45) !important; }
     .hab-card-body { padding:0 14px 14px !important; border-top:1px solid #2a2a35 !important; }
     .hab-card-body[hidden] { display:none !important; }
@@ -194,7 +186,6 @@
     <footer class="footer"><p>Sistema não-oficial · Ordem Paranormal RPG</p><p class="save-status" id="save-status">Salvo automaticamente</p></footer>
   </div>
 
-  <!-- Modal Ataque -->
   <div class="modal-overlay" id="modal-ataque" hidden>
     <div class="modal">
       <div class="modal-header"><h2 id="modal-ataque-title">Novo Ataque</h2><button type="button" class="modal-close" data-close="modal-ataque">×</button></div>
@@ -223,7 +214,6 @@
     </div>
   </div>
 
-  <!-- Modal Ritual -->
   <div class="modal-overlay" id="modal-ritual" hidden>
     <div class="modal">
       <div class="modal-header"><h2 id="modal-ritual-title">Novo Ritual</h2><button type="button" class="modal-close" data-close="modal-ritual">×</button></div>
@@ -250,9 +240,9 @@
   <script src="data.js"></script>
   <script src="rituais-catalog.js"></script>
   <script src="rituais-extra.js"></script>
-  <script src="habilidades-catalog.js?v=pefix5"></script>
+  <script src="habilidades-catalog.js?v=fix6"></script>
   <script src="app.js"></script>
   <script src="catalog-ui.js"></script>
-  <script src="habilidades-ui.js?v=pefix5"></script>
+  <script src="habilidades-ui.js?v=fix6"></script>
 </body>
 </html>
