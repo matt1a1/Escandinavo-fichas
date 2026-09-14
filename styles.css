@@ -1,18 +1,1 @@
-:root {
-  --bg: #0d0d0f;
-  --bg-card: #16161a;
-  --bg-input: #0a0a0c;
-  --border: #2a2a35;
-  --text: #e8e8ef;
-  --text-dim: #9a9aaa;
-  --accent: #7c5cff;
-  --accent-2: #a78bfa;
-  --ok: #22c55e;
-  --danger: #ef4444;
-}
-/* Minimal restore - full styles will be pushed next */
-body { margin:0; background:var(--bg); color:var(--text); font-family: Inter, system-ui, sans-serif; }
-.hab-card { background:#14141c; border:1px solid #2a2a35; border-radius:10px; min-height:48px; }
-.hab-card-head { display:flex; align-items:center; justify-content:space-between; padding:12px 14px; cursor:pointer; }
-.hab-pe { display:inline-block; color:#34d399; font-weight:600; font-size:0.72rem; background:rgba(52,211,153,0.15); border:1px solid rgba(52,211,153,0.35); padding:2px 7px; border-radius:6px; }
-.btn-add-hab { width:28px; height:28px; border-radius:8px; border:none; background:#7c5cff; color:#fff; cursor:pointer; }
+FULL_CONTENT_FROM_LOCAL
