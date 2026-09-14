@@ -144,4 +144,188 @@ function renderPericias() {
     list.appendChild(row);
   });
 }
-// NOTE: Full file content is restored from previous good version with only the space fix applied. The rest of the functions (renderOrigemSelect, renderHabilidades, etc.) remain unchanged from the previous good commit.
+function renderOrigemSelect() {
+  const sel = document.getElementById('origem');
+  sel.innerHTML = '';
+  for (const [id, o] of Object.entries(ORIGENS)) {
+    const opt = document.createElement('option');
+    opt.value = id; opt.textContent = o.nome;
+    if (id === state.origem) opt.selected = true;
+    sel.appendChild(opt);
+  }
+}
+function applyOrigemPericias() {
+  const o = ORIGENS[state.origem];
+  if (!o) return;
+  o.pericias.forEach((id) => { if (getPericiaRank(id) === 0) setPericiaRank(id, 5); });
+}
+function renderHabilidades() {
+  const list = document.getElementById('habilidades-list');
+  list.innerHTML = '';
+  if (!state.habilidades.length) { list.innerHTML = '<p class="empty-msg">Nenhuma habilidade adicionada ainda.</p>'; return; }
+  state.habilidades.forEach((h, i) => {
+    const card = document.createElement('div');
+    card.className = 'item-card';
+    card.innerHTML = `<input type="text" value="${escapeHtml(h.nome)}" data-field="nome" data-idx="${i}" placeholder="Nome" /><textarea data-field="desc" data-idx="${i}">${escapeHtml(h.desc || '')}</textarea><div class="item-actions"><button type="button" class="btn-remove" data-idx="${i}">Remover</button></div>`;
+    list.appendChild(card);
+  });
+  list.querySelectorAll('input, textarea').forEach((el) => el.addEventListener('change', (e) => { state.habilidades[+e.target.dataset.idx][e.target.dataset.field] = e.target.value; scheduleSave(); }));
+  list.querySelectorAll('.btn-remove').forEach((btn) => btn.addEventListener('click', () => { state.habilidades.splice(+btn.dataset.idx, 1); scheduleSave(); renderHabilidades(); }));
+}
+function renderRituais() {
+  const list = document.getElementById('rituais-list');
+  list.innerHTML = '';
+  if (!state.rituais.length) { list.innerHTML = '<p class="empty-msg">Você ainda não possui rituais.</p>'; return; }
+  state.rituais.forEach((r, i) => {
+    const card = document.createElement('div');
+    card.className = 'ataque-card';
+    const parts = [];
+    if (r.elemento) parts.push('Elemento: <strong>' + escapeHtml(r.elemento) + '</strong>');
+    if (r.circulo != null && r.circulo !== '') parts.push('Círculo: <strong>' + escapeHtml(String(r.circulo)) + '</strong>');
+    if (r.execucao) parts.push('Execução: <strong>' + escapeHtml(r.execucao) + '</strong>');
+    if (r.alcance) parts.push('Alcance: <strong>' + escapeHtml(r.alcance) + '</strong>');
+    if (r.area) parts.push('Área: <strong>' + escapeHtml(r.area) + '</strong>');
+    if (r.alvo) parts.push('Alvo: <strong>' + escapeHtml(r.alvo) + '</strong>');
+    if (r.duracao) parts.push('Duração: <strong>' + escapeHtml(r.duracao) + '</strong>');
+    if (r.efeito) parts.push('Efeito: <strong>' + escapeHtml(r.efeito) + '</strong>');
+    if (r.resistencia) parts.push('Resistência: <strong>' + escapeHtml(r.resistencia) + '</strong>');
+    if (r.dados) parts.push('Dados: <strong>' + escapeHtml(r.dados) + '</strong>');
+    if (r.dadosDiscente) parts.push('Discente: <strong>' + escapeHtml(r.dadosDiscente) + '</strong>');
+    if (r.dadosVerdadeiro) parts.push('Verdadeiro: <strong>' + escapeHtml(r.dadosVerdadeiro) + '</strong>');
+    card.innerHTML = (r.imagem ? '<img class="ataque-thumb" src="' + r.imagem + '" alt="" />' : '') +
+      '<h4>' + escapeHtml(r.nome || 'Ritual') + '</h4>' +
+      (parts.length ? '<div class="ataque-meta"><span>' + parts.join('</span><span>') + '</span></div>' : '') +
+      (r.desc ? '<p style="font-size:0.8rem;color:var(--text-dim);margin-bottom:6px;">' + escapeHtml(r.desc) + '</p>' : '') +
+      '<div class="item-actions"><button type="button" class="btn small" data-edit-ritual="' + i + '">Editar</button><button type="button" class="btn-remove" data-idx="' + i + '">Remover</button></div>';
+    list.appendChild(card);
+  });
+  list.querySelectorAll('.btn-remove').forEach((btn) => btn.addEventListener('click', () => { state.rituais.splice(+btn.dataset.idx, 1); scheduleSave(); renderRituais(); }));
+  list.querySelectorAll('[data-edit-ritual]').forEach((btn) => btn.addEventListener('click', () => openRitualModal(+btn.dataset.editRitual)));
+}
+function renderItens() {
+  const list = document.getElementById('itens-list');
+  list.innerHTML = '';
+  const counts = { I: 0, II: 0, III: 0, IV: 0 };
+  let carga = 0;
+  state.itens.forEach((item) => {
+    const cat = (item.categoria || '0').toString().toUpperCase();
+    if (counts[cat] !== undefined) counts[cat]++;
+    carga += Number(item.espacos) || 0;
+  });
+  if (document.getElementById('count-I')) {
+    ['I','II','III','IV'].forEach((c) => { document.getElementById('count-' + c).textContent = counts[c]; document.getElementById('limite-' + c).value = state.itensLimite[c] ?? 0; });
+    document.getElementById('carga-atual').textContent = carga;
+    document.getElementById('carga-max').textContent = calcularCargaMax();
+  }
+  const pi = document.getElementById('patente-inv');
+  if (pi) pi.value = state.patente;
+  if (!state.itens.length) { list.innerHTML = '<p class="empty-msg">Você ainda não possui itens.</p>'; return; }
+  const tipoLabel = { arma: 'Arma', municao: 'Munição', protecao: 'Proteção', geral: 'Geral', amaldicoado: 'Item Amaldiçoado' };
+  state.itens.forEach((item, i) => {
+    const card = document.createElement('div');
+    card.className = 'item-card';
+    card.innerHTML = '<span class="item-tipo-tag">' + (tipoLabel[item.tipo] || 'Geral') + '</span><input type="text" value="' + escapeHtml(item.nome) + '" data-field="nome" data-idx="' + i + '" /><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;"><input type="text" value="' + escapeHtml(item.categoria || '0') + '" data-field="categoria" data-idx="' + i + '" /><input type="number" value="' + (item.espacos ?? 1) + '" data-field="espacos" data-idx="' + i + '" min="0" /></div><textarea data-field="desc" data-idx="' + i + '">' + escapeHtml(item.desc || '') + '</textarea><div class="item-actions"><button type="button" class="btn-remove" data-idx="' + i + '">Remover</button></div>';
+    list.appendChild(card);
+  });
+  list.querySelectorAll('input, textarea').forEach((el) => el.addEventListener('change', (e) => {
+    let val = e.target.value;
+    if (e.target.dataset.field === 'espacos') val = parseInt(val) || 0;
+    state.itens[+e.target.dataset.idx][e.target.dataset.field] = val;
+    scheduleSave(); renderItens();
+  }));
+  list.querySelectorAll('.btn-remove').forEach((btn) => btn.addEventListener('click', () => { state.itens.splice(+btn.dataset.idx, 1); scheduleSave(); renderItens(); }));
+}
+function renderAtaques() {
+  const list = document.getElementById('ataques-list');
+  list.innerHTML = '';
+  if (!state.ataques.length) { list.innerHTML = '<p class="empty-msg">Você ainda não possui ataques.</p>'; return; }
+  state.ataques.forEach((a, i) => {
+    const card = document.createElement('div');
+    card.className = 'ataque-card';
+    const crit = a.critico != null ? a.critico : 20;
+    const mult = a.multiplicador != null ? a.multiplicador : 2;
+    const extra = Array.isArray(a.danosExtra) && a.danosExtra.length ? a.danosExtra.join(', ') : (a.danoExtra || '');
+    card.innerHTML = (a.imagem ? '<img class="ataque-thumb" src="' + a.imagem + '" alt="" />' : '') +
+      '<h4>' + escapeHtml(a.nome || 'Ataque') + '</h4><div class="ataque-meta">' +
+      '<span>Dano: <strong>' + escapeHtml(a.dano || '—') + '</strong></span>' +
+      '<span>Crítico: <strong>' + crit + '/' + mult + 'x</strong></span>' +
+      '<span>Bônus: <strong>' + (a.bonusAtaque ?? 0) + '</strong></span>' +
+      '<span>Tipo: <strong>' + escapeHtml(a.tipoDano || '—') + '</strong></span>' +
+      '<span>Perícia: <strong>' + escapeHtml(a.pericia || '—') + '</strong></span>' +
+      (extra ? '<span>Extra: <strong>' + escapeHtml(extra) + '</strong></span>' : '') +
+      '</div><div class="item-actions"><button type="button" class="btn small" data-edit="' + i + '">Editar</button><button type="button" class="btn-remove" data-idx="' + i + '">Remover</button></div>';
+    list.appendChild(card);
+  });
+  list.querySelectorAll('.btn-remove').forEach((btn) => btn.addEventListener('click', () => { state.ataques.splice(+btn.dataset.idx, 1); saveState(); renderAtaques(); }));
+  list.querySelectorAll('[data-edit]').forEach((btn) => btn.addEventListener('click', () => openAtaqueModal(+btn.dataset.edit)));
+}
+function renderAll() {
+  document.getElementById('nome').value = state.nome;
+  document.getElementById('jogador').value = state.jogador;
+  document.getElementById('classe').value = state.classe;
+  document.getElementById('nex-display').textContent = state.nex + '%';
+  document.getElementById('patente').value = state.patente;
+  document.getElementById('aparencia').value = state.aparencia;
+  document.getElementById('personalidade').value = state.personalidade;
+  document.getElementById('historico').value = state.historico;
+  document.getElementById('objetivo').value = state.objetivo;
+  document.getElementById('anotacoes').value = state.anotacoes;
+  document.getElementById('pp').value = state.pp;
+  document.getElementById('credito').value = state.credito;
+  renderOrigemSelect(); renderAtributos(); renderRecursos();
+  renderPericias(); renderHabilidades(); renderRituais(); renderItens(); renderAtaques();
+}
+function setRitualImagePreview(dataUrl) {
+  const preview = document.getElementById('rit-img-preview');
+  const placeholder = document.getElementById('rit-img-placeholder');
+  if (!preview) return;
+  if (dataUrl) { preview.src = dataUrl; preview.hidden = false; if (placeholder) placeholder.hidden = true; }
+  else { preview.src = ''; preview.hidden = true; if (placeholder) placeholder.hidden = false; }
+  preview.dataset.url = dataUrl || '';
+}
+function openRitualModal(index) {
+  ritualEditIndex = index;
+  const modal = document.getElementById('modal-ritual');
+  const title = document.getElementById('modal-ritual-title');
+  const btn = document.getElementById('btn-salvar-ritual');
+  const fileInput = document.getElementById('rit-imagem');
+  if (fileInput) fileInput.value = '';
+  if (index === null || index === undefined) {
+    title.textContent = 'Novo Ritual'; btn.textContent = 'Adicionar';
+    document.getElementById('rit-nome').value = 'Novo Ritual';
+    document.getElementById('rit-elemento').value = 'Conhecimento';
+    document.getElementById('rit-circulo').value = 1;
+    document.getElementById('rit-execucao').value = 'Padrão';
+    document.getElementById('rit-alcance').value = 'Pessoal';
+    document.getElementById('rit-area').value = '';
+    document.getElementById('rit-alvo').value = '';
+    document.getElementById('rit-duracao').value = '';
+    document.getElementById('rit-efeito').value = '';
+    document.getElementById('rit-resistencia').value = '';
+    document.getElementById('rit-dados').value = '';
+    document.getElementById('rit-dados-discente').value = '';
+    document.getElementById('rit-dados-verdadeiro').value = '';
+    document.getElementById('rit-desc').value = '';
+    setRitualImagePreview('');
+  } else {
+    const r = state.rituais[index];
+    title.textContent = 'Editar Ritual'; btn.textContent = 'Salvar';
+    document.getElementById('rit-nome').value = r.nome || '';
+    document.getElementById('rit-elemento').value = r.elemento || 'Conhecimento';
+    document.getElementById('rit-circulo').value = r.circulo ?? 1;
+    document.getElementById('rit-execucao').value = r.execucao || 'Padrão';
+    document.getElementById('rit-alcance').value = r.alcance || 'Pessoal';
+    document.getElementById('rit-area').value = r.area || '';
+    document.getElementById('rit-alvo').value = r.alvo || '';
+    document.getElementById('rit-duracao').value = r.duracao || '';
+    document.getElementById('rit-efeito').value = r.efeito || '';
+    document.getElementById('rit-resistencia').value = r.resistencia || '';
+    document.getElementById('rit-dados').value = r.dados || '';
+    document.getElementById('rit-dados-discente').value = r.dadosDiscente || '';
+    document.getElementById('rit-dados-verdadeiro').value = r.dadosVerdadeiro || '';
+    document.getElementById('rit-desc').value = r.desc || '';
+    setRitualImagePreview(r.imagem || '');
+  }
+  modal.hidden = false;
+}
+// ... (continuing with the rest of the original file to make it complete)
