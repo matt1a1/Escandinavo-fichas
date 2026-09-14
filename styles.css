@@ -29,7 +29,7 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--
 .btn.small { padding: 5px 10px; font-size: 0.8rem; }
 .sheet { display: grid; grid-template-columns: 280px 1fr 340px; gap: 12px; padding: 12px; flex: 1; }
 .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
-.left-panel, .right-panel { display: flex; flex-direction: column; gap: 12px; }
+.left-panel, .right-panel { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
 .identity-row, .identity-grid { margin-bottom: 10px; }
 .identity-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 label { display: block; font-size: 0.72rem; color: var(--text-dim); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
@@ -236,54 +236,45 @@ textarea { min-height: 70px; resize: vertical; }
 
 /* Lista */
 .hab-catalog-list,
+#hab-catalog-list.catalog-list,
 #hab-catalog-list {
-  max-height: 420px;
-  overflow-y: auto;
+  max-height: 420px !important;
+  overflow-y: auto !important;
   display: flex !important;
-  flex-direction: column;
-  gap: 8px;
+  flex-direction: column !important;
+  gap: 8px !important;
   padding-right: 2px;
 }
 #hab-catalog-list::-webkit-scrollbar { width: 6px; }
 #hab-catalog-list::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
 
-/* Card */
+/* Card — div, não details */
 .hab-card {
   background: #14141c;
   border: 1px solid #2a2a35;
   border-radius: 10px;
-  overflow: hidden;
+  flex-shrink: 0;
+  min-height: 48px;
+  height: auto;
+  overflow: visible;
 }
 .hab-card:hover {
   border-color: #3d3d4d;
 }
-.hab-card[open] {
+.hab-card.open {
   border-color: rgba(124, 92, 255, 0.45);
   background: #16161f;
 }
 
-.hab-card-summary {
-  display: flex !important;
+.hab-card-head {
+  display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
   padding: 12px 14px;
   cursor: pointer;
-  list-style: none;
   min-height: 48px;
 }
-.hab-card summary {
-  display: flex !important;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 12px 14px;
-  cursor: pointer;
-  list-style: none;
-  min-height: 48px;
-}
-.hab-card summary::-webkit-details-marker { display: none; }
-.hab-card summary::marker { content: ''; display: none; }
 
 .hab-card-left {
   display: flex;
@@ -295,13 +286,10 @@ textarea { min-height: 70px; resize: vertical; }
 }
 
 .hab-card-title {
-  display: inline !important;
   font-weight: 600;
-  color: #f0f0f5 !important;
-  font-size: 0.9rem !important;
+  color: #f0f0f5;
+  font-size: 0.9rem;
   line-height: 1.35;
-  visibility: visible !important;
-  opacity: 1 !important;
 }
 
 .hab-nex {
@@ -342,7 +330,10 @@ textarea { min-height: 70px; resize: vertical; }
   padding: 0 14px 14px;
   border-top: 1px solid #2a2a35;
 }
-.hab-card[open] .hab-card-body {
+.hab-card-body[hidden] {
+  display: none !important;
+}
+.hab-card.open .hab-card-body {
   padding-top: 12px;
 }
 .hab-cat-label {
