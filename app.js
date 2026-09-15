@@ -1,1 +1,26 @@
-PLACEHOLDER
+// ===== ESTADO DA FICHA =====
+const state = {
+  nome: '',
+  jogador: '',
+  origem: 'investigador',
+  classe: 'ocultista',
+  nex: 5,
+  patente: 'Recruta',
+  atributos: { for: 1, agi: 1, int: 1, pre: 1, vig: 1 },
+  pericias: {}, // id -> 0 | 5 | 10 | 15
+  vidaAtual: null,
+  sanAtual: null,
+  peAtual: null,
+  aparencia: '',
+  personalidade: '',
+  historico: '',
+  objetivo: '',
+  anotacoes: '',
+  habilidades: [],
+  rituais: [],
+  itens: [],
+  ataques: [],
+  pp: 0,
+  credito: 'Baixo',
+  itensLimite: { I: 2, II: 0, III: 0, IV: 0 },
+};
