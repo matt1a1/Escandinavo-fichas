@@ -24,3 +24,8 @@ const state = {
   credito: 'Baixo',
   itensLimite: { I: 2, II: 0, III: 0, IV: 0 },
 };
+
+// ===== UTILITÁRIOS =====
+function getAttr(key) {
+  return state.atributos[key] ?? 1;
+}
