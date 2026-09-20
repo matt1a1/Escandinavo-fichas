@@ -12,7 +12,40 @@ let ataqueEditIndex = null;
 let ritualEditIndex = null;
 window._atkExtras = [];
 function getAttr(key) { return state.atributos[key] ?? 1; }
-function pontosDisponiveis() { return 9 - Object.values(state.atributos).reduce((a, b) => a + b, 0); }
+function nexAumentosAtributo() {
+  const n = Number(state.nex) || 5;
+  let q = 0;
+  if (n >= 20) q++;
+  if (n >= 50) q++;
+  if (n >= 80) q++;
+  if (n >= 95) q++;
+  return q;
+}
+function pontosDisponiveis() {
+  const gastos = Object.values(state.atributos).reduce((a, b) => a + b, 0);
+  return 9 + nexAumentosAtributo() - gastos;
+}
+function grauPorRodada() { return 2 + getAttr('int'); }
+function grauLimite() {
+  const por = grauPorRodada();
+  if (state.nex >= 70) return por * 2;
+  if (state.nex >= 35) return por;
+  return 0;
+}
+function grauCusto(rank) {
+  if (rank >= 15) return 2;
+  if (rank >= 10) return 1;
+  return 0;
+}
+function grauUsosExceto(id) {
+  return PERICIAS.reduce((n, p) => n + (p.id === id ? 0 : grauCusto(getPericiaRank(p.id))), 0);
+}
+function grauUsos() { return grauUsosExceto(null); }
+function rankMaxNex() {
+  if (state.nex >= 70) return 15;
+  if (state.nex >= 35) return 10;
+  return 5;
+}
 let lastResourceMax = { pv: null, san: null, pe: null };
 function nexNiveis(nex) {
   const n = Math.max(5, Number(nex) || 5);
@@ -132,6 +165,14 @@ function renderAtributos() {
   const el = document.getElementById('attr-points');
   el.textContent = pts;
   el.style.color = pts < 0 ? 'var(--danger)' : 'var(--accent)';
+  const hint = document.getElementById('attr-nex-hint');
+  if (hint) {
+    const extra = nexAumentosAtributo();
+    const marcas = [20, 50, 80, 95].filter((n) => state.nex >= n).map((n) => n + '%');
+    hint.textContent = extra
+      ? ' · Aumento de Atributo +' + extra + '/4 (' + marcas.join(', ') + ' · máx. 5)'
+      : ' · Aumento de Atributo em NEX 20%, 50%, 80% e 95%';
+  }
 }
 function renderRecursos() {
   const { pvMax, sanMax, peMax, cls } = calcularRecursos();
@@ -171,21 +212,52 @@ function renderPericias() {
   list.appendChild(head);
   document.getElementById('pericias-count').textContent = Object.keys(state.pericias).filter((k) => getPericiaRank(k) > 0).length;
   document.getElementById('pericias-max').textContent = periciasMax();
+  const grauEl = document.getElementById('grau-info');
+  if (grauEl) {
+    const usos = grauUsos();
+    const lim = grauLimite();
+    const por = grauPorRodada();
+    if (state.nex < 35) {
+      grauEl.textContent = 'Grau de Treinamento em NEX 35% e 70% (2+INT = ' + por + ')';
+      grauEl.style.color = '';
+    } else {
+      grauEl.textContent = 'Grau ' + usos + '/' + lim + ' (2+INT=' + por + (state.nex >= 70 ? ' · duas rodadas' : ' · NEX 35%') + ')';
+      grauEl.style.color = usos > lim ? 'var(--danger)' : '';
+    }
+  }
   const ranks = [0, 5, 10, 15];
+  const rankLabel = { 0: '0', 5: '5', 10: '10 Vet.', 15: '15 Exp.' };
   PERICIAS.forEach((p) => {
     const rank = getPericiaRank(p.id);
     const other = getPericiaOther(p.id);
     const bonus = getPericiaTeste(p.id);
     const row = document.createElement('div');
     row.className = 'pericia-row' + (rank > 0 ? ' trained' : '');
-    row.innerHTML = `<div class="pericia-nome">${p.nome} <span class="attr-tag">${p.attr}</span></div><div class="pericia-bonus ${bonus ? 'has-bonus' : ''}">${bonus ? '+' + bonus : '—'}</div><div class="pericia-treino"><select class="rank-select">${ranks.map((r) => `<option value="${r}" ${r === rank ? 'selected' : ''}>${r}</option>`).join('')}</select></div><div class="pericia-outros"><input type="number" class="other-input" value="${other}" min="-20" max="50" /></div><div></div>`;
+    row.innerHTML = `<div class="pericia-nome">${p.nome} <span class="attr-tag">${p.attr}</span></div><div class="pericia-bonus ${bonus ? 'has-bonus' : ''}">${bonus ? '+' + bonus : '—'}</div><div class="pericia-treino"><select class="rank-select">${ranks.map((r) => `<option value="${r}" ${r === rank ? 'selected' : ''}>${rankLabel[r]}</option>`).join('')}</select></div><div class="pericia-outros"><input type="number" class="other-input" value="${other}" min="-20" max="50" /></div><div></div>`;
     const select = row.querySelector('.rank-select');
     select.addEventListener('click', (e) => e.stopPropagation());
     select.addEventListener('change', (e) => {
       const novo = parseInt(e.target.value, 10);
       if (rank === 0 && novo > 0) {
         const atuais = Object.keys(state.pericias).filter((k) => getPericiaRank(k) > 0).length;
-        if (atuais >= periciasMax()) { alert('Limite de perícias atingido.'); e.target.value = '0'; return; }
+        if (atuais >= periciasMax()) { alert('Limite de perícias atingido.'); e.target.value = String(rank); return; }
+      }
+      if (novo >= 10 && rank < 5) {
+        alert('Grau de Treinamento só vale em perícia já treinada (5).');
+        e.target.value = String(rank);
+        return;
+      }
+      if (novo > rankMaxNex()) {
+        alert(novo >= 15
+          ? 'Expert (15) só a partir de NEX 70% (segunda rodada do Grau de Treinamento).'
+          : 'Veterano (10) só a partir de NEX 35% (Grau de Treinamento).');
+        e.target.value = String(rank);
+        return;
+      }
+      if (grauUsosExceto(p.id) + grauCusto(novo) > grauLimite()) {
+        alert('Grau de Treinamento: no máximo ' + grauPorRodada() + ' perícias por rodada (2 + Intelecto). Em NEX 70% você ganha uma segunda rodada.');
+        e.target.value = String(rank);
+        return;
       }
       setPericiaRank(p.id, novo); renderPericias(); renderRecursos(); scheduleSave();
     });
@@ -514,7 +586,7 @@ function bindEvents() {
   document.querySelectorAll('.nex-btn').forEach((btn) => btn.addEventListener('click', () => {
     state.nex = Math.max(5, Math.min(99, state.nex + +btn.dataset.delta));
     document.getElementById('nex-display').textContent = state.nex + '%';
-    renderRecursos(); scheduleSave();
+    renderAtributos(); renderRecursos(); renderPericias(); scheduleSave();
   }));
   document.querySelectorAll('.res-btn').forEach((btn) => btn.addEventListener('click', () => {
     const res = btn.dataset.res; const delta = +btn.dataset.delta;
