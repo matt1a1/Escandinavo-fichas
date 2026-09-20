@@ -230,10 +230,11 @@ function renderPericias() {
   PERICIAS.forEach((p) => {
     const rank = getPericiaRank(p.id);
     const other = getPericiaOther(p.id);
-    const bonus = getPericiaTeste(p.id);
+    const bonus = getPericiaBonus(p.id);
+    const bonusTxt = bonus > 0 ? '+' + bonus : String(bonus);
     const row = document.createElement('div');
     row.className = 'pericia-row' + (rank > 0 ? ' trained' : '');
-    row.innerHTML = `<div class="pericia-nome">${p.nome} <span class="attr-tag">${p.attr}</span></div><div class="pericia-bonus ${bonus ? 'has-bonus' : ''}">${bonus ? '+' + bonus : '—'}</div><div class="pericia-treino"><select class="rank-select">${ranks.map((r) => `<option value="${r}" ${r === rank ? 'selected' : ''}>${rankLabel[r]}</option>`).join('')}</select></div><div class="pericia-outros"><input type="number" class="other-input" value="${other}" min="-20" max="50" /></div><div></div>`;
+    row.innerHTML = `<div class="pericia-nome">${p.nome} <span class="attr-tag">${p.attr}</span></div><div class="pericia-bonus ${bonus ? 'has-bonus' : ''}">${bonusTxt}</div><div class="pericia-treino"><select class="rank-select">${ranks.map((r) => `<option value="${r}" ${r === rank ? 'selected' : ''}>${rankLabel[r]}</option>`).join('')}</select></div><div class="pericia-outros"><input type="number" class="other-input" value="${other}" min="-20" max="50" /></div><div></div>`;
     const select = row.querySelector('.rank-select');
     select.addEventListener('click', (e) => e.stopPropagation());
     select.addEventListener('change', (e) => {
