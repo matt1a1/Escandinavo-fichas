@@ -233,11 +233,67 @@ const HABILIDADES_CATALOG = [
   { nome: 'Conjuração Marcial', classe: 'Ocultista', categoria: 'Lâmina Paranormal', nex: '65%', pe: '2 PE',
     desc: 'Uma vez por rodada, quando você lança um ritual com execução de ação padrão, pode gastar 2 PE para fazer um ataque corpo a corpo como ação livre.' },
   { nome: 'Lâmina do Medo', classe: 'Ocultista', categoria: 'Lâmina Paranormal', nex: '99%', pe: '—',
-    desc: 'Você aprende o ritual Lâmina do Medo.' }
+    desc: 'Você aprende o ritual Lâmina do Medo.' },
+
+  // ===== PODERES PARANORMAIS — CONHECIMENTO =====
+  { nome: 'Expansão de Conhecimento', classe: 'Poderes Paranormais', categoria: 'Conhecimento', nex: '', pe: '—',
+    desc: 'Você se conecta com o Conhecimento do Outro Lado, rompendo os limites de sua compreensão. Você aprende um poder de classe que não pertença à sua classe (caso o poder possua pré-requisitos, você precisa preenchê-los). Pré: Conhecimento 1. Afinidade: você aprende um segundo poder de classe que não pertença à sua classe.' },
+  { nome: 'Percepção Paranormal', classe: 'Poderes Paranormais', categoria: 'Conhecimento', nex: '', pe: '—',
+    desc: 'O Conhecimento sussurra em sua mente. Em cenas de investigação, sempre que fizer um teste para procurar pistas, você pode rolar novamente um dado com resultado menor que 10. Você deve aceitar a segunda rolagem, mesmo que seja menor que a primeira. Afinidade: você pode rolar novamente até dois dados com resultado menor que 10.' },
+  { nome: 'Precognição', classe: 'Poderes Paranormais', categoria: 'Conhecimento', nex: '', pe: '—',
+    desc: 'Você possui um “sexto sentido” que o avisa do perigo antes que ele aconteça. Você recebe +2 em Defesa e em testes de resistência. Pré: Conhecimento 1. Afinidade: você fica imune à condição desprevenido.' },
+  { nome: 'Sensitivo', classe: 'Poderes Paranormais', categoria: 'Conhecimento', nex: '', pe: '—',
+    desc: 'Você consegue sentir as emoções e intenções de outros seres, como medo, raiva ou malícia, recebendo +5 em testes de Diplomacia, Intimidação e Intuição. Afinidade: quando você faz um teste oposto usando uma dessas perícias, o oponente sofre −1d.' },
+  { nome: 'Visão do Oculto', classe: 'Poderes Paranormais', categoria: 'Conhecimento', nex: '', pe: '—',
+    desc: 'Você não enxerga mais pelos olhos, mas sim pela percepção do Conhecimento em sua mente. Você recebe +5 em testes de Percepção e enxerga no escuro. Afinidade: você ignora camuflagem.' },
+
+  // ===== PODERES PARANORMAIS — ENERGIA =====
+  { nome: 'Afortunado', classe: 'Poderes Paranormais', categoria: 'Energia', nex: '', pe: '—',
+    desc: 'A Energia considera resultados medíocres entediantes. Uma vez por rolagem, você pode rolar novamente um resultado 1 em qualquer dado que não seja d20. Afinidade: além disso, uma vez por teste, você pode rolar novamente um resultado 1 em d20.' },
+  { nome: 'Campo Protetor', classe: 'Poderes Paranormais', categoria: 'Energia', nex: '', pe: '1 PE',
+    desc: 'Você consegue gerar um campo de Energia que o protege de perigos. Quando usa a ação esquiva, você pode gastar 1 PE para receber +5 em Defesa. Pré: Energia 1. Afinidade: quando usa este poder, você também recebe +5 em Reflexos e, até o início do seu próximo turno, se passar em um teste de Reflexos que reduziria o dano à metade, em vez disso não sofre nenhum dano.' },
+  { nome: 'Causalidade Fortuita', classe: 'Poderes Paranormais', categoria: 'Energia', nex: '', pe: '—',
+    desc: 'A Energia o conduz rumo a descobertas. Em cenas de investigação, a DT para procurar pistas diminui em −5 para você até você encontrar uma pista. Afinidade: a DT para procurar pistas sempre diminui em −5 para você.' },
+  { nome: 'Golpe de Sorte', classe: 'Poderes Paranormais', categoria: 'Energia', nex: '', pe: '—',
+    desc: 'Seus ataques recebem +1 na margem de ameaça. Pré: Energia 1. Afinidade: seus ataques recebem +1 no multiplicador de crítico.' },
+  { nome: 'Manipular Entropia', classe: 'Poderes Paranormais', categoria: 'Energia', nex: '', pe: '2 PE',
+    desc: 'Nada diverte mais a Energia do que a possibilidade de um desastre ainda maior. Quando outro ser em alcance curto faz um teste de perícia, você pode gastar 2 PE para fazê-lo rolar novamente um dos dados desse teste. Pré: Energia 1. Afinidade: o alvo rola novamente todos os dados que você escolher.' },
+
+  // ===== PODERES PARANORMAIS — MORTE =====
+  { nome: 'Encarar a Morte', classe: 'Poderes Paranormais', categoria: 'Morte', nex: '', pe: '—',
+    desc: 'Sua conexão com a Morte faz com que você não hesite em situações de perigo. Durante cenas de ação, seu limite de gasto de PE aumenta em +1 (isso não afeta a DT de seus efeitos). Afinidade: durante cenas de ação, seu limite de gasto de PE aumenta em +2 (para um total de +3).' },
+  { nome: 'Escapar da Morte', classe: 'Poderes Paranormais', categoria: 'Morte', nex: '', pe: '—',
+    desc: 'A Morte tem um interesse especial em sua caminhada. Uma vez por cena, quando receber dano que o deixaria com 0 PV, você fica com 1 PV. Não funciona em caso de dano massivo. Pré: Morte 1. Afinidade: em vez do normal, você evita completamente o dano. Em caso de dano massivo, você fica com 1 PV.' },
+  { nome: 'Potencial Aprimorado', classe: 'Poderes Paranormais', categoria: 'Morte', nex: '', pe: '—',
+    desc: 'A Morte lhe concede potencial latente de momentos roubados de outro lugar. Você recebe +1 ponto de esforço por NEX. Quando sobe de NEX, os PE que recebe por este poder aumentam de acordo. Ex.: se escolher este poder em NEX 30%, recebe 6 PE. Quando subir para NEX 35%, recebe +1 PE adicional, e assim por diante. Afinidade: você recebe +1 PE adicional por NEX (para um total de +2 PE por NEX).' },
+  { nome: 'Potencial Reaproveitado', classe: 'Poderes Paranormais', categoria: 'Morte', nex: '', pe: '—',
+    desc: 'Você absorve os momentos desperdiçados de outros seres. Uma vez por rodada, quando passa num teste de resistência, você ganha 2 PE temporários cumulativos. Os pontos desaparecem no final da cena. Afinidade: você ganha 3 PE temporários, em vez de 2.' },
+  { nome: 'Surto Temporal', classe: 'Poderes Paranormais', categoria: 'Morte', nex: '', pe: '3 PE',
+    desc: 'A sua percepção temporal se torna distorcida e espiralizada, fazendo com que a noção de passagem do tempo nunca mais seja a mesma para você. Uma vez por cena, durante seu turno, você pode gastar 3 PE para realizar uma ação padrão adicional. Pré: Morte 2. Afinidade: em vez de uma vez por cena, você pode usar este poder uma vez por turno.' },
+
+  // ===== PODERES PARANORMAIS — SANGUE =====
+  { nome: 'Anatomia Insana', classe: 'Poderes Paranormais', categoria: 'Sangue', nex: '', pe: '—',
+    desc: 'O seu corpo é transfigurado e parece desenvolver um instinto próprio separado da sua consciência. Você tem 50% de chance (resultado par em 1d4) de ignorar o dano adicional de um acerto crítico ou ataque furtivo. Pré: Sangue 2. Afinidade: você é imune aos efeitos de acertos críticos e ataques furtivos.' },
+  { nome: 'Arma de Sangue', classe: 'Poderes Paranormais', categoria: 'Sangue', nex: '', pe: '2 PE',
+    desc: 'O Sangue devora parte de seu corpo e se manifesta como parte de você. Ação de movimento + 2 PE: produz garras, chifres ou uma lâmina de sangue cristalizado no antebraço. Arma simples, corpo a corpo e leve (não precisa empunhar) que causa 1d6 de dano de Sangue. 1x por turno, na ação agredir, gaste 1 PE para um ataque adicional com essa arma. Dura até o fim da cena. Afinidade: a arma se torna permanente e causa 1d10 de dano de Sangue.' },
+  { nome: 'Sangue de Ferro', classe: 'Poderes Paranormais', categoria: 'Sangue', nex: '', pe: '—',
+    desc: 'O seu sangue flui de forma paranormal e agressiva, concedendo vigor não natural. Você recebe +2 pontos de vida por NEX. Quando sobe de NEX, os PV que recebe por este poder aumentam de acordo. Ex.: se escolher este poder em NEX 50%, recebe 20 PV; ao subir para 55%, recebe +2 PV, e assim por diante. Afinidade: você recebe +5 em Fortitude e se torna imune a venenos e doenças.' },
+  { nome: 'Sangue Fervente', classe: 'Poderes Paranormais', categoria: 'Sangue', nex: '', pe: '—',
+    desc: 'A intensidade da dor desperta em você sentimentos bestiais e prazerosos. Enquanto estiver machucado, você recebe +1 em Agilidade ou Força, à sua escolha (escolha sempre que este efeito for ativado). Pré: Sangue 2. Afinidade: o bônus em Agilidade ou Força aumenta para +2.' },
+  { nome: 'Sangue Vivo', classe: 'Poderes Paranormais', categoria: 'Sangue', nex: '', pe: '—',
+    desc: 'A carnificina não pode parar, o Sangue precisa continuar fluindo. Na primeira vez que ficar machucado durante uma cena, você recebe Cura Acelerada 2. Esse efeito nunca cura você acima da metade dos PV máximos (você nunca deixa de estar machucado) e termina no fim da cena ou caso você perca a condição machucado. Afinidade: a Cura Acelerada aumenta para 5.' },
+
+  // ===== PODERES PARANORMAIS — VARIA =====
+  { nome: 'Aprender Ritual', classe: 'Poderes Paranormais', categoria: 'Varia', nex: '', pe: '—',
+    desc: 'Você aprende e pode conjurar um ritual de 1º círculo à sua escolha. Além disso, pode substituir um ritual que já conhece por outro. A partir de NEX 45%, aprende um ritual de até 2º círculo; a partir de NEX 75%, de até 3º círculo. Pode escolher este poder várias vezes, sujeito ao limite de rituais conhecidos. Conta como um poder do elemento do ritual escolhido.' },
+  { nome: 'Resistir a <Elemento>', classe: 'Poderes Paranormais', categoria: 'Varia', nex: '', pe: '—',
+    desc: 'Escolha entre Conhecimento, Energia, Morte ou Sangue. Você recebe resistência 10 contra esse elemento. Este poder conta como um poder do elemento escolhido. Afinidade: aumenta a resistência para 20.' }
 ];
 
 const HABILIDADES_CATEGORIAS = {
   'Combatente': ['Poderes de Combatente', 'Aniquilador', 'Comandante de Campo', 'Guerreiro', 'Operações Especiais', 'Tropa de Choque'],
   'Especialista': ['Poderes de Especialista', 'Atirador de Elite', 'Infiltrador', 'Médico de Campo', 'Negociador', 'Técnico'],
-  'Ocultista': ['Poderes de Ocultista', 'Conduíte', 'Flagelador', 'Graduado', 'Intuitivo', 'Lâmina Paranormal']
+  'Ocultista': ['Poderes de Ocultista', 'Conduíte', 'Flagelador', 'Graduado', 'Intuitivo', 'Lâmina Paranormal'],
+  'Poderes Paranormais': ['Conhecimento', 'Energia', 'Morte', 'Sangue', 'Varia']
 };
+
