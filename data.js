@@ -69,7 +69,7 @@ const CLASSES = {
     sanBase: 12, sanPorNex: 3,
     peBase: 2, pePorNex: 2,
     periciasBase: 1,
-    proficiencias: 'Armas simples e táticas, Proteções leves e médias',
+    proficiencias: 'Armas simples, armas táticas e proteções leves',
     habilidadesIniciais: ['Ataque Especial', 'Treinamento em Luta ou Pontaria'],
   },
   especialista: {

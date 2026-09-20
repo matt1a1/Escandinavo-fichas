@@ -45,6 +45,7 @@
     .catalog-item-desc.ritual-body { white-space:pre-wrap !important; margin-top:4px !important; padding-top:8px !important; border-top:1px solid #2a2a35 !important; }
     .rit-ver { font-size:.78rem !important; color:#9a9aaa !important; }
     .rit-ver strong { color:#a78bfa !important; }
+    .res-formula { margin:8px 0 0 !important; font-size:.68rem !important; line-height:1.4 !important; color:#8a8a9a !important; }
   </style>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Cinzel:wght@500;600&display=swap" rel="stylesheet" />
 </head>
@@ -89,6 +90,7 @@
           <div class="resource vida"><label>VIDA</label><div class="resource-bar"><button type="button" class="res-btn" data-res="vida" data-delta="-5">«</button><button type="button" class="res-btn" data-res="vida" data-delta="-1">‹</button><span class="res-value"><span id="vida-atual">13</span> / <span id="vida-max">13</span></span><button type="button" class="res-btn" data-res="vida" data-delta="1">›</button><button type="button" class="res-btn" data-res="vida" data-delta="5">»</button></div></div>
           <div class="resource sanidade"><label>SANIDADE</label><div class="resource-bar"><button type="button" class="res-btn" data-res="sanidade" data-delta="-5">«</button><button type="button" class="res-btn" data-res="sanidade" data-delta="-1">‹</button><span class="res-value"><span id="san-atual">20</span> / <span id="san-max">20</span></span><button type="button" class="res-btn" data-res="sanidade" data-delta="1">›</button><button type="button" class="res-btn" data-res="sanidade" data-delta="5">»</button></div></div>
           <div class="resource esforco"><label>ESFORÇO</label><div class="resource-bar"><button type="button" class="res-btn" data-res="esforco" data-delta="-5">«</button><button type="button" class="res-btn" data-res="esforco" data-delta="-1">‹</button><span class="res-value"><span id="pe-atual">5</span> / <span id="pe-max">5</span></span><button type="button" class="res-btn" data-res="esforco" data-delta="1">›</button><button type="button" class="res-btn" data-res="esforco" data-delta="5">»</button></div></div>
+          <p class="res-formula" id="res-formula"></p>
         </section>
         <section class="card combat-stats">
           <div class="stat-row"><div class="stat"><label>Defesa</label><span id="defesa">11</span></div><div class="stat"><label>Bloqueio</label><span id="bloqueio">0</span></div><div class="stat"><label>Esquiva</label><span id="esquiva">11</span></div></div>
@@ -271,12 +273,12 @@
     </div>
   </div>
 
-  <script src="data.js?v=restore1"></script>
+  <script src="data.js?v=nex1"></script>
   <script src="rituais-catalog.js?v=restore1"></script>
   <script src="rituais-extra.js?v=restore1"></script>
   <script src="habilidades-catalog.js?v=pp1"></script>
-  <script src="app.js?v=restore1"></script>
+  <script src="app.js?v=nex1"></script>
   <script src="catalog-ui.js?v=restore1"></script>
-  <script src="habilidades-ui.js?v=restore1"></script>
+  <script src="habilidades-ui.js?v=nex1"></script>
 </body>
 </html>

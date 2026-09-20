@@ -13,14 +13,43 @@ let ritualEditIndex = null;
 window._atkExtras = [];
 function getAttr(key) { return state.atributos[key] ?? 1; }
 function pontosDisponiveis() { return 9 - Object.values(state.atributos).reduce((a, b) => a + b, 0); }
+let lastResourceMax = { pv: null, san: null, pe: null };
+function nexNiveis(nex) {
+  const n = Math.max(5, Number(nex) || 5);
+  if (n >= 99) return 20;
+  return Math.floor(n / 5);
+}
+function temHabilidade(nome) {
+  const alvo = String(nome || '').toLowerCase();
+  return (state.habilidades || []).some((h) => String(h.nome || '').toLowerCase() === alvo);
+}
 function calcularRecursos() {
-  const cls = CLASSES[state.classe];
-  const n = Math.floor(state.nex / 5);
+  const cls = CLASSES[state.classe] || CLASSES.ocultista;
+  const niveis = nexNiveis(state.nex);
+  const extra = Math.max(0, niveis - 1);
+  const vig = getAttr('vig');
+  const pre = getAttr('pre');
+  let pv = cls.pvBase + vig + extra * (cls.pvPorNex + vig);
+  let pe = cls.peBase + pre + extra * (cls.pePorNex + pre);
+  let san = cls.sanBase + extra * cls.sanPorNex;
+  if (temHabilidade('Sangue de Ferro')) pv += 2 * niveis;
+  if (temHabilidade('Potencial Aprimorado')) pe += niveis;
   return {
-    pvMax: Math.max(1, cls.pvBase + getAttr('vig') + (n - 1) * (cls.pvPorNex + getAttr('vig'))),
-    sanMax: Math.max(1, cls.sanBase + (n - 1) * cls.sanPorNex),
-    peMax: Math.max(1, cls.peBase + getAttr('pre') + (n - 1) * (cls.pePorNex + getAttr('pre'))),
+    pvMax: Math.max(1, pv),
+    sanMax: Math.max(1, san),
+    peMax: Math.max(1, pe),
+    niveis,
+    cls
   };
+}
+function calcularPeTurno() {
+  const n = Math.max(5, Number(state.nex) || 5);
+  return 1 + Math.floor((n >= 99 ? 99 : n) / 10);
+}
+function clampRecurso(atual, max, last) {
+  if (atual === null || atual === undefined) return max;
+  if (last != null) atual = atual + (max - last);
+  return Math.max(0, Math.min(max, atual));
 }
 function calcularDefesa() { return 10 + getAttr('agi'); }
 function getPericiaRank(id) {
@@ -105,13 +134,11 @@ function renderAtributos() {
   el.style.color = pts < 0 ? 'var(--danger)' : 'var(--accent)';
 }
 function renderRecursos() {
-  const { pvMax, sanMax, peMax } = calcularRecursos();
-  if (state.vidaAtual === null) state.vidaAtual = pvMax;
-  if (state.sanAtual === null) state.sanAtual = sanMax;
-  if (state.peAtual === null) state.peAtual = peMax;
-  state.vidaAtual = Math.min(state.vidaAtual, pvMax);
-  state.sanAtual = Math.min(state.sanAtual, sanMax);
-  state.peAtual = Math.min(state.peAtual, peMax);
+  const { pvMax, sanMax, peMax, cls } = calcularRecursos();
+  state.vidaAtual = clampRecurso(state.vidaAtual, pvMax, lastResourceMax.pv);
+  state.sanAtual = clampRecurso(state.sanAtual, sanMax, lastResourceMax.san);
+  state.peAtual = clampRecurso(state.peAtual, peMax, lastResourceMax.pe);
+  lastResourceMax = { pv: pvMax, san: sanMax, pe: peMax };
   document.getElementById('vida-atual').textContent = state.vidaAtual;
   document.getElementById('vida-max').textContent = pvMax;
   document.getElementById('san-atual').textContent = state.sanAtual;
@@ -121,11 +148,19 @@ function renderRecursos() {
   document.getElementById('defesa').textContent = calcularDefesa();
   document.getElementById('bloqueio').textContent = calcularBloqueio();
   document.getElementById('esquiva').textContent = calcularEsquiva();
-  document.getElementById('pe-turno').textContent = 1;
-  document.getElementById('proficiencias').textContent = CLASSES[state.classe].proficiencias;
+  document.getElementById('pe-turno').textContent = calcularPeTurno();
+  document.getElementById('proficiencias').textContent = cls.proficiencias;
   const cm = document.getElementById('carga-max');
   if (cm) cm.textContent = calcularCargaMax();
   document.getElementById('dt-rituais').textContent = calcularDTRituais();
+  const formula = document.getElementById('res-formula');
+  if (formula) {
+    formula.textContent = cls.nome
+      + ' · NEX ' + state.nex + '% (' + nexNiveis(state.nex) + ' níveis)'
+      + ' · PV ' + cls.pvBase + '+VIG, +' + cls.pvPorNex + '+VIG/nível'
+      + ' · PE ' + cls.peBase + '+PRE, +' + cls.pePorNex + '+PRE/nível'
+      + ' · SAN ' + cls.sanBase + ', +' + cls.sanPorNex + '/nível';
+  }
 }
 function renderPericias() {
   const list = document.getElementById('pericias-list');
@@ -186,7 +221,7 @@ function renderHabilidades() {
     list.appendChild(card);
   });
   list.querySelectorAll('input, textarea').forEach((el) => el.addEventListener('change', (e) => { state.habilidades[+e.target.dataset.idx][e.target.dataset.field] = e.target.value; scheduleSave(); }));
-  list.querySelectorAll('.btn-remove').forEach((btn) => btn.addEventListener('click', () => { state.habilidades.splice(+btn.dataset.idx, 1); scheduleSave(); renderHabilidades(); }));
+  list.querySelectorAll('.btn-remove').forEach((btn) => btn.addEventListener('click', () => { state.habilidades.splice(+btn.dataset.idx, 1); scheduleSave(); renderHabilidades(); renderRecursos(); }));
 }
 function renderRituais() {
   const list = document.getElementById('rituais-list');
@@ -472,14 +507,13 @@ function bindEvents() {
     el.querySelectorAll('.attr-btn').forEach((btn) => btn.addEventListener('click', () => {
       let val = state.atributos[key] + +btn.dataset.delta;
       if (val < 0) val = 0; if (val > 5) val = 5;
-      state.atributos[key] = val; state.vidaAtual = null; state.peAtual = null;
+      state.atributos[key] = val;
       renderAtributos(); renderRecursos(); renderPericias(); scheduleSave();
     }));
   });
   document.querySelectorAll('.nex-btn').forEach((btn) => btn.addEventListener('click', () => {
     state.nex = Math.max(5, Math.min(99, state.nex + +btn.dataset.delta));
     document.getElementById('nex-display').textContent = state.nex + '%';
-    state.vidaAtual = null; state.sanAtual = null; state.peAtual = null;
     renderRecursos(); scheduleSave();
   }));
   document.querySelectorAll('.res-btn').forEach((btn) => btn.addEventListener('click', () => {
@@ -491,7 +525,9 @@ function bindEvents() {
     renderRecursos(); scheduleSave();
   }));
   document.getElementById('classe').addEventListener('change', (e) => {
-    state.classe = e.target.value; state.vidaAtual = null; state.sanAtual = null; state.peAtual = null;
+    state.classe = e.target.value;
+    state.vidaAtual = null; state.sanAtual = null; state.peAtual = null;
+    lastResourceMax = { pv: null, san: null, pe: null };
     if (!state.habilidades.length) state.habilidades = CLASSES[state.classe].habilidadesIniciais.map((n) => ({ nome: n, desc: '' }));
     scheduleSave(); renderAll();
   });
@@ -636,6 +672,7 @@ function importJSON(e) {
     try {
       Object.assign(state, JSON.parse(ev.target.result));
       if (!state.itensLimite) state.itensLimite = { I: 2, II: 0, III: 0, IV: 0 };
+      lastResourceMax = { pv: null, san: null, pe: null };
       saveState(); renderAll(); alert('Ficha importada com sucesso!');
     } catch (err) { alert('Erro ao importar JSON.'); }
   };
@@ -653,6 +690,7 @@ function novaFicha() {
   });
   applyOrigemPericias();
   state.habilidades = CLASSES[state.classe].habilidadesIniciais.map((n) => ({ nome: n, desc: '' }));
+  lastResourceMax = { pv: null, san: null, pe: null };
   saveState(); renderAll();
 }
 function init() {
