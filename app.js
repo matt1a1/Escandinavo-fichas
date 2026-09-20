@@ -25,6 +25,21 @@ function pontosDisponiveis() {
   const gastos = Object.values(state.atributos).reduce((a, b) => a + b, 0);
   return 9 + nexAumentosAtributo() - gastos;
 }
+function pontosAcimaDe3() {
+  return Object.values(state.atributos).reduce((n, v) => n + Math.max(0, Number(v) - 3), 0);
+}
+function normalizarAtributosNex() {
+  const extra = nexAumentosAtributo();
+  const keys = ['for', 'agi', 'int', 'pre', 'vig'];
+  while (pontosAcimaDe3() > extra) {
+    let best = null;
+    keys.forEach((k) => {
+      if (state.atributos[k] > 3 && (best == null || state.atributos[k] > state.atributos[best])) best = k;
+    });
+    if (!best) break;
+    state.atributos[best] -= 1;
+  }
+}
 function grauPorRodada() { return 2 + getAttr('int'); }
 function grauLimite() {
   const por = grauPorRodada();
@@ -170,8 +185,8 @@ function renderAtributos() {
     const extra = nexAumentosAtributo();
     const marcas = [20, 50, 80, 95].filter((n) => state.nex >= n).map((n) => n + '%');
     hint.textContent = extra
-      ? ' · Aumento de Atributo +' + extra + '/4 (' + marcas.join(', ') + ' · máx. 5)'
-      : ' · Aumento de Atributo em NEX 20%, 50%, 80% e 95%';
+      ? ' · máx. inicial 3 · Aumento de Atributo +' + extra + '/4 (' + marcas.join(', ') + ' · até 5)'
+      : ' · começam em 1 · 4 pontos · máx. inicial 3 · baixar a 0 dá +1 ponto';
   }
 }
 function renderRecursos() {
@@ -578,8 +593,19 @@ function bindEvents() {
   document.querySelectorAll('.attr-item').forEach((el) => {
     const key = el.dataset.attr;
     el.querySelectorAll('.attr-btn').forEach((btn) => btn.addEventListener('click', () => {
-      let val = state.atributos[key] + +btn.dataset.delta;
-      if (val < 0) val = 0; if (val > 5) val = 5;
+      const delta = +btn.dataset.delta;
+      let val = state.atributos[key] + delta;
+      if (val < 0) val = 0;
+      if (val > 5) val = 5;
+      if (val === state.atributos[key]) return;
+      if (delta > 0) {
+        if (pontosDisponiveis() <= 0) return;
+        const acimaDepois = pontosAcimaDe3() - Math.max(0, state.atributos[key] - 3) + Math.max(0, val - 3);
+        if (acimaDepois > nexAumentosAtributo()) {
+          alert('O máximo inicial de cada atributo é 3. Aumento de Atributo (NEX 20%, 50%, 80% e 95%) permite subir até 5.');
+          return;
+        }
+      }
       state.atributos[key] = val;
       renderAtributos(); renderRecursos(); renderPericias(); scheduleSave();
     }));
@@ -587,6 +613,7 @@ function bindEvents() {
   document.querySelectorAll('.nex-btn').forEach((btn) => btn.addEventListener('click', () => {
     state.nex = Math.max(5, Math.min(99, state.nex + +btn.dataset.delta));
     document.getElementById('nex-display').textContent = state.nex + '%';
+    normalizarAtributosNex();
     renderAtributos(); renderRecursos(); renderPericias(); scheduleSave();
   }));
   document.querySelectorAll('.res-btn').forEach((btn) => btn.addEventListener('click', () => {
@@ -772,6 +799,7 @@ function init() {
     applyOrigemPericias();
     state.habilidades = CLASSES[state.classe].habilidadesIniciais.map((n) => ({ nome: n, desc: '' }));
   }
+  normalizarAtributosNex();
   bindEvents(); renderAll();
   setSaveStatus(loaded ? 'Ficha restaurada' : 'Salvo automaticamente', 'saved');
 }
