@@ -124,6 +124,7 @@
         if (typeof saveState === 'function') saveState();
         if (typeof renderHabilidades === 'function') renderHabilidades();
         if (typeof renderRecursos === 'function') renderRecursos();
+        if (typeof renderItens === 'function') renderItens();
         renderList();
       });
     });

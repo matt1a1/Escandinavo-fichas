@@ -10,6 +10,7 @@ const STORAGE_KEY = 'escandinavo-ficha-v1';
 let saveTimer = null;
 let ataqueEditIndex = null;
 let ritualEditIndex = null;
+let itemEditIndex = null;
 window._atkExtras = [];
 function getAttr(key) { return state.atributos[key] ?? 1; }
 function nexAumentosAtributo() {
@@ -130,7 +131,12 @@ function setPericiaOther(id, other) {
 }
 function calcularEsquiva() { const b = getPericiaBonus('reflexos'); return b > 0 ? calcularDefesa() + b : calcularDefesa(); }
 function calcularBloqueio() { return getPericiaBonus('fortitude'); }
-function calcularCargaMax() { return Math.max(1, getAttr('for')) * 5; }
+function calcularCargaMax() {
+  let f = getAttr('for');
+  if (temHabilidade('Inventário Otimizado')) f += getAttr('int');
+  if (f <= 0) return 2;
+  return f * 5;
+}
 function calcularDTRituais() { return 10 + getAttr('pre') + Math.floor(state.nex / 10); }
 function periciasMax() {
   const cls = CLASSES[state.classe];
@@ -309,7 +315,7 @@ function renderHabilidades() {
     list.appendChild(card);
   });
   list.querySelectorAll('input, textarea').forEach((el) => el.addEventListener('change', (e) => { state.habilidades[+e.target.dataset.idx][e.target.dataset.field] = e.target.value; scheduleSave(); }));
-  list.querySelectorAll('.btn-remove').forEach((btn) => btn.addEventListener('click', () => { state.habilidades.splice(+btn.dataset.idx, 1); scheduleSave(); renderHabilidades(); renderRecursos(); }));
+  list.querySelectorAll('.btn-remove').forEach((btn) => btn.addEventListener('click', () => { state.habilidades.splice(+btn.dataset.idx, 1); scheduleSave(); renderHabilidades(); renderRecursos(); renderItens(); }));
 }
 function renderRituais() {
   const list = document.getElementById('rituais-list');
@@ -343,36 +349,104 @@ function renderRituais() {
 }
 function renderItens() {
   const list = document.getElementById('itens-list');
+  if (!list) return;
   list.innerHTML = '';
   const counts = { I: 0, II: 0, III: 0, IV: 0 };
   let carga = 0;
-  state.itens.forEach((item) => {
-    const cat = (item.categoria || '0').toString().toUpperCase();
+  (state.itens || []).forEach((item) => {
+    const cat = String(item.categoria || '0').toUpperCase();
     if (counts[cat] !== undefined) counts[cat]++;
     carga += Number(item.espacos) || 0;
   });
-  if (document.getElementById('count-I')) {
-    ['I','II','III','IV'].forEach((c) => { document.getElementById('count-' + c).textContent = counts[c]; document.getElementById('limite-' + c).value = state.itensLimite[c] ?? 0; });
-    document.getElementById('carga-atual').textContent = carga;
-    document.getElementById('carga-max').textContent = calcularCargaMax();
+  const cargaMax = calcularCargaMax();
+  ['I', 'II', 'III', 'IV'].forEach((c) => {
+    const countEl = document.getElementById('count-' + c);
+    const limEl = document.getElementById('limite-' + c);
+    const box = countEl && countEl.closest('.cat-box');
+    if (countEl) countEl.textContent = counts[c];
+    if (limEl && document.activeElement !== limEl) limEl.value = state.itensLimite[c] ?? 0;
+    const lim = Number(state.itensLimite[c]) || 0;
+    if (box) box.classList.toggle('over', counts[c] > lim);
+  });
+  const cargaAtualEl = document.getElementById('carga-atual');
+  const cargaMaxEl = document.getElementById('carga-max');
+  const cargaRow = document.querySelector('#tab-inventario .carga-row');
+  const hint = document.getElementById('carga-hint');
+  if (cargaAtualEl) cargaAtualEl.textContent = carga;
+  if (cargaMaxEl) cargaMaxEl.textContent = cargaMax;
+  if (cargaRow) cargaRow.classList.toggle('over', carga > cargaMax);
+  if (hint) {
+    const parts = [];
+    if (temHabilidade('Inventário Otimizado')) parts.push('Inventário Otimizado (FOR+INT)×5');
+    else if (getAttr('for') <= 0) parts.push('Força 0: 2 espaços');
+    else parts.push('Carga = Força × 5');
+    if (carga > cargaMax) parts.push('acima da carga máxima');
+    hint.textContent = parts.join(' · ');
+    hint.classList.toggle('warn', carga > cargaMax);
   }
   const pi = document.getElementById('patente-inv');
-  if (pi) pi.value = state.patente;
-  if (!state.itens.length) { list.innerHTML = '<p class="empty-msg">Você ainda não possui itens.</p>'; return; }
+  if (pi && document.activeElement !== pi) pi.value = state.patente;
+  if (!state.itens.length) {
+    list.innerHTML = '<p class="empty-msg">Você ainda não possui itens.</p>';
+    return;
+  }
   const tipoLabel = { arma: 'Arma', municao: 'Munição', protecao: 'Proteção', geral: 'Geral', amaldicoado: 'Item Amaldiçoado' };
   state.itens.forEach((item, i) => {
     const card = document.createElement('div');
     card.className = 'item-card';
-    card.innerHTML = '<span class="item-tipo-tag">' + (tipoLabel[item.tipo] || 'Geral') + '</span><input type="text" value="' + escapeHtml(item.nome) + '" data-field="nome" data-idx="' + i + '" /><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;"><input type="text" value="' + escapeHtml(item.categoria || '0') + '" data-field="categoria" data-idx="' + i + '" /><input type="number" value="' + (item.espacos ?? 1) + '" data-field="espacos" data-idx="' + i + '" min="0" /></div><textarea data-field="desc" data-idx="' + i + '">' + escapeHtml(item.desc || '') + '</textarea><div class="item-actions"><button type="button" class="btn-remove" data-idx="' + i + '">Remover</button></div>';
+    const cat = item.categoria || '0';
+    const esp = item.espacos ?? 0;
+    card.innerHTML =
+      '<span class="item-tipo-tag">' + escapeHtml(tipoLabel[item.tipo] || 'Geral') + '</span>' +
+      '<h4>' + escapeHtml(item.nome || 'Item sem nome') + '</h4>' +
+      '<div class="ataque-meta">' +
+        '<span>Categoria: <strong>' + escapeHtml(String(cat)) + '</strong></span>' +
+        '<span>Espaços: <strong>' + esp + '</strong></span>' +
+      '</div>' +
+      (item.desc ? '<p style="font-size:0.8rem;color:var(--text-dim);margin:0 0 6px;">' + escapeHtml(item.desc) + '</p>' : '') +
+      '<div class="item-actions"><button type="button" class="btn small" data-edit-item="' + i + '">Editar</button><button type="button" class="btn-remove" data-idx="' + i + '">Remover</button></div>';
     list.appendChild(card);
   });
-  list.querySelectorAll('input, textarea').forEach((el) => el.addEventListener('change', (e) => {
-    let val = e.target.value;
-    if (e.target.dataset.field === 'espacos') val = parseInt(val) || 0;
-    state.itens[+e.target.dataset.idx][e.target.dataset.field] = val;
-    scheduleSave(); renderItens();
+  list.querySelectorAll('.btn-remove').forEach((btn) => btn.addEventListener('click', () => {
+    state.itens.splice(+btn.dataset.idx, 1);
+    scheduleSave();
+    renderItens();
   }));
-  list.querySelectorAll('.btn-remove').forEach((btn) => btn.addEventListener('click', () => { state.itens.splice(+btn.dataset.idx, 1); scheduleSave(); renderItens(); }));
+  list.querySelectorAll('[data-edit-item]').forEach((btn) => btn.addEventListener('click', () => openItemModal(+btn.dataset.editItem)));
+}
+function openItemModal(index) {
+  const modal = document.getElementById('modal-item');
+  if (!modal) return;
+  itemEditIndex = (index === null || index === undefined) ? null : index;
+  const title = document.getElementById('modal-item-title');
+  const saveBtn = document.getElementById('btn-salvar-item');
+  const item = itemEditIndex == null ? null : state.itens[itemEditIndex];
+  title.textContent = item ? 'Editar Item' : 'Novo Item';
+  saveBtn.textContent = item ? 'Salvar' : 'Adicionar';
+  document.getElementById('item-nome').value = item ? (item.nome || '') : '';
+  document.getElementById('item-tipo').value = item ? (item.tipo || 'geral') : (openItemModal._tipo || 'geral');
+  document.getElementById('item-categoria').value = item ? (item.categoria || '0') : (openItemModal._tipo === 'amaldicoado' ? 'I' : '0');
+  document.getElementById('item-espacos').value = item ? (item.espacos ?? 1) : 1;
+  document.getElementById('item-desc').value = item ? (item.desc || '') : '';
+  openItemModal._tipo = null;
+  modal.hidden = false;
+  document.getElementById('item-nome').focus();
+}
+function salvarItemModal() {
+  const nome = document.getElementById('item-nome').value.trim();
+  if (!nome) { alert('Informe o nome do item.'); return; }
+  const item = {
+    nome,
+    tipo: document.getElementById('item-tipo').value || 'geral',
+    categoria: document.getElementById('item-categoria').value || '0',
+    espacos: parseInt(document.getElementById('item-espacos').value, 10) || 0,
+    desc: document.getElementById('item-desc').value.trim()
+  };
+  if (itemEditIndex == null) state.itens.push(item);
+  else state.itens[itemEditIndex] = item;
+  document.getElementById('modal-item').hidden = true;
+  scheduleSave();
+  renderItens();
 }
 function renderAtaques() {
   const list = document.getElementById('ataques-list');
@@ -607,14 +681,14 @@ function bindEvents() {
         }
       }
       state.atributos[key] = val;
-      renderAtributos(); renderRecursos(); renderPericias(); scheduleSave();
+      renderAtributos(); renderRecursos(); renderPericias(); renderItens(); scheduleSave();
     }));
   });
   document.querySelectorAll('.nex-btn').forEach((btn) => btn.addEventListener('click', () => {
     state.nex = Math.max(5, Math.min(99, state.nex + +btn.dataset.delta));
     document.getElementById('nex-display').textContent = state.nex + '%';
     normalizarAtributosNex();
-    renderAtributos(); renderRecursos(); renderPericias(); scheduleSave();
+    renderAtributos(); renderRecursos(); renderPericias(); renderItens(); scheduleSave();
   }));
   document.querySelectorAll('.res-btn').forEach((btn) => btn.addEventListener('click', () => {
     const res = btn.dataset.res; const delta = +btn.dataset.delta;
@@ -661,12 +735,13 @@ function bindEvents() {
     });
   }
   document.getElementById('modal-ritual')?.addEventListener('click', (e) => { if (e.target.id === 'modal-ritual') e.target.hidden = true; });
-  document.getElementById('btn-add-item').addEventListener('click', () => { state.itens.push({ nome: '', tipo: 'geral', categoria: '0', espacos: 1, desc: '' }); renderItens(); scheduleSave(); });
+  document.getElementById('btn-add-item').addEventListener('click', () => { openItemModal._tipo = 'geral'; openItemModal(null); });
   document.querySelectorAll('.btn-type').forEach((btn) => btn.addEventListener('click', () => {
-    const tipo = btn.dataset.tipo;
-    state.itens.push({ nome: '', tipo, categoria: tipo === 'amaldicoado' ? 'I' : '0', espacos: 1, desc: '' });
-    renderItens(); scheduleSave();
+    openItemModal._tipo = btn.dataset.tipo || 'geral';
+    openItemModal(null);
   }));
+  document.getElementById('btn-salvar-item')?.addEventListener('click', salvarItemModal);
+  document.getElementById('modal-item')?.addEventListener('click', (e) => { if (e.target.id === 'modal-item') e.target.hidden = true; });
   ['I','II','III','IV'].forEach((cat) => {
     const el = document.getElementById('limite-' + cat);
     if (el) el.addEventListener('input', (e) => { state.itensLimite[cat] = parseInt(e.target.value) || 0; scheduleSave(); });

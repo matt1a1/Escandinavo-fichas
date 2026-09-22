@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <title>Fichas — Ordem Paranormal</title>
-  <link rel="stylesheet" href="styles.css?v=restore1" />
+  <title>Escandinavo Fichas — Ordem Paranormal</title>
+  <link rel="stylesheet" href="styles.css?v=inv1" />
   <style>
     /* scrollbar escura */
     * { scrollbar-width: thin; scrollbar-color: #3a3a48 transparent; }
@@ -54,7 +54,7 @@
 <body>
   <div id="app">
     <header class="top-bar">
-      <div class="brand"><span class="logo">◈</span><div><h1>Fichas</h1><p>Ordem Paranormal RPG</p></div></div>
+      <div class="brand"><span class="logo">◈</span><div><h1>Escandinavo Fichas</h1><p>Ordem Paranormal RPG</p></div></div>
       <div class="header-actions">
         <button id="btn-new" class="btn secondary">Nova Ficha</button>
         <button id="btn-export" class="btn secondary">Exportar JSON</button>
@@ -183,18 +183,33 @@
           <div id="rituais-list" class="item-list"></div>
         </div>
         <div class="tab-content" id="tab-inventario">
-          <div class="list-header"><h3></h3><button type="button" class="btn primary small" id="btn-add-item">Adicionar</button></div>
           <div class="inv-grid">
             <div class="inv-field"><label>Pontos de Prestígio</label><input type="number" id="pp" value="0" min="0" /></div>
             <div class="inv-field"><label>Patente</label><input type="text" id="patente-inv" value="Recruta" /></div>
           </div>
           <div class="inv-limits">
-            <div class="inv-limits-row"><label>Limite de Itens</label><div class="cat-boxes"><input type="number" id="limite-I" value="2" min="0" /><input type="number" id="limite-II" value="0" min="0" /><input type="number" id="limite-III" value="0" min="0" /><input type="number" id="limite-IV" value="0" min="0" /></div></div>
-            <div class="inv-limits-row"><label>No Inventário</label><div class="cat-boxes readonly"><span id="count-I">0</span><span id="count-II">0</span><span id="count-III">0</span><span id="count-IV">0</span></div></div>
+            <div class="inv-limits-row">
+              <label>Limite de Itens</label>
+              <div class="cat-boxes">
+                <div class="cat-box"><span class="cat-head">I</span><input type="number" id="limite-I" value="2" min="0" /></div>
+                <div class="cat-box"><span class="cat-head">II</span><input type="number" id="limite-II" value="0" min="0" /></div>
+                <div class="cat-box"><span class="cat-head">III</span><input type="number" id="limite-III" value="0" min="0" /></div>
+                <div class="cat-box"><span class="cat-head">IV</span><input type="number" id="limite-IV" value="0" min="0" /></div>
+              </div>
+            </div>
+            <div class="inv-limits-row">
+              <label>No Inventário</label>
+              <div class="cat-boxes readonly">
+                <div class="cat-box"><span class="cat-head">I</span><span id="count-I">0</span></div>
+                <div class="cat-box"><span class="cat-head">II</span><span id="count-II">0</span></div>
+                <div class="cat-box"><span class="cat-head">III</span><span id="count-III">0</span></div>
+                <div class="cat-box"><span class="cat-head">IV</span><span id="count-IV">0</span></div>
+              </div>
+            </div>
           </div>
           <div class="inv-grid">
             <div class="inv-field"><label>Limite de Crédito</label><input type="text" id="credito" value="Baixo" /></div>
-            <div class="inv-field"><label>Carga Máx.</label><div class="carga-row"><span id="carga-atual">0</span><span class="carga-sep">/</span><span id="carga-max">5</span></div></div>
+            <div class="inv-field"><label>Carga</label><div class="carga-row"><span id="carga-atual">0</span><span class="carga-sep">/</span><span id="carga-max">5</span></div><p class="carga-hint" id="carga-hint"></p></div>
           </div>
           <div class="item-type-btns">
             <span class="novo-label">Novo</span>
@@ -203,6 +218,7 @@
             <button type="button" class="btn-type" data-tipo="protecao">Proteção</button>
             <button type="button" class="btn-type" data-tipo="geral">Geral</button>
             <button type="button" class="btn-type" data-tipo="amaldicoado">Item Amald.</button>
+            <button type="button" class="btn primary small" id="btn-add-item">Adicionar</button>
           </div>
           <div id="itens-list" class="item-list"></div>
         </div>
@@ -275,12 +291,44 @@
     </div>
   </div>
 
+  <div class="modal-overlay" id="modal-item" hidden>
+    <div class="modal">
+      <div class="modal-header"><h2 id="modal-item-title">Novo Item</h2><button type="button" class="modal-close" data-close="modal-item">×</button></div>
+      <div class="modal-body">
+        <div class="field"><label>Nome*</label><input type="text" id="item-nome" placeholder="Nome do item" /></div>
+        <div class="modal-row">
+          <div class="field"><label>Tipo</label>
+            <select id="item-tipo">
+              <option value="arma">Arma</option>
+              <option value="municao">Munição</option>
+              <option value="protecao">Proteção</option>
+              <option value="geral">Geral</option>
+              <option value="amaldicoado">Item Amaldiçoado</option>
+            </select>
+          </div>
+          <div class="field"><label>Categoria</label>
+            <select id="item-categoria">
+              <option value="0">0</option>
+              <option value="I">I</option>
+              <option value="II">II</option>
+              <option value="III">III</option>
+              <option value="IV">IV</option>
+            </select>
+          </div>
+          <div class="field"><label>Espaços</label><input type="number" id="item-espacos" value="1" min="0" /></div>
+        </div>
+        <div class="field"><label>Descrição</label><textarea id="item-desc" rows="4" placeholder="Efeito, RD, munição, anotações…"></textarea></div>
+      </div>
+      <div class="modal-footer"><button type="button" class="btn secondary" data-close="modal-item">Cancelar</button><button type="button" class="btn primary" id="btn-salvar-item">Adicionar</button></div>
+    </div>
+  </div>
+
   <script src="data.js?v=nex1"></script>
   <script src="rituais-catalog.js?v=restore1"></script>
   <script src="rituais-extra.js?v=restore1"></script>
   <script src="habilidades-catalog.js?v=pp1"></script>
-  <script src="app.js?v=nex4"></script>
+  <script src="app.js?v=inv1"></script>
   <script src="catalog-ui.js?v=restore1"></script>
-  <script src="habilidades-ui.js?v=nex1"></script>
+  <script src="habilidades-ui.js?v=inv1"></script>
 </body>
 </html>
