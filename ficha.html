@@ -2,13 +2,12 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Escandinavo Fichas</title>
 <script>
 fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bfb207669552c837164b121a/index.html')
   .then(function (r) { return r.text(); })
   .then(function (html) {
-    // Botão voltar
     if (html.indexOf('btn-voltar-agentes') === -1) {
       html = html.replace(
         '<button id="btn-new" class="btn secondary">Nova Ficha</button>',
@@ -16,16 +15,20 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
       );
     }
 
-    // CSS atualizado (sem quebrar a tag link)
-    html = html.replace(/href="styles\.css[^"]*"/g, 'href="styles.css?v=hab4"');
+    html = html.replace(/href="styles\.css[^"]*"/g, 'href="styles.css?v=mob1"');
     if (html.indexOf('styles-hab.css') === -1) {
       html = html.replace(
         '</head>',
-        '  <link rel="stylesheet" href="styles-hab.css?v=hab4" />\n</head>'
+        '  <link rel="stylesheet" href="styles-hab.css?v=mob1" />\n</head>'
+      );
+    }
+    if (html.indexOf('mobile.css') === -1) {
+      html = html.replace(
+        '</head>',
+        '  <link rel="stylesheet" href="mobile.css?v=1" />\n</head>'
       );
     }
 
-    // Scripts extras antes de </body>
     var extras = '';
     if (html.indexOf('origens-poderes.js') === -1) {
       extras += '<script src="origens-poderes.js?v=1"><\/script>\n';

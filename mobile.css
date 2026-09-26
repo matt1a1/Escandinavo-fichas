@@ -1,0 +1,93 @@
+/* Mobile — Escandinavo Fichas */
+@media (max-width: 720px) {
+  .ag-nav { padding: 12px 14px; gap: 14px; flex-wrap: wrap; }
+  .ag-nav .brand { font-size: .92rem; width: 100%; margin-right: 0; margin-bottom: 4px; }
+  .ag-nav a { font-size: .9rem; padding: 6px 2px; }
+  .ag-wrap { padding: 16px 14px 40px; }
+  .ag-header { gap: 10px; }
+  .ag-header h1 { font-size: 1rem; }
+  .btn-primary, .btn-ghost, .btn-outline {
+    padding: 10px 14px; font-size: .88rem; min-height: 42px;
+  }
+  .ag-search { font-size: 16px; padding: 12px 14px; }
+  .ag-grid, .camp-grid, .camp-agentes-grid {
+    grid-template-columns: 1fr !important; gap: 12px;
+  }
+  .camp-detail-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .camp-detail-cover { width: 100%; height: 100px; }
+  .camp-detail-header h1 { font-size: 1.25rem; }
+  .camp-detail-actions { width: 100%; }
+  .camp-detail-actions .btn-outline { flex: 1 1 auto; text-align: center; }
+  .camp-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .camp-tab { white-space: nowrap; padding: 10px 14px; }
+  .modal-box {
+    margin: 12px; max-width: none !important;
+    max-height: calc(100vh - 24px); border-radius: 12px;
+  }
+  .modal-box-body { padding: 16px; }
+  .wizard-top { padding: 14px 16px; }
+  .wizard-body { padding: 16px 14px 80px; }
+  .wizard-steps { font-size: .75rem; gap: 8px; padding: 16px 8px 4px; }
+  .wizard-steps .sep { display: none; }
+  .attr-pentagon { transform: scale(0.85); }
+  .origem-item summary { flex-wrap: wrap; gap: 8px; }
+  .origem-item .btn-escolher { width: 100%; }
+  .classe-card { padding: 14px; }
+  .finais-grid, .classe-grid { grid-template-columns: 1fr !important; }
+  .attr-layout { flex-direction: column; }
+  .wizard-nav {
+    position: sticky; bottom: 0; background: var(--ag-bg, #0b0b10);
+    padding: 12px 14px; border-top: 1px solid var(--ag-border, #2a2a38);
+  }
+
+  .top-bar {
+    flex-direction: column; align-items: stretch; gap: 10px; padding: 10px 12px;
+  }
+  .brand h1 { font-size: 1rem; }
+  .header-actions {
+    width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  }
+  .header-actions .btn { width: 100%; text-align: center; min-height: 40px; }
+  .sheet { grid-template-columns: 1fr !important; padding: 8px; gap: 10px; }
+  .panel { padding: 12px; }
+  .identity-grid { grid-template-columns: 1fr !important; }
+  .attrs-row, .attr-grid {
+    display: grid !important; grid-template-columns: repeat(3, 1fr); gap: 8px;
+  }
+  .pericia-row {
+    grid-template-columns: 1.2fr 0.55fr 0.7fr 0.55fr 0.25fr;
+    font-size: 0.78rem; gap: 4px; padding: 8px 4px;
+  }
+  .pericias-list { max-height: 320px; }
+  .tabs {
+    overflow-x: auto; flex-wrap: nowrap !important;
+    -webkit-overflow-scrolling: touch; gap: 2px;
+  }
+  .tabs button, .tab {
+    white-space: nowrap; padding: 10px 12px; font-size: 0.82rem; min-height: 40px;
+  }
+  .inv-grid { grid-template-columns: 1fr !important; }
+  .cat-boxes { grid-template-columns: repeat(2, 1fr) !important; }
+  .catalog-filters { grid-template-columns: 1fr !important; }
+  .modal { padding: 8px !important; }
+  .modal-content {
+    max-width: 100% !important; margin: 0 !important;
+    max-height: 92vh; border-radius: 12px;
+  }
+  .modal-row { grid-template-columns: 1fr !important; }
+  input, select, textarea { font-size: 16px !important; }
+  .btn, .res-btn, .attr-btn, .nex-btn { min-height: 40px; min-width: 40px; }
+  .hab-class-tabs, .hab-cat-chips {
+    overflow-x: auto; flex-wrap: nowrap !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  .hab-class-tab, .hab-chip { white-space: nowrap; flex-shrink: 0; }
+  .footer { padding: 12px; font-size: 0.75rem; text-align: center; }
+}
+
+@media (max-width: 400px) {
+  .camp-detail-actions { flex-direction: column; }
+  .camp-detail-actions .btn-outline { width: 100%; }
+  .header-actions { grid-template-columns: 1fr; }
+  .attrs-row, .attr-grid { grid-template-columns: repeat(2, 1fr) !important; }
+}
