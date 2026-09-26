@@ -5,42 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <title>Escandinavo Fichas — Ordem Paranormal</title>
-  <link rel="stylesheet" href="styles.css?v=inv1" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Cinzel:wght@500;600&display=swap" rel="stylesheet" />
+  <script src="ficha-html.js?v=1"></script>
+  <script>
+    if (window.__FICHA_HTML__) {
+      document.open();
+      document.write(window.__FICHA_HTML__);
+      document.close();
+    } else {
+      document.addEventListener('DOMContentLoaded', function() {
+        document.body.innerHTML = '<p style="font-family:sans-serif;padding:40px;color:#c00">Erro ao carregar a ficha. Arquivo ficha-html.js ausente ou incompleto.</p>';
+      });
+    }
+  </script>
 </head>
 <body>
-  <div id="app">
-    <header class="top-bar">
-      <div class="brand"><span class="logo">◈</span><div><h1>Escandinavo Fichas</h1><p>Ordem Paranormal RPG</p></div></div>
-      <div class="header-actions">
-        <button id="btn-voltar-agentes" class="btn secondary">← Agentes</button>
-        <button id="btn-new" class="btn secondary">Nova Ficha</button>
-        <button id="btn-export" class="btn secondary">Exportar JSON</button>
-        <button id="btn-import" class="btn secondary">Importar JSON</button>
-        <input type="file" id="import-file" accept=".json" hidden />
-        <button id="btn-print" class="btn primary">Imprimir / PDF</button>
-      </div>
-    </header>
-    <main class="sheet">
-      <p style="padding:40px;text-align:center;color:#888">Carregando ficha… Se esta mensagem permanecer, atualize a página (Ctrl+F5).</p>
-    </main>
-  </div>
-  <script src="data.js?v=ocu1"></script>
-  <script src="rituais-catalog.js?v=restore1"></script>
-  <script src="rituais-extra.js?v=restore1"></script>
-  <script src="habilidades-catalog.js?v=ocu1"></script>
-  <script src="app.js?v=ocu1"></script>
-  <script src="catalog-ui.js?v=restore1"></script>
-  <script src="habilidades-ui.js?v=inv1"></script>
-  <script src="itens-catalog.js?v=inv2"></script>
-  <script src="itens-ui.js?v=inv2"></script>
-  <script>
-    // Se o HTML principal não veio completo no deploy, o app.js recria a interface
-    document.addEventListener('DOMContentLoaded', function() {
-      if (!document.getElementById('pericias-list') && typeof renderAll === 'function') {
-        console.warn('HTML incompleto — tentando recuperar via app.js');
-      }
-    });
-  </script>
+  <p style="font-family:sans-serif;padding:40px;color:#888">Carregando ficha…</p>
 </body>
 </html>
