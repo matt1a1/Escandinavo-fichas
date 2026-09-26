@@ -16,6 +16,7 @@
     *::-webkit-scrollbar-corner { background: transparent; }
     /* habilidades */
     #hab-catalog-list { display:flex !important; flex-direction:column !important; gap:8px !important; max-height:420px; overflow-y:auto; }
+    #item-catalog-list { max-height:420px !important; }
     .hab-card { background:#14141c !important; border:1px solid #2a2a35 !important; border-radius:10px !important; flex-shrink:0 !important; min-height:48px !important; height:auto !important; overflow:visible !important; }
     .hab-card.open { border-color:rgba(124,92,255,.45) !important; background:#16161f !important; }
     .hab-card-head { display:flex !important; align-items:center !important; justify-content:space-between !important; gap:10px !important; padding:12px 14px !important; cursor:pointer !important; min-height:48px !important; }
@@ -220,6 +221,33 @@
             <button type="button" class="btn-type" data-tipo="amaldicoado">Item Amald.</button>
             <button type="button" class="btn primary small" id="btn-add-item">Adicionar</button>
           </div>
+          <div class="catalog-panel">
+            <div class="catalog-header">
+              <h4>Catálogo de Itens</h4>
+              <span class="catalog-count" id="item-catalog-count">0</span>
+            </div>
+            <div class="catalog-filters">
+              <input type="search" id="item-search" placeholder="Buscar item..." autocomplete="off" />
+              <select id="item-filter-tipo">
+                <option value="">Todos os tipos</option>
+                <option value="arma">Armas</option>
+                <option value="municao">Munição</option>
+                <option value="protecao">Proteções</option>
+                <option value="geral">Geral</option>
+                <option value="amaldicoado">Paranormal / Amaldiçoado</option>
+              </select>
+              <select id="item-filter-cat">
+                <option value="">Todas as categorias</option>
+                <option value="0">Cat. 0</option>
+                <option value="I">Cat. I</option>
+                <option value="II">Cat. II</option>
+                <option value="III">Cat. III</option>
+                <option value="IV">Cat. IV</option>
+              </select>
+            </div>
+            <div id="item-catalog-list" class="catalog-list"></div>
+          </div>
+          <div class="list-header" style="margin-top:12px;"><h3>Itens do personagem</h3></div>
           <div id="itens-list" class="item-list"></div>
         </div>
         <div class="tab-content" id="tab-combate">
@@ -327,8 +355,10 @@
   <script src="rituais-catalog.js?v=restore1"></script>
   <script src="rituais-extra.js?v=restore1"></script>
   <script src="habilidades-catalog.js?v=pp1"></script>
-  <script src="app.js?v=inv1"></script>
+  <script src="app.js?v=inv2"></script>
   <script src="catalog-ui.js?v=restore1"></script>
   <script src="habilidades-ui.js?v=inv1"></script>
+  <script src="itens-catalog.js?v=inv2"></script>
+  <script src="itens-ui.js?v=inv2"></script>
 </body>
 </html>

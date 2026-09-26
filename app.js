@@ -100,7 +100,27 @@ function clampRecurso(atual, max, last) {
   if (last != null) atual = atual + (max - last);
   return Math.max(0, Math.min(max, atual));
 }
-function calcularDefesa() { return 10 + getAttr('agi'); }
+function calcularDefesa() {
+  let def = 10 + getAttr('agi');
+  let prot = 0;
+  let escudo = 0;
+  (state.itens || []).forEach((item) => {
+    if (item.tipo !== 'protecao') return;
+    const d = Number(item.defesa) || 0;
+    if (/escudo/i.test(item.nome || '')) escudo += d;
+    else if (d > prot) prot = d;
+  });
+  return def + prot + escudo;
+}
+function calcularCargaMax() {
+  let f = getAttr('for');
+  if (temHabilidade('Inventário Otimizado')) f += getAttr('int');
+  let max = f <= 0 ? 2 : f * 5;
+  (state.itens || []).forEach((item) => {
+    if (/mochila militar/i.test(item.nome || '')) max += 2;
+  });
+  return max;
+}
 function getPericiaRank(id) {
   const p = state.pericias[id];
   if (typeof p === 'number') return p;
@@ -131,12 +151,6 @@ function setPericiaOther(id, other) {
 }
 function calcularEsquiva() { const b = getPericiaBonus('reflexos'); return b > 0 ? calcularDefesa() + b : calcularDefesa(); }
 function calcularBloqueio() { return getPericiaBonus('fortitude'); }
-function calcularCargaMax() {
-  let f = getAttr('for');
-  if (temHabilidade('Inventário Otimizado')) f += getAttr('int');
-  if (f <= 0) return 2;
-  return f * 5;
-}
 function calcularDTRituais() { return 10 + getAttr('pre') + Math.floor(state.nex / 10); }
 function periciasMax() {
   const cls = CLASSES[state.classe];
@@ -402,6 +416,8 @@ function renderItens() {
       '<div class="ataque-meta">' +
         '<span>Categoria: <strong>' + escapeHtml(String(cat)) + '</strong></span>' +
         '<span>Espaços: <strong>' + esp + '</strong></span>' +
+        (item.dano ? '<span>Dano: <strong>' + escapeHtml(item.dano) + '</strong></span>' : '') +
+        (item.defesa ? '<span>Defesa: <strong>+' + item.defesa + '</strong></span>' : '') +
       '</div>' +
       (item.desc ? '<p style="font-size:0.8rem;color:var(--text-dim);margin:0 0 6px;">' + escapeHtml(item.desc) + '</p>' : '') +
       '<div class="item-actions"><button type="button" class="btn small" data-edit-item="' + i + '">Editar</button><button type="button" class="btn-remove" data-idx="' + i + '">Remover</button></div>';
@@ -411,6 +427,7 @@ function renderItens() {
     state.itens.splice(+btn.dataset.idx, 1);
     scheduleSave();
     renderItens();
+    renderRecursos();
   }));
   list.querySelectorAll('[data-edit-item]').forEach((btn) => btn.addEventListener('click', () => openItemModal(+btn.dataset.editItem)));
 }
@@ -435,18 +452,20 @@ function openItemModal(index) {
 function salvarItemModal() {
   const nome = document.getElementById('item-nome').value.trim();
   if (!nome) { alert('Informe o nome do item.'); return; }
-  const item = {
+  const prev = itemEditIndex == null ? {} : (state.itens[itemEditIndex] || {});
+  const item = Object.assign({}, prev, {
     nome,
     tipo: document.getElementById('item-tipo').value || 'geral',
     categoria: document.getElementById('item-categoria').value || '0',
     espacos: parseInt(document.getElementById('item-espacos').value, 10) || 0,
     desc: document.getElementById('item-desc').value.trim()
-  };
+  });
   if (itemEditIndex == null) state.itens.push(item);
   else state.itens[itemEditIndex] = item;
   document.getElementById('modal-item').hidden = true;
   scheduleSave();
   renderItens();
+  renderRecursos();
 }
 function renderAtaques() {
   const list = document.getElementById('ataques-list');
