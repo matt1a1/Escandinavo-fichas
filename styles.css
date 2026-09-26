@@ -93,80 +93,19 @@ textarea { min-height: 70px; resize: vertical; }
 .item-card, .ataque-card { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px; }
 .btn-remove { background: transparent; border: 1px solid var(--danger); color: var(--danger); border-radius: 6px; padding: 4px 8px; cursor: pointer; font-size: 0.75rem; }
 .empty-msg { color: var(--text-dim); font-size: 0.85rem; text-align: center; padding: 16px; }
-.hab-subtabs { display: flex; gap: 0; margin-bottom: 14px; background: #121218; border: 1px solid var(--border); border-radius: 10px; padding: 3px; }
-.hab-subtab { flex: 1; background: transparent; border: none; color: var(--text-dim); padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 0.82rem; font-weight: 500; }
-.hab-subtab.active { background: linear-gradient(135deg, #6d4aff, #8b5cf6); color: #fff; font-weight: 600; }
-.hab-nex { display: inline-block; color: #c4b5fd; font-weight: 600; font-size: 0.72rem; background: rgba(124, 92, 255, 0.15); border: 1px solid rgba(124, 92, 255, 0.35); padding: 2px 7px; border-radius: 6px; }
-.hab-pe { display: inline-block; color: #34d399; font-weight: 600; font-size: 0.72rem; background: rgba(52, 211, 153, 0.15); border: 1px solid rgba(52, 211, 153, 0.35); padding: 2px 7px; border-radius: 6px; }
-.hab-card { background: #14141c; border: 1px solid #2a2a35; border-radius: 10px; }
-.hab-card-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 14px; cursor: pointer; }
-.hab-card-title { font-weight: 600; color: #f0f0f5; font-size: 0.9rem; }
-.hab-card-desc { margin: 0; color: #b0b0c0; font-size: 0.82rem; line-height: 1.5; }
-.btn-add-hab { width: 28px; height: 28px; border-radius: 8px; border: none; background: #7c5cff; color: #fff; cursor: pointer; }
-.btn-add-hab.have { background: rgba(34, 197, 94, 0.2); color: #6ee7b7; border: 1px solid rgba(34, 197, 94, 0.45); }
-
-/* Minhas Habilidades — cards com descrição */
-.hab-mine-card {
-  background: #14141c;
-  border: 1px solid #2a2a35;
-  border-radius: 10px;
-  padding: 12px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.hab-mine-card:hover { border-color: rgba(124, 92, 255, 0.35); }
-.hab-mine-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 10px;
-}
-.hab-mine-title-row {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.hab-mine-nome {
-  width: 100%;
-  background: transparent;
-  border: none;
-  color: #f0f0f5;
-  font-weight: 600;
-  font-size: 0.95rem;
-  padding: 0;
-  outline: none;
-}
-.hab-mine-nome:focus { border-bottom: 1px solid #8b5cf6; }
-.hab-mine-tags { display: flex; flex-wrap: wrap; gap: 6px; }
-.hab-cat-tag {
-  display: inline-block;
-  font-size: 0.72rem;
-  font-weight: 600;
-  padding: 2px 7px;
-  border-radius: 6px;
-  color: #a0a0b0;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid #2a2a35;
-}
-.hab-mine-desc {
-  width: 100%;
-  min-height: 64px;
-  background: rgba(0,0,0,0.25);
-  border: 1px solid #2a2a35;
-  border-radius: 8px;
-  color: #b0b0c0;
-  font-size: 0.84rem;
-  line-height: 1.5;
-  padding: 10px 12px;
-  resize: vertical;
-  font-family: inherit;
-}
-.hab-mine-desc:focus {
-  outline: none;
-  border-color: rgba(124, 92, 255, 0.45);
-  color: #f0f0f5;
-}
+.footer { display: flex; justify-content: space-between; padding: 10px 16px; border-top: 1px solid var(--border); font-size: 0.75rem; color: var(--text-dim); }
+.save-status.saved { color: var(--ok); }
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.65); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 16px; }
+.modal-overlay[hidden] { display: none !important; }
+.modal { background: #15151c; border: 1px solid var(--border); border-radius: 12px; width: min(560px, 100%); max-height: 90vh; overflow-y: auto; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 1px solid var(--border); }
+.modal-close { background: transparent; border: none; color: var(--text-dim); font-size: 1.4rem; cursor: pointer; }
+.modal-body { padding: 16px; }
+.modal-footer { display: flex; justify-content: flex-end; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--border); }
+.field { margin-bottom: 12px; }
+.catalog-item { display: flex; flex-direction: column; gap: 8px; background: #14141c; border: 1px solid #2a2a35; border-radius: 10px; padding: 12px 14px; }
+.catalog-tag { display: inline-block; font-size: 0.72rem; padding: 3px 9px; border-radius: 999px; background: rgba(255,255,255,0.06); border: 1px solid #2a2a35; color: #b0b0c0; }
 @media (max-width: 1100px) { .sheet { grid-template-columns: 1fr; } }
+
+/* Carrega estilos de habilidades (abas, filtros, cards) */
+@import url('styles-hab.css?v=hab2');

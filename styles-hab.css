@@ -1,0 +1,276 @@
+/* ========== HABILIDADES ========== */
+
+.hab-subtabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 14px;
+  background: #121218;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 3px;
+}
+.hab-subtab {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+.hab-subtab:hover { color: var(--text); }
+.hab-subtab.active {
+  background: linear-gradient(135deg, #6d4aff, #8b5cf6);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(124, 92, 255, 0.35);
+}
+
+.hab-class-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.hab-class-tab {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-dim);
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-bottom: -1px;
+}
+.hab-class-tab:hover { color: var(--text); }
+.hab-class-tab.active {
+  color: #c4b5fd;
+  border-bottom-color: var(--accent);
+  font-weight: 600;
+}
+
+.hab-cat-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.hab-chip {
+  background: #14141c;
+  border: 1px solid #2e2e3a;
+  color: #b0b0c0;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+.hab-chip:hover {
+  border-color: #4a4a5a;
+  color: #e8e8ef;
+}
+.hab-chip.active {
+  background: rgba(124, 92, 255, 0.18);
+  border-color: #7c5cff;
+  color: #c4b5fd;
+}
+
+#hab-view-catalog .catalog-filters {
+  display: block;
+  margin-bottom: 10px;
+}
+#hab-view-catalog .catalog-filters input {
+  width: 100%;
+  background: #121218;
+  border: 1px solid var(--border);
+  color: #e8e8ef;
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 0.85rem;
+}
+#hab-view-catalog .catalog-filters input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(124, 92, 255, 0.2);
+}
+
+.hab-catalog-list,
+#hab-catalog-list.catalog-list,
+#hab-catalog-list {
+  max-height: 420px !important;
+  overflow-y: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  padding-right: 2px;
+}
+
+.hab-card {
+  background: #14141c;
+  border: 1px solid #2a2a35;
+  border-radius: 10px;
+  flex-shrink: 0;
+  min-height: 48px;
+  height: auto;
+  overflow: visible;
+}
+.hab-card:hover { border-color: #3d3d4d; }
+.hab-card.open {
+  border-color: rgba(124, 92, 255, 0.45);
+  background: #16161f;
+}
+.hab-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px;
+  cursor: pointer;
+  min-height: 48px;
+}
+.hab-card-left {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+.hab-card-title {
+  font-weight: 600;
+  color: #f0f0f5;
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+.hab-nex {
+  display: inline-block;
+  color: #c4b5fd;
+  font-weight: 600;
+  font-size: 0.72rem;
+  background: rgba(124, 92, 255, 0.15);
+  border: 1px solid rgba(124, 92, 255, 0.35);
+  padding: 2px 7px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+.hab-pe {
+  display: inline-block;
+  color: #34d399;
+  font-weight: 600;
+  font-size: 0.72rem;
+  background: rgba(52, 211, 153, 0.15);
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  padding: 2px 7px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+.btn-add-hab {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: none;
+  background: #7c5cff;
+  color: #fff;
+  font-size: 1.05rem;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-add-hab:hover { filter: brightness(1.12); }
+.btn-add-hab.have {
+  background: rgba(34, 197, 94, 0.2);
+  color: #6ee7b7;
+  border: 1px solid rgba(34, 197, 94, 0.45);
+}
+.hab-card-body {
+  padding: 0 14px 14px;
+  border-top: 1px solid #2a2a35;
+}
+.hab-card-body[hidden] { display: none !important; }
+.hab-card.open .hab-card-body { padding-top: 12px; }
+.hab-cat-label {
+  color: #a78bfa;
+  font-size: 0.68rem;
+  margin: 0 0 6px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.hab-card-desc {
+  margin: 0;
+  color: #b0b0c0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+/* Minhas Habilidades */
+.hab-mine-card {
+  background: #14141c;
+  border: 1px solid #2a2a35;
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.hab-mine-card:hover { border-color: rgba(124, 92, 255, 0.35); }
+.hab-mine-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+.hab-mine-title-row {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.hab-mine-nome {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: #f0f0f5;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0;
+  outline: none;
+}
+.hab-mine-nome:focus { border-bottom: 1px solid #8b5cf6; }
+.hab-mine-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.hab-cat-tag {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 6px;
+  color: #a0a0b0;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid #2a2a35;
+}
+.hab-mine-desc {
+  width: 100%;
+  min-height: 64px;
+  background: rgba(0,0,0,0.25);
+  border: 1px solid #2a2a35;
+  border-radius: 8px;
+  color: #b0b0c0;
+  font-size: 0.84rem;
+  line-height: 1.5;
+  padding: 10px 12px;
+  resize: vertical;
+  font-family: inherit;
+}
+.hab-mine-desc:focus {
+  outline: none;
+  border-color: rgba(124, 92, 255, 0.45);
+  color: #f0f0f5;
+}
