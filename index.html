@@ -1,12 +1,130 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="refresh" content="0;url=agentes.html" />
-  <title>Escandinavo Fichas</title>
-  <script>location.replace('agentes.html');</script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Escandinavo Fichas — Agentes</title>
+<link rel="stylesheet" href="styles.css" />
+<style>
+  :root{--ag-bg:#0b0b10;--ag-panel:#16161f;--ag-panel-2:#1d1d29;--ag-border:#2a2a38;--ag-accent:#8b5cf6;--ag-accent-2:#a855f7;--ag-text:#f2f2f6;--ag-text-dim:#9797a8;--ag-danger:#ef4444;}
+  *{box-sizing:border-box;} body{background:var(--ag-bg);color:var(--ag-text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;margin:0;min-height:100vh;}
+  .ag-nav{display:flex;align-items:center;gap:28px;padding:18px 32px;border-bottom:1px solid var(--ag-border);background:linear-gradient(180deg, rgba(139,92,246,.08), transparent);}
+  .ag-nav .brand{font-weight:700;letter-spacing:.02em;margin-right:auto;}
+  .ag-nav a{color:var(--ag-text-dim);text-decoration:none;font-size:.95rem;padding-bottom:4px;border-bottom:2px solid transparent;cursor:pointer;}
+  .ag-nav a.active{color:var(--ag-text);border-bottom-color:var(--ag-accent);}
+  .ag-wrap{max-width:1100px;margin:0 auto;padding:32px;}
+  .ag-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;gap:16px;flex-wrap:wrap;}
+  .ag-header h1{font-size:1.1rem;font-weight:600;margin:0;color:var(--ag-text-dim);}
+  .ag-header h1 b{color:var(--ag-text);}
+  .btn-primary{background:var(--ag-accent);color:#fff;border:none;border-radius:8px;padding:10px 18px;font-weight:600;font-size:.9rem;cursor:pointer;}
+  .btn-primary:hover{background:var(--ag-accent-2);}
+  .btn-ghost{background:transparent;color:var(--ag-text-dim);border:1px solid var(--ag-border);border-radius:8px;padding:9px 16px;font-size:.9rem;cursor:pointer;}
+  .ag-search{width:100%;padding:11px 14px;border-radius:8px;border:1px solid var(--ag-border);background:var(--ag-panel);color:var(--ag-text);margin-bottom:22px;font-size:.9rem;}
+  .ag-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px;}
+  .ag-card{background:var(--ag-panel);border:1px solid var(--ag-border);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;position:relative;}
+  .ag-card .avatar{width:100%;height:90px;border-radius:8px;background:var(--ag-panel-2);display:flex;align-items:center;justify-content:center;font-size:1.6rem;color:var(--ag-text-dim);}
+  .ag-card h3{margin:0;font-size:1rem;}
+  .ag-card .meta{font-size:.78rem;color:var(--ag-text-dim);}
+  .ag-card .del{position:absolute;top:10px;right:10px;background:transparent;border:none;color:var(--ag-text-dim);cursor:pointer;font-size:.85rem;padding:4px;border-radius:6px;}
+  .ag-card .del:hover{color:var(--ag-danger);background:rgba(239,68,68,.1);}
+  .ag-card .acessar{margin-top:auto;background:var(--ag-accent);color:#fff;text-align:center;text-decoration:none;padding:9px;border-radius:8px;font-size:.85rem;font-weight:600;}
+  .ag-empty{grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--ag-text-dim);border:1px dashed var(--ag-border);border-radius:12px;}
+</style>
 </head>
 <body>
-  <p><a href="agentes.html">Ir para Agentes</a></p>
+<nav class="ag-nav">
+  <span class="brand">◈ Escandinavo Fichas</span>
+  <a data-view="agentes" class="active">Agentes</a>
+  <a data-view="campanhas">Campanhas</a>
+</nav>
+<div class="ag-wrap">
+  <section id="view-agentes">
+    <div class="ag-header">
+      <h1>Agentes: <b id="ag-count">0</b></h1>
+      <button class="btn-primary" id="btn-novo-agente">+ Novo Agente</button>
+    </div>
+    <input type="text" class="ag-search" id="ag-search" placeholder="Buscar agente..." />
+    <div class="ag-grid" id="ag-grid"></div>
+  </section>
+  <section id="view-campanhas" hidden>
+    <div class="ag-header">
+      <h1>Campanhas: <b id="camp-count">0</b></h1>
+      <button class="btn-primary" id="btn-nova-campanha">+ Nova Campanha</button>
+    </div>
+    <div class="ag-grid" id="camp-grid"></div>
+  </section>
+</div>
+<script src="data.js"></script>
+<script>
+const REGISTRO_KEY = 'escandinavo-agentes-registro';
+const CAMPANHAS_KEY = 'escandinavo-campanhas-registro';
+function lerAgentes(){ try{ return JSON.parse(localStorage.getItem(REGISTRO_KEY)) || []; }catch(e){ return []; } }
+function salvarAgentes(lista){ localStorage.setItem(REGISTRO_KEY, JSON.stringify(lista)); }
+function lerCampanhas(){ try{ return JSON.parse(localStorage.getItem(CAMPANHAS_KEY)) || []; }catch(e){ return []; } }
+function salvarCampanhas(lista){ localStorage.setItem(CAMPANHAS_KEY, JSON.stringify(lista)); }
+const CLASSE_LABEL = { combatente:'Combatente', especialista:'Especialista', ocultista:'Ocultista', mundano:'Mundano' };
+function formatarData(ts){ return new Date(ts).toLocaleDateString('pt-BR'); }
+function renderAgentes(){
+  const grid = document.getElementById('ag-grid');
+  const termo = (document.getElementById('ag-search').value || '').toLowerCase();
+  let lista = lerAgentes().sort((a,b)=> b.atualizadoEm - a.atualizadoEm);
+  if (termo) lista = lista.filter(a => (a.nome||'').toLowerCase().includes(termo));
+  document.getElementById('ag-count').textContent = lerAgentes().length;
+  grid.innerHTML = '';
+  if (!lista.length){ grid.innerHTML = '<div class="ag-empty">Nenhum agente ainda. Clique em "Novo Agente" para criar sua primeira ficha.</div>'; return; }
+  lista.forEach(a => {
+    const card = document.createElement('div');
+    card.className = 'ag-card';
+    card.innerHTML = `<button class="del" title="Excluir" data-id="${a.id}">✕</button><div class="avatar">◈</div><h3>${a.nome || 'Sem nome'}</h3><div class="meta">${CLASSE_LABEL[a.classe] || a.classe || '—'} · NEX ${a.nex ?? 5}% · atualizado em ${formatarData(a.atualizadoEm)}</div><a class="acessar" href="ficha.html?id=${encodeURIComponent(a.id)}">Acessar Ficha</a>`;
+    grid.appendChild(card);
+  });
+  grid.querySelectorAll('.del').forEach(btn => btn.addEventListener('click', () => {
+    if (!confirm('Excluir este agente?')) return;
+    const id = btn.dataset.id;
+    salvarAgentes(lerAgentes().filter(a => a.id !== id));
+    localStorage.removeItem('escandinavo-ficha-' + id);
+    renderAgentes();
+  }));
+}
+document.getElementById('ag-search').addEventListener('input', renderAgentes);
+function renderCampanhas(){
+  const grid = document.getElementById('camp-grid');
+  const lista = lerCampanhas().sort((a,b)=> b.criadaEm - a.criadaEm);
+  document.getElementById('camp-count').textContent = lista.length;
+  grid.innerHTML = '';
+  if (!lista.length){ grid.innerHTML = '<div class="ag-empty">Nenhuma campanha ainda.</div>'; return; }
+  lista.forEach(c => {
+    const card = document.createElement('div');
+    card.className = 'ag-card';
+    card.innerHTML = `<div class="avatar">📋</div><h3>${c.nome}</h3><div class="meta">Iniciada em: ${formatarData(c.criadaEm)}</div>`;
+    grid.appendChild(card);
+  });
+}
+document.getElementById('btn-nova-campanha').addEventListener('click', () => {
+  const nome = prompt('Nome da campanha:');
+  if (!nome || !nome.trim()) return;
+  const lista = lerCampanhas();
+  lista.push({ id: 'camp_' + Date.now().toString(36), nome: nome.trim(), jogadores: 0, criadaEm: Date.now() });
+  salvarCampanhas(lista);
+  renderCampanhas();
+});
+document.querySelectorAll('.ag-nav a').forEach(link => link.addEventListener('click', () => {
+  document.querySelectorAll('.ag-nav a').forEach(a => a.classList.remove('active'));
+  link.classList.add('active');
+  const view = link.dataset.view;
+  document.getElementById('view-agentes').hidden = view !== 'agentes';
+  document.getElementById('view-campanhas').hidden = view !== 'campanhas';
+  if (view === 'campanhas') renderCampanhas();
+}));
+document.getElementById('btn-novo-agente').addEventListener('click', () => {
+  const id = 'ag_' + Date.now().toString(36);
+  const nome = prompt('Nome do agente:', 'Novo Agente') || 'Novo Agente';
+  const lista = lerAgentes();
+  lista.push({ id, nome, classe: 'ocultista', origem: 'investigador', nex: 5, atualizadoEm: Date.now() });
+  salvarAgentes(lista);
+  window.location.href = 'ficha.html?id=' + encodeURIComponent(id);
+});
+renderAgentes();
+</script>
 </body>
 </html>
