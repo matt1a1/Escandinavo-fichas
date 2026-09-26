@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <title>Escandinavo Fichas — Ordem Paranormal</title>
+  <link rel="stylesheet" href="styles.css?v=inv1" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Cinzel:wght@500;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div id="app">
+    <header class="top-bar">
+      <div class="brand"><span class="logo">◈</span><div><h1>Escandinavo Fichas</h1><p>Ordem Paranormal RPG</p></div></div>
+      <div class="header-actions">
+        <button id="btn-voltar-agentes" class="btn secondary">← Agentes</button>
+        <button id="btn-new" class="btn secondary">Nova Ficha</button>
+        <button id="btn-export" class="btn secondary">Exportar JSON</button>
+        <button id="btn-import" class="btn secondary">Importar JSON</button>
+        <input type="file" id="import-file" accept=".json" hidden />
+        <button id="btn-print" class="btn primary">Imprimir / PDF</button>
+      </div>
+    </header>
+    <main class="sheet">
+      <aside class="left-panel">
+        <section class="card identity">
+          <div class="identity-row"><label>Personagem</label><input type="text" id="nome" placeholder="Nome do Agente" /></div>
+          <div class="identity-row"><label>Jogador</label><input type="text" id="jogador" placeholder="Seu nome" /></div>
+          <div class="identity-grid">
+            <div><label>Origem</label><select id="origem"></select></div>
+            <div><label>Classe</label><select id="classe"><option value="combatente">Combatente</option><option value="especialista">Especialista</option><option value="ocultista" selected>Ocultista</option></select></div>
+          </div>
+          <div class="identity-grid">
+            <div><label>NEX</label><div class="nex-control"><button type="button" class="nex-btn" data-delta="-5">−</button><span id="nex-display">5%</span><button type="button" class="nex-btn" data-delta="5">+</button></div></div>
+            <div><label>Patente</label><input type="text" id="patente" value="Recruta" /></div>
+          </div>
+        </section>
+        <section class="card attributes">
+          <h2>Atributos</h2>
+          <p class="points-left">Pontos restantes: <strong id="attr-points">4</strong><span class="attr-nex-hint" id="attr-nex-hint"></span></p>
+          <div class="attr-grid">
+            <div class="attr-item" data-attr="for"><span class="attr-label">FORÇA</span><div class="attr-controls"><button type="button" class="attr-btn" data-delta="-1">−</button><span class="attr-value">1</span><button type="button" class="attr-btn" data-delta="1">+</button></div></div>
+            <div class="attr-item" data-attr="agi"><span class="attr-label">AGILIDADE</span><div class="attr-controls"><button type="button" class="attr-btn" data-delta="-1">−</button><span class="attr-value">1</span><button type="button" class="attr-btn" data-delta="1">+</button></div></div>
+            <div class="attr-item" data-attr="int"><span class="attr-label">INTELECTO</span><div class="attr-controls"><button type="button" class="attr-btn" data-delta="-1">−</button><span class="attr-value">1</span><button type="button" class="attr-btn" data-delta="1">+</button></div></div>
+            <div class="attr-item" data-attr="pre"><span class="attr-label">PRESENÇA</span><div class="attr-controls"><button type="button" class="attr-btn" data-delta="-1">−</button><span class="attr-value">1</span><button type="button" class="attr-btn" data-delta="1">+</button></div></div>
+            <div class="attr-item" data-attr="vig"><span class="attr-label">VIGOR</span><div class="attr-controls"><button type="button" class="attr-btn" data-delta="-1">−</button><span class="attr-value">1</span><button type="button" class="attr-btn" data-delta="1">+</button></div></div>
+          </div>
+        </section>
+        <section class="card resources">
+          <div class="resource vida"><label>VIDA</label><div class="resource-bar"><button type="button" class="res-btn" data-res="vida" data-delta="-5">«</button><button type="button" class="res-btn" data-res="vida" data-delta="-1">‹</button><span class="res-value"><span id="vida-atual">13</span> / <span id="vida-max">13</span></span><button type="button" class="res-btn" data-res="vida" data-delta="1">›</button><button type="button" class="res-btn" data-res="vida" data-delta="5">»</button></div></div>
+          <div class="resource sanidade"><label>SANIDADE</label><div class="resource-bar"><button type="button" class="res-btn" data-res="sanidade" data-delta="-5">«</button><button type="button" class="res-btn" data-res="sanidade" data-delta="-1">‹</button><span class="res-value"><span id="san-atual">20</span> / <span id="san-max">20</span></span><button type="button" class="res-btn" data-res="sanidade" data-delta="1">›</button><button type="button" class="res-btn" data-res="sanidade" data-delta="5">»</button></div></div>
+          <div class="resource esforco"><label>ESFORÇO</label><div class="resource-bar"><button type="button" class="res-btn" data-res="esforco" data-delta="-5">«</button><button type="button" class="res-btn" data-res="esforco" data-delta="-1">‹</button><span class="res-value"><span id="pe-atual">5</span> / <span id="pe-max">5</span></span><button type="button" class="res-btn" data-res="esforco" data-delta="1">›</button><button type="button" class="res-btn" data-res="esforco" data-delta="5">»</button></div></div>
+          <p class="res-formula" id="res-formula"></p>
+        </section>
+        <section class="card combat-stats">
+          <div class="stat-row"><div class="stat"><label>Defesa</label><span id="defesa">11</span></div><div class="stat"><label>Bloqueio</label><span id="bloqueio">0</span></div><div class="stat"><label>Esquiva</label><span id="esquiva">11</span></div></div>
+          <div class="stat-row"><div class="stat"><label>Deslocamento</label><span>9 m / 6 ▢</span></div><div class="stat"><label>PE / Turno</label><span id="pe-turno">1</span></div></div>
+          <div class="stat-row"><div class="stat full"><label>Proficiências</label><span id="proficiencias">Armas simples</span></div></div>
+        </section>
+      </aside>
+      <section class="center-panel card">
+        <div class="panel-header"><h2>Perícias</h2><span class="pericias-info">Treinadas: <strong id="pericias-count">0</strong> / <strong id="pericias-max">0</strong><br><span id="grau-info"></span></span></div>
+        <div class="pericias-list" id="pericias-list"></div>
+      </section>
+      <aside class="right-panel">
+        <nav class="tabs">
+          <button class="tab active" data-tab="descricao">Descrição</button>
+          <button class="tab" data-tab="habilidades">Habilidades</button>
+          <button class="tab" data-tab="rituais">Rituais</button>
+          <button class="tab" data-tab="inventario">Inventário</button>
+          <button class="tab" data-tab="combate">Combate</button>
+        </nav>
+        <div class="tab-content active" id="tab-descricao">
+          <div class="field"><label>Aparência</label><textarea id="aparencia"></textarea></div>
+          <div class="field"><label>Personalidade</label><textarea id="personalidade"></textarea></div>
+          <div class="field"><label>Histórico</label><textarea id="historico"></textarea></div>
+          <div class="field"><label>Objetivo</label><textarea id="objetivo"></textarea></div>
+          <div class="field"><label>Anotações</label><textarea id="anotacoes"></textarea></div>
+        </div>
+        <div class="tab-content" id="tab-habilidades">
+          <div class="hab-subtabs">
+            <button type="button" class="hab-subtab active" data-hab-view="catalog">Habilidades</button>
+            <button type="button" class="hab-subtab" data-hab-view="mine">Minhas Habilidades</button>
+          </div>
+          <div id="hab-view-catalog">
+            <div class="hab-class-tabs" id="hab-class-tabs"></div>
+            <div class="hab-cat-chips" id="hab-cat-chips"></div>
+            <div class="catalog-filters"><input type="search" id="hab-search" placeholder="Buscar..." autocomplete="off" /></div>
+            <div id="hab-catalog-list" class="catalog-list hab-catalog-list"></div>
+          </div>
+          <div id="hab-view-mine" hidden>
+            <div class="list-header"><h3>Minhas Habilidades</h3><button type="button" class="btn small" id="btn-add-hab">+ Personalizada</button></div>
+            <div id="habilidades-list" class="item-list"></div>
+          </div>
+        </div>
+        <div class="tab-content" id="tab-rituais">
+          <div class="list-header"><h3>Rituais</h3><div><span class="dt-rituais">DT: <strong id="dt-rituais">12</strong></span> <button type="button" class="btn small" id="btn-add-ritual">+ Novo Ritual</button></div></div>
+          <div class="catalog-panel"><div class="catalog-header"><h4>Catálogo</h4><span class="catalog-count" id="catalog-count">0</span></div>
+            <div class="catalog-filters"><input type="search" id="ritual-search" placeholder="Buscar..." /><select id="ritual-filter-elemento"><option value="">Elementos</option></select><select id="ritual-filter-circulo"><option value="">Círculos</option></select></div>
+            <div id="ritual-catalog-list" class="catalog-list"></div>
+          </div>
+          <div id="rituais-list" class="item-list"></div>
+        </div>
+        <div class="tab-content" id="tab-inventario">
+          <div class="inv-grid"><div class="inv-field"><label>PP</label><input type="number" id="pp" value="0" min="0" /></div><div class="inv-field"><label>Patente</label><input type="text" id="patente-inv" value="Recruta" /></div></div>
+          <div class="carga-row"><span>Carga: <strong id="carga-atual">0</strong> / <strong id="carga-max">5</strong></span><span id="carga-hint"></span></div>
+          <div id="item-catalog-list" class="catalog-list"></div>
+          <div class="list-header"><h3>Itens</h3><button type="button" class="btn small" id="btn-add-item">Adicionar</button></div>
+          <div id="itens-list" class="item-list"></div>
+        </div>
+        <div class="tab-content" id="tab-combate">
+          <div class="list-header"><h3>Ataques</h3><button type="button" class="btn small" id="btn-add-ataque">+ Novo Ataque</button></div>
+          <div id="ataques-list" class="item-list"></div>
+        </div>
+      </aside>
+    </main>
+    <div id="save-status" class="save-status"></div>
+  </div>
+  <script src="data.js?v=ocu1"></script>
+  <script src="rituais-catalog.js?v=restore1"></script>
+  <script src="rituais-extra.js?v=restore1"></script>
+  <script src="habilidades-catalog.js?v=ocu1"></script>
+  <script src="app.js?v=ocu1"></script>
+  <script src="catalog-ui.js?v=restore1"></script>
+  <script src="habilidades-ui.js?v=inv1"></script>
+  <script src="itens-catalog.js?v=inv2"></script>
+  <script src="itens-ui.js?v=inv2"></script>
+</body>
+</html>
