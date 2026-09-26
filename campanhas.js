@@ -1,4 +1,4 @@
-// Campanhas completas (lista, acessar, excluir, adicionar agentes, editar nome)
+// Campanhas completas — lista, acessar, excluir, adicionar agentes, editar nome (modal)
 (function () {
   const CAMPANHAS_KEY = 'escandinavo-campanhas-registro';
   const REGISTRO_KEY = 'escandinavo-agentes-registro';
@@ -187,60 +187,172 @@
   function renomearCampanha() {
     const c = getCampanha(campanhaAtualId);
     if (!c) return;
-    const nome = prompt('Nome da campanha:', c.nome || '');
-    if (nome === null) return;
-    const n = nome.trim();
-    if (!n) { alert('O nome não pode ficar vazio.'); return; }
+    var modal = document.getElementById('modal-renomear-camp');
+    var input = document.getElementById('input-nome-campanha');
+    if (!modal || !input) return;
+    input.value = c.nome || '';
+    input.style.borderColor = '';
+    modal.hidden = false;
+    setTimeout(function () { input.focus(); input.select(); }, 50);
+  }
+
+  function fecharModalRenomear() {
+    var modal = document.getElementById('modal-renomear-camp');
+    if (modal) modal.hidden = true;
+  }
+
+  function salvarNomeCampanha() {
+    var input = document.getElementById('input-nome-campanha');
+    if (!input) return;
+    var n = (input.value || '').trim();
+    if (!n) {
+      input.style.borderColor = 'var(--ag-danger)';
+      input.focus();
+      return;
+    }
+    input.style.borderColor = '';
     atualizarCampanha(campanhaAtualId, { nome: n });
+    fecharModalRenomear();
     abrirCampanha(campanhaAtualId);
   }
 
+  function ensureModalRenomear() {
+    if (document.getElementById('modal-renomear-camp')) return;
+    var div = document.createElement('div');
+    div.id = 'modal-renomear-camp';
+    div.className = 'wizard-overlay';
+    div.hidden = true;
+    div.innerHTML =
+      '<div class="modal-box" style="max-width:420px">' +
+        '<div class="wizard-top">' +
+          '<span class="brand">Editar campanha</span>' +
+          '<button type="button" class="btn-ghost" id="modal-renomear-close">Fechar</button>' +
+        '</div>' +
+        '<div class="modal-box-body">' +
+          '<label for="input-nome-campanha" style="display:block;font-size:.85rem;color:var(--ag-text-dim);margin-bottom:8px">Nome da campanha</label>' +
+          '<input type="text" id="input-nome-campanha" class="ag-search" style="margin-bottom:18px" placeholder="Ex: Escandinavo" maxlength="80" />' +
+          '<div style="display:flex;justify-content:flex-end;gap:10px">' +
+            '<button type="button" class="btn-ghost" id="btn-renomear-cancelar">Cancelar</button>' +
+            '<button type="button" class="btn-primary" id="btn-renomear-salvar">Salvar</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(div);
+  }
+
   function bind() {
-    const btnNova = document.getElementById('btn-nova-campanha');
+    ensureModalRenomear();
+
+    var btnNova = document.getElementById('btn-nova-campanha');
     if (btnNova) {
-      const novo = btnNova.cloneNode(true);
+      var novo = btnNova.cloneNode(true);
       btnNova.parentNode.replaceChild(novo, btnNova);
-      novo.addEventListener('click', () => {
-        const nome = prompt('Nome da campanha:');
-        if (!nome || !nome.trim()) return;
-        const lista = lerCampanhas();
-        lista.push({ id: 'camp_' + Date.now().toString(36), nome: nome.trim(), agentes: [], jogadoresLista: [], capa: null, criadaEm: Date.now() });
-        salvarCampanhas(lista);
-        renderCampanhas();
+      novo.addEventListener('click', function () {
+        campanhaAtualId = null;
+        var modal = document.getElementById('modal-renomear-camp');
+        var input = document.getElementById('input-nome-campanha');
+        if (!modal || !input) return;
+        input.value = '';
+        input.style.borderColor = '';
+        modal.hidden = false;
+        // modo criar
+        modal.dataset.modo = 'criar';
+        var brand = modal.querySelector('.brand');
+        if (brand) brand.textContent = 'Nova campanha';
+        setTimeout(function () { input.focus(); }, 50);
       });
     }
 
-    const btnVoltar = document.getElementById('btn-voltar-campanhas');
-    if (btnVoltar) btnVoltar.addEventListener('click', () => renderCampanhas());
+    var btnVoltar = document.getElementById('btn-voltar-campanhas');
+    if (btnVoltar) btnVoltar.addEventListener('click', function () { renderCampanhas(); });
 
-    const btnAdd = document.getElementById('btn-camp-add-agentes');
+    var btnAdd = document.getElementById('btn-camp-add-agentes');
     if (btnAdd) btnAdd.addEventListener('click', abrirModalAgentes);
 
-    const btnClose = document.getElementById('modal-add-agentes-close');
-    if (btnClose) btnClose.addEventListener('click', () => { document.getElementById('modal-add-agentes').hidden = true; });
+    var btnClose = document.getElementById('modal-add-agentes-close');
+    if (btnClose) btnClose.addEventListener('click', function () {
+      document.getElementById('modal-add-agentes').hidden = true;
+    });
 
-    const btnConf = document.getElementById('btn-confirmar-agentes');
+    var btnConf = document.getElementById('btn-confirmar-agentes');
     if (btnConf) btnConf.addEventListener('click', confirmarAgentes);
 
-    const btnEdit = document.getElementById('btn-camp-editar');
-    if (btnEdit) btnEdit.addEventListener('click', renomearCampanha);
+    var btnEdit = document.getElementById('btn-camp-editar');
+    if (btnEdit) btnEdit.addEventListener('click', function () {
+      var modal = document.getElementById('modal-renomear-camp');
+      if (modal) modal.dataset.modo = 'editar';
+      var brand = modal && modal.querySelector('.brand');
+      if (brand) brand.textContent = 'Editar campanha';
+      renomearCampanha();
+    });
 
-    const titulo = document.getElementById('camp-detail-nome');
+    var titulo = document.getElementById('camp-detail-nome');
     if (titulo) {
       titulo.style.cursor = 'pointer';
       titulo.title = 'Clique para editar o nome';
-      titulo.addEventListener('click', renomearCampanha);
+      titulo.addEventListener('click', function () {
+        var modal = document.getElementById('modal-renomear-camp');
+        if (modal) modal.dataset.modo = 'editar';
+        var brand = modal && modal.querySelector('.brand');
+        if (brand) brand.textContent = 'Editar campanha';
+        renomearCampanha();
+      });
     }
 
-    const btnCapa = document.getElementById('btn-camp-capa');
-    const fileCapa = document.getElementById('camp-capa-file');
+    // Modal renomear / criar
+    function onSalvarNome() {
+      var modal = document.getElementById('modal-renomear-camp');
+      var modo = modal && modal.dataset.modo;
+      var input = document.getElementById('input-nome-campanha');
+      if (!input) return;
+      var n = (input.value || '').trim();
+      if (!n) {
+        input.style.borderColor = 'var(--ag-danger)';
+        input.focus();
+        return;
+      }
+      input.style.borderColor = '';
+      if (modo === 'criar') {
+        var lista = lerCampanhas();
+        lista.push({
+          id: 'camp_' + Date.now().toString(36),
+          nome: n,
+          agentes: [],
+          jogadoresLista: [],
+          capa: null,
+          criadaEm: Date.now()
+        });
+        salvarCampanhas(lista);
+        fecharModalRenomear();
+        renderCampanhas();
+      } else {
+        salvarNomeCampanha();
+      }
+    }
+
+    var btnRenClose = document.getElementById('modal-renomear-close');
+    if (btnRenClose) btnRenClose.addEventListener('click', fecharModalRenomear);
+    var btnRenCancel = document.getElementById('btn-renomear-cancelar');
+    if (btnRenCancel) btnRenCancel.addEventListener('click', fecharModalRenomear);
+    var btnRenSave = document.getElementById('btn-renomear-salvar');
+    if (btnRenSave) btnRenSave.addEventListener('click', onSalvarNome);
+    var inputNomeCamp = document.getElementById('input-nome-campanha');
+    if (inputNomeCamp) {
+      inputNomeCamp.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); onSalvarNome(); }
+        if (e.key === 'Escape') fecharModalRenomear();
+      });
+    }
+
+    var btnCapa = document.getElementById('btn-camp-capa');
+    var fileCapa = document.getElementById('camp-capa-file');
     if (btnCapa && fileCapa) {
-      btnCapa.addEventListener('click', () => fileCapa.click());
-      fileCapa.addEventListener('change', (e) => {
-        const file = e.target.files && e.target.files[0];
+      btnCapa.addEventListener('click', function () { fileCapa.click(); });
+      fileCapa.addEventListener('change', function (e) {
+        var file = e.target.files && e.target.files[0];
         if (!file) return;
-        const reader = new FileReader();
-        reader.onload = () => {
+        var reader = new FileReader();
+        reader.onload = function () {
           atualizarCampanha(campanhaAtualId, { capa: reader.result });
           abrirCampanha(campanhaAtualId);
         };
@@ -249,20 +361,20 @@
       });
     }
 
-    document.querySelectorAll('.camp-tab').forEach(tab => {
-      tab.addEventListener('click', () => {
-        document.querySelectorAll('.camp-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.camp-tab').forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        document.querySelectorAll('.camp-tab').forEach(function (t) { t.classList.remove('active'); });
         tab.classList.add('active');
-        const which = tab.dataset.campTab;
+        var which = tab.dataset.campTab;
         document.getElementById('camp-tab-agentes').hidden = which !== 'agentes';
         document.getElementById('camp-tab-jogadores').hidden = which !== 'jogadores';
       });
     });
 
-    document.querySelectorAll('.ag-nav a').forEach(link => {
-      link.addEventListener('click', () => {
-        const view = link.dataset.view;
-        const detail = document.getElementById('view-camp-detail');
+    document.querySelectorAll('.ag-nav a').forEach(function (link) {
+      link.addEventListener('click', function () {
+        var view = link.dataset.view;
+        var detail = document.getElementById('view-camp-detail');
         if (detail) detail.hidden = true;
         if (view === 'campanhas') setTimeout(renderCampanhas, 0);
       });
