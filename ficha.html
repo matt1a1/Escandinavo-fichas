@@ -3,26 +3,31 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Escandinavo Fichas — Ordem Paranormal</title>
-<script src="fpart0.js?v=3"></script>
-<script src="fpart1.js?v=3"></script>
-<script src="fpart2.js?v=3"></script>
-<script src="fpart3.js?v=3"></script>
-<script src="fpart4.js?v=3"></script>
-<script src="fpart5.js?v=3"></script>
-<script src="fpart6.js?v=3"></script>
-<script src="floader.js?v=3"></script>
+<title>Escandinavo Fichas</title>
 <script>
-if (window.__FICHA_HTML__ && window.__FICHA_HTML__.length > 10000) {
-  document.open();
-  document.write(window.__FICHA_HTML__);
-  document.close();
-} else {
-  document.addEventListener('DOMContentLoaded', function() {
-    document.body.innerHTML = '<p style="font-family:sans-serif;padding:40px;color:#c00">Erro ao carregar a ficha. Use Ctrl+F5.</p>';
+fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bfb207669552c837164b121a/index.html')
+  .then(function(r) { return r.text(); })
+  .then(function(html) {
+    if (html.indexOf('btn-voltar-agentes') === -1) {
+      html = html.replace(
+        '<button id="btn-new" class="btn secondary">Nova Ficha</button>',
+        '<button id="btn-voltar-agentes" class="btn secondary">\u2190 Agentes</button>\n        <button id="btn-new" class="btn secondary">Nova Ficha</button>'
+      );
+    }
+    document.open();
+    document.write(html);
+    document.close();
+    setTimeout(function() {
+      var b = document.getElementById('btn-voltar-agentes');
+      if (b) b.onclick = function() { location.href = 'index.html'; };
+    }, 800);
+  })
+  .catch(function() {
+    document.body.innerHTML = '<p style="font-family:sans-serif;padding:40px;color:#c00">N\u00e3o foi poss\u00edvel carregar a ficha. Tente Ctrl+F5.</p>';
   });
-}
 </script>
 </head>
-<body><p style="font-family:sans-serif;padding:40px;color:#888">Carregando ficha…</p></body>
+<body>
+<p style="font-family:sans-serif;padding:40px;color:#888">Carregando ficha\u2026</p>
+</body>
 </html>
