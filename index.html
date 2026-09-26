@@ -29,45 +29,46 @@
   .ag-card .del:hover{color:var(--ag-danger);}
   .ag-card .acessar{margin-top:auto;background:var(--ag-accent);color:#fff;text-align:center;text-decoration:none;padding:9px;border-radius:8px;font-size:.85rem;font-weight:600;}
   .ag-empty{grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--ag-text-dim);border:1px dashed var(--ag-border);border-radius:12px;}
+  .camp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;}
+  .camp-card{background:var(--ag-panel);border:1px solid var(--ag-border);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;position:relative;}
+  .camp-cover{height:120px;background:linear-gradient(135deg,#1a1a28,#2a1a3a);display:flex;align-items:flex-start;justify-content:space-between;padding:10px;background-size:cover;background-position:center;}
+  .camp-cover .badge{background:rgba(0,0,0,.55);color:#fff;font-size:.75rem;padding:3px 8px;border-radius:6px;}
+  .camp-cover .del-camp{background:rgba(0,0,0,.45);border:none;color:#f88;width:28px;height:28px;border-radius:6px;cursor:pointer;}
+  .camp-cover .del-camp:hover{background:var(--ag-danger);color:#fff;}
+  .camp-body{padding:14px;display:flex;flex-direction:column;gap:8px;flex:1;}
+  .camp-body h3{margin:0;font-size:1.05rem;}
+  .camp-body .meta{font-size:.78rem;color:var(--ag-text-dim);}
+  .camp-body .btn-acessar{margin-top:auto;align-self:flex-end;background:var(--ag-accent);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-weight:600;font-size:.85rem;cursor:pointer;}
+  .btn-outline{background:transparent;color:var(--ag-text);border:1px solid var(--ag-accent);border-radius:8px;padding:8px 14px;font-size:.82rem;cursor:pointer;font-weight:500;}
+  .btn-outline:hover{background:rgba(139,92,246,.12);}
+  .camp-detail-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px;}
+  .camp-detail-actions{display:flex;flex-wrap:wrap;gap:8px;}
+  .camp-detail-header{display:flex;gap:18px;align-items:center;margin-bottom:22px;}
+  .camp-detail-cover{width:120px;height:80px;border-radius:10px;background:var(--ag-panel-2);border:1px solid var(--ag-border);display:flex;align-items:center;justify-content:center;font-size:1.6rem;color:var(--ag-text-dim);background-size:cover;background-position:center;flex-shrink:0;}
+  .camp-detail-header h1{margin:0 0 4px;font-size:1.5rem;}
+  .camp-detail-meta{margin:0;color:var(--ag-text-dim);font-size:.85rem;}
+  .camp-tabs{display:flex;gap:4px;border-bottom:1px solid var(--ag-border);margin-bottom:16px;}
+  .camp-tab{background:transparent;border:none;border-bottom:2px solid transparent;color:var(--ag-text-dim);padding:10px 16px;cursor:pointer;font-size:.9rem;margin-bottom:-1px;}
+  .camp-tab.active{color:var(--ag-text);border-bottom-color:var(--ag-accent);font-weight:600;}
+  .camp-agentes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
+  .camp-ag-card{background:var(--ag-panel);border:1px solid var(--ag-border);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px;position:relative;}
+  .camp-ag-card h3{margin:0;font-size:.95rem;}
+  .camp-ag-card .meta{font-size:.78rem;color:var(--ag-text-dim);}
+  .camp-ag-card .btn-acessar{margin-top:auto;align-self:flex-end;background:var(--ag-accent);color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:.8rem;font-weight:600;cursor:pointer;text-decoration:none;}
+  .camp-ag-card .rm-ag{position:absolute;top:8px;right:8px;background:transparent;border:none;color:var(--ag-text-dim);cursor:pointer;}
+  .camp-ag-card .rm-ag:hover{color:var(--ag-danger);}
+  .modal-box{max-width:560px;margin:40px auto;background:var(--ag-bg);border:1px solid var(--ag-border);border-radius:12px;max-height:85vh;overflow:auto;}
+  .modal-box-body{padding:20px 24px 28px;}
+  .modal-agentes-lista{display:flex;flex-direction:column;gap:8px;max-height:360px;overflow-y:auto;}
+  .modal-ag-item{display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--ag-panel);border:1px solid var(--ag-border);border-radius:8px;cursor:pointer;}
+  .modal-ag-item:hover{border-color:var(--ag-accent);}
+  .modal-ag-item input{width:18px;height:18px;accent-color:var(--ag-accent);}
+  .modal-ag-item .info{flex:1;}
+  .modal-ag-item .info strong{display:block;font-size:.9rem;}
+  .modal-ag-item .info span{font-size:.75rem;color:var(--ag-text-dim);}
   .wizard-overlay{position:fixed;inset:0;background:#0a0a0e;z-index:200;overflow-y:auto;}
   .wizard-overlay[hidden]{display:none;}
   .wizard-top{display:flex;justify-content:space-between;align-items:center;padding:18px 32px;border-bottom:1px solid var(--ag-border);}
-  .wizard-steps{display:flex;gap:14px;justify-content:center;align-items:center;padding:26px 10px 6px;font-size:.85rem;flex-wrap:wrap;}
-  .wizard-steps span.step{color:var(--ag-text-dim);padding:0 6px;}
-  .wizard-steps span.step.active{color:var(--ag-accent);font-weight:700;}
-  .wizard-steps span.sep{color:var(--ag-border);}
-  .wizard-body{max-width:960px;margin:0 auto;padding:24px 28px 60px;}
-  .wizard-nav{display:flex;justify-content:space-between;margin-top:28px;}
-  .tut-text{color:var(--ag-text-dim);line-height:1.7;font-size:.95rem;max-width:720px;margin:0 auto 20px;}
-  .tut-text b{color:var(--ag-text);}
-  .tut-highlight{color:#c4b5fd;font-weight:600;}
-  .attr-layout{display:flex;gap:40px;align-items:center;justify-content:center;flex-wrap:wrap;margin:28px 0;}
-  .attr-layout .tut-text{flex:1;min-width:260px;margin:0;}
-  .attr-pentagon{width:280px;height:280px;position:relative;flex-shrink:0;}
-  .attr-pentagon svg{width:100%;height:100%;}
-  .attr-node{position:absolute;width:72px;height:72px;border-radius:50%;border:2px solid #e8e8f0;background:#0a0a0e;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:translate(-50%,-50%);}
-  .attr-node b{font-size:1.25rem;color:#fff;line-height:1;}
-  .attr-node small{font-size:.65rem;color:#c0c0d0;letter-spacing:.04em;text-align:center;line-height:1.15;margin-top:2px;}
-  .origem-banner{display:flex;align-items:center;gap:14px;padding:12px 16px;background:#12121a;border:1px solid var(--ag-border);border-radius:10px;margin-bottom:16px;font-size:.85rem;color:var(--ag-text-dim);}
-  .origem-search{width:100%;padding:10px 14px;border-radius:8px;border:1px solid var(--ag-border);background:var(--ag-panel);color:var(--ag-text);margin-bottom:14px;}
-  .origem-item{border:1px solid var(--ag-border);border-radius:10px;margin-bottom:8px;overflow:hidden;background:var(--ag-panel);}
-  .origem-item summary{list-style:none;display:flex;justify-content:space-between;align-items:center;padding:12px 16px;cursor:pointer;font-weight:600;}
-  .origem-item summary::-webkit-details-marker{display:none;}
-  .origem-item .det{padding:0 16px 14px;color:var(--ag-text-dim);font-size:.85rem;}
-  .origem-item.selected{border-color:var(--ag-accent);}
-  .btn-escolher{background:var(--ag-accent);color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:.8rem;cursor:pointer;}
-  .classe-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:24px;}
-  .classe-card{background:var(--ag-panel);border:1px solid var(--ag-border);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:12px;min-height:320px;}
-  .classe-card.selected{border-color:var(--ag-accent);}
-  .classe-card h3{margin:0;font-size:1.25rem;border-bottom:2px solid var(--ag-accent);padding-bottom:8px;}
-  .classe-card .cls-desc{font-size:.84rem;color:var(--ag-text-dim);line-height:1.55;flex:1;overflow-y:auto;max-height:220px;}
-  .classe-card .btn-escolher{align-self:center;min-width:120px;}
-  .finais-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px;}
-  .finais-grid label{display:block;font-size:.8rem;color:var(--ag-text-dim);margin-bottom:6px;}
-  .finais-grid input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--ag-border);background:var(--ag-panel);color:var(--ag-text);}
-  .resumo-box{margin-top:20px;padding:14px 16px;border:1px solid var(--ag-border);border-radius:10px;background:var(--ag-panel);font-size:.85rem;color:var(--ag-text-dim);}
-  .resumo-box b{color:var(--ag-text);}
-  @media (max-width:800px){ .classe-grid{grid-template-columns:1fr;} .attr-layout{flex-direction:column;} .finais-grid{grid-template-columns:1fr;} }
 </style>
 </head>
 <body>
@@ -85,14 +86,45 @@
     <input type="text" class="ag-search" id="ag-search" placeholder="Buscar agente..." />
     <div class="ag-grid" id="ag-grid"></div>
   </section>
+
   <section id="view-campanhas" hidden>
     <div class="ag-header">
       <h1>Campanhas: <b id="camp-count">0</b></h1>
       <button class="btn-primary" id="btn-nova-campanha">+ Nova Campanha</button>
     </div>
-    <div class="ag-grid" id="camp-grid"></div>
+    <div class="camp-grid" id="camp-grid"></div>
+  </section>
+
+  <section id="view-camp-detail" hidden>
+    <div class="camp-detail-top">
+      <button type="button" class="btn-ghost" id="btn-voltar-campanhas">← Campanhas</button>
+      <div class="camp-detail-actions">
+        <button type="button" class="btn-outline" id="btn-camp-capa">Foto de Capa</button>
+        <button type="button" class="btn-outline" id="btn-camp-add-agentes">Adicionar Agentes</button>
+        <button type="button" class="btn-outline" id="btn-camp-editar">Editar Campanha</button>
+        <input type="file" id="camp-capa-file" accept="image/*" hidden />
+      </div>
+    </div>
+    <div class="camp-detail-header">
+      <div class="camp-detail-cover" id="camp-detail-cover">◈</div>
+      <div>
+        <h1 id="camp-detail-nome">Campanha</h1>
+        <p class="camp-detail-meta" id="camp-detail-meta"></p>
+      </div>
+    </div>
+    <div class="camp-tabs">
+      <button type="button" class="camp-tab active" data-camp-tab="agentes">Agentes</button>
+      <button type="button" class="camp-tab" data-camp-tab="jogadores">Jogadores</button>
+    </div>
+    <div id="camp-tab-agentes" class="camp-tab-panel">
+      <div class="camp-agentes-grid" id="camp-agentes-grid"></div>
+    </div>
+    <div id="camp-tab-jogadores" class="camp-tab-panel" hidden>
+      <div class="camp-agentes-grid" id="camp-jogadores-grid"></div>
+    </div>
   </section>
 </div>
+
 <div class="wizard-overlay" id="wizard" hidden>
   <div class="wizard-top">
     <span class="brand">◈ Novo Agente</span>
@@ -101,7 +133,25 @@
   <div class="wizard-steps" id="wizard-steps"></div>
   <div class="wizard-body" id="wizard-body"></div>
 </div>
+
+<div class="wizard-overlay" id="modal-add-agentes" hidden>
+  <div class="modal-box">
+    <div class="wizard-top">
+      <span class="brand">Adicionar Agentes</span>
+      <button type="button" class="btn-ghost" id="modal-add-agentes-close">Fechar</button>
+    </div>
+    <div class="modal-box-body">
+      <p style="color:var(--ag-text-dim);margin:0 0 14px">Selecione as fichas que fazem parte desta campanha.</p>
+      <div id="modal-agentes-lista" class="modal-agentes-lista"></div>
+      <div style="display:flex;justify-content:flex-end;margin-top:18px">
+        <button type="button" class="btn-primary" id="btn-confirmar-agentes">Confirmar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script src="data.js"></script>
 <script src="wizard.js?v=tut1"></script>
+<script src="campanhas.js?v=1"></script>
 </body>
 </html>
