@@ -910,7 +910,7 @@ function bindEvents() {
   document.getElementById('btn-new').addEventListener('click', novaFicha);
   document.getElementById('btn-print').addEventListener('click', () => window.print());
   const btnVoltar = document.getElementById('btn-voltar-agentes');
-  if (btnVoltar) btnVoltar.addEventListener('click', () => { window.location.href = 'agentes.html'; });
+  if (btnVoltar) btnVoltar.addEventListener('click', () => { window.location.href = 'index.html'; });
 }
 function exportJSON() {
   const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
