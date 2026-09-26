@@ -5,15 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <title>Escandinavo Fichas — Ordem Paranormal</title>
-  <script src="ficha-html.js?v=1"></script>
+  <script src="ficha-part-0.js?v=1"></script>
+  <script src="ficha-part-1.js?v=1"></script>
+  <script src="ficha-part-2.js?v=1"></script>
+  <script src="ficha-loader.js?v=1"></script>
   <script>
-    if (window.__FICHA_HTML__) {
+    if (window.__FICHA_HTML__ && window.__FICHA_HTML__.length > 1000) {
       document.open();
       document.write(window.__FICHA_HTML__);
       document.close();
     } else {
       document.addEventListener('DOMContentLoaded', function() {
-        document.body.innerHTML = '<p style="font-family:sans-serif;padding:40px;color:#c00">Erro ao carregar a ficha. Arquivo ficha-html.js ausente ou incompleto.</p>';
+        document.body.innerHTML = '<p style="font-family:sans-serif;padding:40px;color:#c00">Erro ao carregar a ficha (partes ausentes). Atualize com Ctrl+F5.</p>';
       });
     }
   </script>
