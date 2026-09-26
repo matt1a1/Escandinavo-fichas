@@ -6,7 +6,33 @@ const state = {
   habilidades: [], rituais: [], itens: [], ataques: [], pp: 0, credito: 'Baixo',
   itensLimite: { I: 2, II: 0, III: 0, IV: 0 },
 };
-const STORAGE_KEY = 'escandinavo-ficha-v1';
+const AGENTES_REGISTRO_KEY = 'escandinavo-agentes-registro';
+function getAgenteIdFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('id') || 'v1'; // 'v1' preserva o comportamento antigo (ficha única) para quem já usava o app
+}
+const AGENTE_ID = getAgenteIdFromUrl();
+const STORAGE_KEY = 'escandinavo-ficha-' + AGENTE_ID;
+function lerRegistroAgentes() {
+  try { return JSON.parse(localStorage.getItem(AGENTES_REGISTRO_KEY)) || []; }
+  catch (e) { return []; }
+}
+function syncAgenteRegistro() {
+  try {
+    const registro = lerRegistroAgentes();
+    const idx = registro.findIndex((a) => a.id === AGENTE_ID);
+    const entrada = {
+      id: AGENTE_ID,
+      nome: state.nome || 'Sem nome',
+      classe: state.classe,
+      origem: state.origem,
+      nex: state.nex,
+      atualizadoEm: Date.now(),
+    };
+    if (idx === -1) registro.push(entrada); else registro[idx] = entrada;
+    localStorage.setItem(AGENTES_REGISTRO_KEY, JSON.stringify(registro));
+  } catch (e) { /* silencioso: não deve impedir o salvamento da ficha */ }
+}
 let saveTimer = null;
 let ataqueEditIndex = null;
 let ritualEditIndex = null;
@@ -178,7 +204,11 @@ function setSaveStatus(text, cls) {
   el.className = 'save-status' + (cls ? ' ' + cls : '');
 }
 function saveState() {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); setSaveStatus('Salvo automaticamente', 'saved'); }
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    syncAgenteRegistro();
+    setSaveStatus('Salvo automaticamente', 'saved');
+  }
   catch (e) { setSaveStatus('Erro ao salvar', ''); }
 }
 function scheduleSave() {
@@ -879,6 +909,8 @@ function bindEvents() {
   document.getElementById('import-file').addEventListener('change', importJSON);
   document.getElementById('btn-new').addEventListener('click', novaFicha);
   document.getElementById('btn-print').addEventListener('click', () => window.print());
+  const btnVoltar = document.getElementById('btn-voltar-agentes');
+  if (btnVoltar) btnVoltar.addEventListener('click', () => { window.location.href = 'agentes.html'; });
 }
 function exportJSON() {
   const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
