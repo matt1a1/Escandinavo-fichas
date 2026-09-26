@@ -14,15 +14,19 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
         '<button id="btn-voltar-agentes" class="btn secondary">\u2190 Agentes</button>\n        <button id="btn-new" class="btn secondary">Nova Ficha</button>'
       );
     }
-    // Injeta patch de habilidades e CSS atualizado
+    // CSS atualizado (abas + minhas habilidades)
+    html = html.replace(/styles\.css(\?v=[^"']*)?/g, 'styles.css?v=hab3');
+    if (html.indexOf('styles-hab.css') === -1) {
+      html = html.replace(
+        /href="styles\.css[^"']*"/,
+        'href="styles.css?v=hab3" />\n  <link rel="stylesheet" href="styles-hab.css?v=hab3"'
+      );
+    }
     if (html.indexOf('habilidades-fix.js') === -1) {
       html = html.replace(
         '</body>',
         '<script src="habilidades-fix.js?v=hab1"><\/script>\n</body>'
       );
-    }
-    if (html.indexOf('styles.css') !== -1) {
-      html = html.replace(/styles\.css(\?v=[^"']*)?/g, 'styles.css?v=hab1');
     }
     document.open();
     document.write(html);
