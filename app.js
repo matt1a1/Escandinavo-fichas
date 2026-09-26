@@ -95,6 +95,13 @@ function calcularPeTurno() {
   const n = Math.max(5, Number(state.nex) || 5);
   return 1 + Math.floor((n >= 99 ? 99 : n) / 10);
 }
+function peritoEscala(nex) {
+  const n = Number(nex) || 5;
+  if (n >= 85) return { pe: 5, dado: '1d12' };
+  if (n >= 55) return { pe: 4, dado: '1d8' };
+  if (n >= 25) return { pe: 3, dado: '1d6' };
+  return { pe: 2, dado: '1d4' };
+}
 function clampRecurso(atual, max, last) {
   if (atual === null || atual === undefined) return max;
   if (last != null) atual = atual + (max - last);
@@ -231,11 +238,17 @@ function renderRecursos() {
   document.getElementById('dt-rituais').textContent = calcularDTRituais();
   const formula = document.getElementById('res-formula');
   if (formula) {
-    formula.textContent = cls.nome
+    let txt = cls.nome
       + ' · NEX ' + state.nex + '% (' + nexNiveis(state.nex) + ' níveis)'
       + ' · PV ' + cls.pvBase + '+VIG, +' + cls.pvPorNex + '+VIG/nível'
       + ' · PE ' + cls.peBase + '+PRE, +' + cls.pePorNex + '+PRE/nível'
-      + ' · SAN ' + cls.sanBase + ', +' + cls.sanPorNex + '/nível';
+      + ' · SAN ' + cls.sanBase + ', +' + cls.sanPorNex + '/nível'
+      + ' · Perícias ' + cls.periciasBase + '+INT';
+    if (state.classe === 'especialista') {
+      const p = peritoEscala(state.nex);
+      txt += ' · Perito ' + p.pe + ' PE, +' + p.dado;
+    }
+    formula.textContent = txt;
   }
 }
 function renderPericias() {

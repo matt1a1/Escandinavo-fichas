@@ -77,8 +77,8 @@ const CLASSES = {
     pvBase: 16, pvPorNex: 3,
     sanBase: 16, sanPorNex: 4,
     peBase: 3, pePorNex: 3,
-    periciasBase: 3,
-    proficiencias: 'Armas simples, Proteções leves',
+    periciasBase: 7,
+    proficiencias: 'Armas simples e proteções leves',
     habilidadesIniciais: ['Eclético', 'Perito'],
   },
   ocultista: {

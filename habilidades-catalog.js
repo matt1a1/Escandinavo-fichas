@@ -87,9 +87,11 @@ const HABILIDADES_CATALOG = [
 
   // ===== ESPECIALISTA — BASE + PODERES =====
   { nome: 'Eclético', classe: 'Especialista', categoria: 'Poderes de Especialista', nex: '5%', pe: '2 PE',
-    desc: 'Gaste 2 PE em teste de perícia para receber benefícios de treinado.' },
-  { nome: 'Perito', classe: 'Especialista', categoria: 'Poderes de Especialista', nex: '5%', pe: '2+ PE',
-    desc: 'Em 2 perícias treinadas (exceto Luta/Pontaria): +1d6 com 2 PE. Escala em NEX alto.' },
+    desc: 'Você não sofre penalidade em perícias nas quais não é treinado. Além disso, pode gastar 2 PE para receber os benefícios de treinado em um teste de perícia.' },
+  { nome: 'Perito', classe: 'Especialista', categoria: 'Poderes de Especialista', nex: '5%', pe: '2 PE',
+    desc: 'Escolha duas perícias treinadas (exceto Luta e Pontaria). Quando faz um teste dessas perícias, pode gastar PE para somar um bônus no resultado.\nNEX 5%: 2 PE, +1d4\nNEX 25%: 3 PE, +1d6\nNEX 55%: 4 PE, +1d8\nNEX 85%: 5 PE, +1d12' },
+  { nome: 'Engenhosidade', classe: 'Especialista', categoria: 'Poderes de Especialista', nex: '75%', pe: '—',
+    desc: 'No NEX 75% você se torna expert nas perícias escolhidas em Perito.' },
   { nome: 'Acuidade com Arma', classe: 'Especialista', categoria: 'Poderes de Especialista', nex: '', pe: '—',
     desc: 'Arma leve corpo a corpo/arremesso usa Agilidade. Pré: Agi 2.' },
   { nome: 'Balística Avançada', classe: 'Especialista', categoria: 'Poderes de Especialista', nex: '', pe: '—',
