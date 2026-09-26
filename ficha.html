@@ -20,12 +20,14 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
       html = html.replace('</head>', '  <link rel="stylesheet" href="styles-hab.css?v=mob2" />\n</head>');
     }
     if (html.indexOf('mobile.css') === -1) {
-      html = html.replace('</head>', '  <link rel="stylesheet" href="mobile.css?v=2" />\n</head>');
-    } else {
-      html = html.replace(/mobile\.css\?v=[^"]*/g, 'mobile.css?v=2');
+      html = html.replace('</head>', '  <link rel="stylesheet" href="mobile.css?v=3" />\n</head>');
     }
 
     var extras = '';
+    if (html.indexOf('firebase-config.js') === -1) {
+      extras += '<script src="firebase-config.js"><\/script>\n';
+      extras += '<script src="auth.js?v=1"><\/script>\n';
+    }
     if (html.indexOf('origens-poderes.js') === -1) {
       extras += '<script src="origens-poderes.js?v=1"><\/script>\n';
     }
