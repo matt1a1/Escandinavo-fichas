@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Escandinavo Fichas — Agentes</title>
-<link rel="stylesheet" href="styles.css" />
+<link rel="stylesheet" href="styles.css" onerror="this.remove()" />
 <style>
   :root{--ag-bg:#0b0b10;--ag-panel:#16161f;--ag-panel-2:#1d1d29;--ag-border:#2a2a38;--ag-accent:#8b5cf6;--ag-accent-2:#a855f7;--ag-text:#f2f2f6;--ag-text-dim:#9797a8;--ag-danger:#ef4444;}
   *{box-sizing:border-box;} body{background:var(--ag-bg);color:var(--ag-text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;margin:0;min-height:100vh;}
@@ -18,6 +18,7 @@
   .ag-header h1 b{color:var(--ag-text);}
   .btn-primary{background:var(--ag-accent);color:#fff;border:none;border-radius:8px;padding:10px 18px;font-weight:600;font-size:.9rem;cursor:pointer;}
   .btn-primary:hover{background:var(--ag-accent-2);}
+  .btn-ghost{background:transparent;color:var(--ag-text-dim);border:1px solid var(--ag-border);border-radius:8px;padding:9px 16px;font-size:.9rem;cursor:pointer;}
   .ag-search{width:100%;padding:11px 14px;border-radius:8px;border:1px solid var(--ag-border);background:var(--ag-panel);color:var(--ag-text);margin-bottom:22px;font-size:.9rem;}
   .ag-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px;}
   .ag-card{background:var(--ag-panel);border:1px solid var(--ag-border);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;position:relative;}
@@ -28,6 +29,45 @@
   .ag-card .del:hover{color:var(--ag-danger);}
   .ag-card .acessar{margin-top:auto;background:var(--ag-accent);color:#fff;text-align:center;text-decoration:none;padding:9px;border-radius:8px;font-size:.85rem;font-weight:600;}
   .ag-empty{grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--ag-text-dim);border:1px dashed var(--ag-border);border-radius:12px;}
+  .wizard-overlay{position:fixed;inset:0;background:#0a0a0e;z-index:200;overflow-y:auto;}
+  .wizard-overlay[hidden]{display:none;}
+  .wizard-top{display:flex;justify-content:space-between;align-items:center;padding:18px 32px;border-bottom:1px solid var(--ag-border);}
+  .wizard-steps{display:flex;gap:14px;justify-content:center;align-items:center;padding:26px 10px 6px;font-size:.85rem;flex-wrap:wrap;}
+  .wizard-steps span.step{color:var(--ag-text-dim);padding:0 6px;}
+  .wizard-steps span.step.active{color:var(--ag-accent);font-weight:700;}
+  .wizard-steps span.sep{color:var(--ag-border);}
+  .wizard-body{max-width:960px;margin:0 auto;padding:24px 28px 60px;}
+  .wizard-nav{display:flex;justify-content:space-between;margin-top:28px;}
+  .tut-text{color:var(--ag-text-dim);line-height:1.7;font-size:.95rem;max-width:720px;margin:0 auto 20px;}
+  .tut-text b{color:var(--ag-text);}
+  .tut-highlight{color:#c4b5fd;font-weight:600;}
+  .attr-layout{display:flex;gap:40px;align-items:center;justify-content:center;flex-wrap:wrap;margin:28px 0;}
+  .attr-layout .tut-text{flex:1;min-width:260px;margin:0;}
+  .attr-pentagon{width:280px;height:280px;position:relative;flex-shrink:0;}
+  .attr-pentagon svg{width:100%;height:100%;}
+  .attr-node{position:absolute;width:72px;height:72px;border-radius:50%;border:2px solid #e8e8f0;background:#0a0a0e;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:translate(-50%,-50%);}
+  .attr-node b{font-size:1.25rem;color:#fff;line-height:1;}
+  .attr-node small{font-size:.65rem;color:#c0c0d0;letter-spacing:.04em;text-align:center;line-height:1.15;margin-top:2px;}
+  .origem-banner{display:flex;align-items:center;gap:14px;padding:12px 16px;background:#12121a;border:1px solid var(--ag-border);border-radius:10px;margin-bottom:16px;font-size:.85rem;color:var(--ag-text-dim);}
+  .origem-search{width:100%;padding:10px 14px;border-radius:8px;border:1px solid var(--ag-border);background:var(--ag-panel);color:var(--ag-text);margin-bottom:14px;}
+  .origem-item{border:1px solid var(--ag-border);border-radius:10px;margin-bottom:8px;overflow:hidden;background:var(--ag-panel);}
+  .origem-item summary{list-style:none;display:flex;justify-content:space-between;align-items:center;padding:12px 16px;cursor:pointer;font-weight:600;}
+  .origem-item summary::-webkit-details-marker{display:none;}
+  .origem-item .det{padding:0 16px 14px;color:var(--ag-text-dim);font-size:.85rem;}
+  .origem-item.selected{border-color:var(--ag-accent);}
+  .btn-escolher{background:var(--ag-accent);color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:.8rem;cursor:pointer;}
+  .classe-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:24px;}
+  .classe-card{background:var(--ag-panel);border:1px solid var(--ag-border);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:12px;min-height:320px;}
+  .classe-card.selected{border-color:var(--ag-accent);}
+  .classe-card h3{margin:0;font-size:1.25rem;border-bottom:2px solid var(--ag-accent);padding-bottom:8px;}
+  .classe-card .cls-desc{font-size:.84rem;color:var(--ag-text-dim);line-height:1.55;flex:1;overflow-y:auto;max-height:220px;}
+  .classe-card .btn-escolher{align-self:center;min-width:120px;}
+  .finais-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px;}
+  .finais-grid label{display:block;font-size:.8rem;color:var(--ag-text-dim);margin-bottom:6px;}
+  .finais-grid input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--ag-border);background:var(--ag-panel);color:var(--ag-text);}
+  .resumo-box{margin-top:20px;padding:14px 16px;border:1px solid var(--ag-border);border-radius:10px;background:var(--ag-panel);font-size:.85rem;color:var(--ag-text-dim);}
+  .resumo-box b{color:var(--ag-text);}
+  @media (max-width:800px){ .classe-grid{grid-template-columns:1fr;} .attr-layout{flex-direction:column;} .finais-grid{grid-template-columns:1fr;} }
 </style>
 </head>
 <body>
@@ -53,77 +93,15 @@
     <div class="ag-grid" id="camp-grid"></div>
   </section>
 </div>
+<div class="wizard-overlay" id="wizard" hidden>
+  <div class="wizard-top">
+    <span class="brand">◈ Novo Agente</span>
+    <button class="btn-ghost" id="wizard-close">Cancelar</button>
+  </div>
+  <div class="wizard-steps" id="wizard-steps"></div>
+  <div class="wizard-body" id="wizard-body"></div>
+</div>
 <script src="data.js"></script>
-<script>
-const REGISTRO_KEY = 'escandinavo-agentes-registro';
-const CAMPANHAS_KEY = 'escandinavo-campanhas-registro';
-function lerAgentes(){ try{ return JSON.parse(localStorage.getItem(REGISTRO_KEY)) || []; }catch(e){ return []; } }
-function salvarAgentes(lista){ localStorage.setItem(REGISTRO_KEY, JSON.stringify(lista)); }
-function lerCampanhas(){ try{ return JSON.parse(localStorage.getItem(CAMPANHAS_KEY)) || []; }catch(e){ return []; } }
-function salvarCampanhas(lista){ localStorage.setItem(CAMPANHAS_KEY, JSON.stringify(lista)); }
-const CLASSE_LABEL = { combatente:'Combatente', especialista:'Especialista', ocultista:'Ocultista', mundano:'Mundano' };
-function formatarData(ts){ return new Date(ts).toLocaleDateString('pt-BR'); }
-function renderAgentes(){
-  const grid = document.getElementById('ag-grid');
-  const termo = (document.getElementById('ag-search').value || '').toLowerCase();
-  let lista = lerAgentes().sort((a,b)=> b.atualizadoEm - a.atualizadoEm);
-  if (termo) lista = lista.filter(a => (a.nome||'').toLowerCase().includes(termo));
-  document.getElementById('ag-count').textContent = lerAgentes().length;
-  grid.innerHTML = '';
-  if (!lista.length){ grid.innerHTML = '<div class="ag-empty">Nenhum agente ainda. Clique em "Novo Agente" para criar sua primeira ficha.</div>'; return; }
-  lista.forEach(a => {
-    const card = document.createElement('div');
-    card.className = 'ag-card';
-    card.innerHTML = `<button class="del" title="Excluir" data-id="${a.id}">✕</button><div class="avatar">◈</div><h3>${a.nome || 'Sem nome'}</h3><div class="meta">${CLASSE_LABEL[a.classe] || a.classe || '—'} · NEX ${a.nex ?? 5}% · atualizado em ${formatarData(a.atualizadoEm)}</div><a class="acessar" href="ficha.html?id=${encodeURIComponent(a.id)}">Acessar Ficha</a>`;
-    grid.appendChild(card);
-  });
-  grid.querySelectorAll('.del').forEach(btn => btn.addEventListener('click', () => {
-    if (!confirm('Excluir este agente?')) return;
-    const id = btn.dataset.id;
-    salvarAgentes(lerAgentes().filter(a => a.id !== id));
-    localStorage.removeItem('escandinavo-ficha-' + id);
-    renderAgentes();
-  }));
-}
-document.getElementById('ag-search').addEventListener('input', renderAgentes);
-function renderCampanhas(){
-  const grid = document.getElementById('camp-grid');
-  const lista = lerCampanhas().sort((a,b)=> b.criadaEm - a.criadaEm);
-  document.getElementById('camp-count').textContent = lista.length;
-  grid.innerHTML = '';
-  if (!lista.length){ grid.innerHTML = '<div class="ag-empty">Nenhuma campanha ainda.</div>'; return; }
-  lista.forEach(c => {
-    const card = document.createElement('div');
-    card.className = 'ag-card';
-    card.innerHTML = `<div class="avatar">📋</div><h3>${c.nome}</h3><div class="meta">Iniciada em: ${formatarData(c.criadaEm)}</div>`;
-    grid.appendChild(card);
-  });
-}
-document.getElementById('btn-nova-campanha').addEventListener('click', () => {
-  const nome = prompt('Nome da campanha:');
-  if (!nome || !nome.trim()) return;
-  const lista = lerCampanhas();
-  lista.push({ id: 'camp_' + Date.now().toString(36), nome: nome.trim(), jogadores: 0, criadaEm: Date.now() });
-  salvarCampanhas(lista);
-  renderCampanhas();
-});
-document.querySelectorAll('.ag-nav a').forEach(link => link.addEventListener('click', () => {
-  document.querySelectorAll('.ag-nav a').forEach(a => a.classList.remove('active'));
-  link.classList.add('active');
-  const view = link.dataset.view;
-  document.getElementById('view-agentes').hidden = view !== 'agentes';
-  document.getElementById('view-campanhas').hidden = view !== 'campanhas';
-  if (view === 'campanhas') renderCampanhas();
-}));
-document.getElementById('btn-novo-agente').addEventListener('click', () => {
-  const id = 'ag_' + Date.now().toString(36);
-  const nome = prompt('Nome do agente:', 'Novo Agente') || 'Novo Agente';
-  const lista = lerAgentes();
-  lista.push({ id, nome, classe: 'ocultista', origem: 'investigador', nex: 5, atualizadoEm: Date.now() });
-  salvarAgentes(lista);
-  window.location.href = 'ficha.html?id=' + encodeURIComponent(id);
-});
-renderAgentes();
-</script>
+<script src="wizard.js?v=tut1"></script>
 </body>
 </html>
