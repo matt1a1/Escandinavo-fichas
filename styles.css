@@ -1,3 +1,5 @@
+@import url('styles-hab.css?v=hab2');
+
 /* Scrollbar tema escuro */
 * {
   scrollbar-width: thin;
@@ -106,6 +108,3 @@ textarea { min-height: 70px; resize: vertical; }
 .catalog-item { display: flex; flex-direction: column; gap: 8px; background: #14141c; border: 1px solid #2a2a35; border-radius: 10px; padding: 12px 14px; }
 .catalog-tag { display: inline-block; font-size: 0.72rem; padding: 3px 9px; border-radius: 999px; background: rgba(255,255,255,0.06); border: 1px solid #2a2a35; color: #b0b0c0; }
 @media (max-width: 1100px) { .sheet { grid-template-columns: 1fr; } }
-
-/* Carrega estilos de habilidades (abas, filtros, cards) */
-@import url('styles-hab.css?v=hab2');
