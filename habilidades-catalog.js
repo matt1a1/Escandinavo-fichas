@@ -175,7 +175,7 @@ const HABILIDADES_CATALOG = [
 
   // ===== OCULTISTA — BASE + PODERES =====
   { nome: 'Escolhido pelo Outro Lado', classe: 'Ocultista', categoria: 'Poderes de Ocultista', nex: '5%', pe: '—',
-    desc: 'Começa com rituais de 1º círculo; aprende mais conforme o NEX.' },
+    desc: 'Você aprende e pode lançar rituais do Outro Lado.\nNEX 5%: 1º círculo\nNEX 25%: 2º círculo\nNEX 55%: 3º círculo\nNEX 85%: 4º círculo' },
   { nome: 'Camuflar Ocultismo', classe: 'Ocultista', categoria: 'Poderes de Ocultista', nex: '', pe: '+2 PE',
     desc: 'Esconde símbolos; ao lançar ritual pode gastar +2 PE para lançar só com concentração.' },
   { nome: 'Envolto em Mistério', classe: 'Ocultista', categoria: 'Poderes de Ocultista', nex: '', pe: '—',

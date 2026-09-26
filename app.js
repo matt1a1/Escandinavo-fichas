@@ -102,6 +102,13 @@ function peritoEscala(nex) {
   if (n >= 25) return { pe: 3, dado: '1d6' };
   return { pe: 2, dado: '1d4' };
 }
+function circuloOcultista(nex) {
+  const n = Number(nex) || 5;
+  if (n >= 85) return 4;
+  if (n >= 55) return 3;
+  if (n >= 25) return 2;
+  return 1;
+}
 function clampRecurso(atual, max, last) {
   if (atual === null || atual === undefined) return max;
   if (last != null) atual = atual + (max - last);
@@ -248,6 +255,9 @@ function renderRecursos() {
       const p = peritoEscala(state.nex);
       txt += ' · Perito ' + p.pe + ' PE, +' + p.dado;
     }
+    if (state.classe === 'ocultista') {
+      txt += ' · Rituais até ' + circuloOcultista(state.nex) + 'º círculo · Perícias Ocultismo, Vontade + 3+INT';
+    }
     formula.textContent = txt;
   }
 }
@@ -330,6 +340,10 @@ function applyOrigemPericias() {
   const o = ORIGENS[state.origem];
   if (!o) return;
   o.pericias.forEach((id) => { if (getPericiaRank(id) === 0) setPericiaRank(id, 5); });
+}
+function applyClassePericias() {
+  const fixas = CLASSES[state.classe]?.periciasFixas || [];
+  fixas.forEach((id) => { if (getPericiaRank(id) === 0) setPericiaRank(id, 5); });
 }
 function renderHabilidades() {
   const list = document.getElementById('habilidades-list');
@@ -734,6 +748,7 @@ function bindEvents() {
     state.classe = e.target.value;
     state.vidaAtual = null; state.sanAtual = null; state.peAtual = null;
     lastResourceMax = { pv: null, san: null, pe: null };
+    applyClassePericias();
     if (!state.habilidades.length) state.habilidades = CLASSES[state.classe].habilidadesIniciais.map((n) => ({ nome: n, desc: '' }));
     scheduleSave(); renderAll();
   });
@@ -896,6 +911,7 @@ function novaFicha() {
     itensLimite: { I: 2, II: 0, III: 0, IV: 0 },
   });
   applyOrigemPericias();
+  applyClassePericias();
   state.habilidades = CLASSES[state.classe].habilidadesIniciais.map((n) => ({ nome: n, desc: '' }));
   lastResourceMax = { pv: null, san: null, pe: null };
   saveState(); renderAll();
@@ -904,7 +920,10 @@ function init() {
   const loaded = loadState();
   if (!loaded) {
     applyOrigemPericias();
+    applyClassePericias();
     state.habilidades = CLASSES[state.classe].habilidadesIniciais.map((n) => ({ nome: n, desc: '' }));
+  } else {
+    applyClassePericias();
   }
   normalizarAtributosNex();
   bindEvents(); renderAll();

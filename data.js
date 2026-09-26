@@ -86,9 +86,10 @@ const CLASSES = {
     pvBase: 12, pvPorNex: 2,
     sanBase: 20, sanPorNex: 5,
     peBase: 4, pePorNex: 4,
-    periciasBase: 1,
+    periciasBase: 5,
+    periciasFixas: ['ocultismo', 'vontade'],
     proficiencias: 'Armas simples',
-    habilidadesIniciais: ['Escolhido pelo Outro Lado', 'Impostor'],
+    habilidadesIniciais: ['Escolhido pelo Outro Lado'],
   },
 };
 
