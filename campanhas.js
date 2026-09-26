@@ -1,4 +1,4 @@
-// Campanhas completas (lista, acessar, excluir, adicionar agentes)
+// Campanhas completas (lista, acessar, excluir, adicionar agentes, editar nome)
 (function () {
   const CAMPANHAS_KEY = 'escandinavo-campanhas-registro';
   const REGISTRO_KEY = 'escandinavo-agentes-registro';
@@ -9,7 +9,7 @@
   function lerAgentes(){ try{ return JSON.parse(localStorage.getItem(REGISTRO_KEY)) || []; }catch(e){ return []; } }
   function formatarData(ts){ return new Date(ts).toLocaleDateString('pt-BR'); }
   function escapeCamp(s) {
-    return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    return String(s == null ? '' : s).replace(/&/g,'&').replace(/</g,'<').replace(/>/g,'>').replace(/"/g,'"');
   }
 
   let campanhaAtualId = null;
@@ -75,7 +75,8 @@
     campanhaAtualId = id;
     document.getElementById('view-campanhas').hidden = true;
     document.getElementById('view-camp-detail').hidden = false;
-    document.getElementById('camp-detail-nome').textContent = c.nome || 'Campanha';
+    document.getElementById('camp-detail-nome').innerHTML =
+      escapeCamp(c.nome || 'Campanha') + ' <span class="edit-hint">✎</span>';
     const nAg = (c.agentes || []).length;
     document.getElementById('camp-detail-meta').textContent =
       'Iniciada em: ' + formatarData(c.criadaEm) + ' · ' + nAg + ' agente' + (nAg === 1 ? '' : 's');
@@ -183,6 +184,17 @@
     }
   }
 
+  function renomearCampanha() {
+    const c = getCampanha(campanhaAtualId);
+    if (!c) return;
+    const nome = prompt('Nome da campanha:', c.nome || '');
+    if (nome === null) return;
+    const n = nome.trim();
+    if (!n) { alert('O nome não pode ficar vazio.'); return; }
+    atualizarCampanha(campanhaAtualId, { nome: n });
+    abrirCampanha(campanhaAtualId);
+  }
+
   function bind() {
     const btnNova = document.getElementById('btn-nova-campanha');
     if (btnNova) {
@@ -211,14 +223,14 @@
     if (btnConf) btnConf.addEventListener('click', confirmarAgentes);
 
     const btnEdit = document.getElementById('btn-camp-editar');
-    if (btnEdit) btnEdit.addEventListener('click', () => {
-      const c = getCampanha(campanhaAtualId);
-      if (!c) return;
-      const nome = prompt('Nome da campanha:', c.nome);
-      if (!nome || !nome.trim()) return;
-      atualizarCampanha(campanhaAtualId, { nome: nome.trim() });
-      abrirCampanha(campanhaAtualId);
-    });
+    if (btnEdit) btnEdit.addEventListener('click', renomearCampanha);
+
+    const titulo = document.getElementById('camp-detail-nome');
+    if (titulo) {
+      titulo.style.cursor = 'pointer';
+      titulo.title = 'Clique para editar o nome';
+      titulo.addEventListener('click', renomearCampanha);
+    }
 
     const btnCapa = document.getElementById('btn-camp-capa');
     const fileCapa = document.getElementById('camp-capa-file');
