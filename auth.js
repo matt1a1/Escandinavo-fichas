@@ -1,16 +1,19 @@
 /**
  * Login Google + sincronização (Firebase)
  * - Popup no desktop; redirect no mobile se popup falhar
+ * - Nome de conta editável
  */
 (function () {
   const REGISTRO_KEY = 'escandinavo-agentes-registro';
   const CAMPANHAS_KEY = 'escandinavo-campanhas-registro';
   const FICHA_PREFIX = 'escandinavo-ficha-';
+  const NOME_LOCAL_KEY = 'escandinavo-nome-conta';
 
   let auth = null;
   let db = null;
   let currentUser = null;
   let syncing = false;
+  let customName = '';
 
   function configOk() {
     const c = window.FIREBASE_CONFIG;
@@ -19,6 +22,12 @@
 
   function isMobile() {
     return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || window.innerWidth <= 720;
+  }
+
+  function displayName() {
+    if (customName && customName.trim()) return customName.trim();
+    if (currentUser) return currentUser.displayName || currentUser.email || 'Conta';
+    return '';
   }
 
   function toast(msg, isErr) {
@@ -38,6 +47,81 @@
     el._t = setTimeout(function () { el.style.opacity = '0'; }, 4500);
   }
 
+  function ensureNameModal() {
+    if (document.getElementById('modal-nome-conta')) return;
+    const wrap = document.createElement('div');
+    wrap.id = 'modal-nome-conta';
+    wrap.hidden = true;
+    wrap.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:300;display:flex;align-items:center;justify-content:center;padding:16px;';
+    wrap.innerHTML =
+      '<div style="background:#16161f;border:1px solid #2a2a38;border-radius:12px;padding:22px;max-width:400px;width:100%;">' +
+        '<h3 style="margin:0 0 6px;font-size:1.05rem;color:#f2f2f6;">Nome da conta</h3>' +
+        '<p style="margin:0 0 14px;font-size:.82rem;color:#9797a8;">Esse nome aparece no site. Não altera sua conta Google.</p>' +
+        '<input id="input-nome-conta" type="text" maxlength="40" placeholder="Seu nome" ' +
+          'style="width:100%;padding:11px 12px;border-radius:8px;border:1px solid #2a2a38;background:#0b0b10;color:#f2f2f6;font-size:.95rem;margin-bottom:16px;box-sizing:border-box;" />' +
+        '<div style="display:flex;gap:10px;justify-content:flex-end;">' +
+          '<button type="button" id="btn-nome-cancelar" class="btn-ghost" style="padding:9px 14px;">Cancelar</button>' +
+          '<button type="button" id="btn-nome-salvar" class="btn-primary" style="padding:9px 16px;">Salvar</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(wrap);
+
+    wrap.addEventListener('click', function (e) {
+      if (e.target === wrap) wrap.hidden = true;
+    });
+    document.getElementById('btn-nome-cancelar').onclick = function () {
+      wrap.hidden = true;
+    };
+    document.getElementById('btn-nome-salvar').onclick = function () {
+      salvarNomeConta();
+    };
+    document.getElementById('input-nome-conta').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') salvarNomeConta();
+      if (e.key === 'Escape') wrap.hidden = true;
+    });
+  }
+
+  function abrirEditarNome() {
+    if (!currentUser) return;
+    ensureNameModal();
+    const modal = document.getElementById('modal-nome-conta');
+    const input = document.getElementById('input-nome-conta');
+    input.value = displayName();
+    modal.hidden = false;
+    setTimeout(function () { input.focus(); input.select(); }, 50);
+  }
+
+  async function salvarNomeConta() {
+    const input = document.getElementById('input-nome-conta');
+    const nome = (input && input.value || '').trim();
+    if (!nome) {
+      toast('Digite um nome', true);
+      return;
+    }
+    if (nome.length > 40) {
+      toast('Nome muito longo (máx. 40)', true);
+      return;
+    }
+    customName = nome;
+    try { localStorage.setItem(NOME_LOCAL_KEY, nome); } catch (e) {}
+    updateAuthUI();
+    const modal = document.getElementById('modal-nome-conta');
+    if (modal) modal.hidden = true;
+    toast('Nome atualizado');
+
+    if (currentUser && db) {
+      try {
+        await db.collection('users').doc(currentUser.uid).set(
+          { customName: nome, updatedAt: firebase.firestore.FieldValue.serverTimestamp() },
+          { merge: true }
+        );
+      } catch (e) {
+        console.warn('salvar nome', e);
+        toast('Nome salvo localmente; falha na nuvem', true);
+      }
+    }
+  }
+
   function ensureAuthUI() {
     if (document.getElementById('auth-bar')) {
       updateAuthUI();
@@ -50,7 +134,8 @@
     bar.id = 'auth-bar';
     bar.style.cssText = 'display:flex;align-items:center;gap:8px;margin-left:auto;flex-shrink:0;';
     bar.innerHTML =
-      '<span id="auth-user" style="font-size:.8rem;color:#9797a8;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>' +
+      '<button type="button" id="auth-user" title="Clique para alterar o nome" ' +
+        'style="font-size:.8rem;color:#c4b5fd;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:transparent;border:none;cursor:pointer;padding:4px 6px;border-radius:6px;"></button>' +
       '<button type="button" id="btn-auth-login" class="btn-primary" style="padding:8px 14px;font-size:.82rem;display:none;white-space:nowrap;">Entrar com Google</button>' +
       '<button type="button" id="btn-auth-logout" class="btn-ghost" style="padding:8px 12px;font-size:.82rem;display:none;">Sair</button>';
 
@@ -58,6 +143,7 @@
 
     document.getElementById('btn-auth-login').onclick = function () { loginGoogle(); };
     document.getElementById('btn-auth-logout').onclick = function () { logout(); };
+    document.getElementById('auth-user').onclick = function () { abrirEditarNome(); };
     updateAuthUI();
   }
 
@@ -70,18 +156,22 @@
     if (!configOk()) {
       loginBtn.style.display = 'none';
       logoutBtn.style.display = 'none';
-      if (userEl) userEl.textContent = '';
+      if (userEl) { userEl.textContent = ''; userEl.style.display = 'none'; }
       return;
     }
 
     if (currentUser) {
       loginBtn.style.display = 'none';
       logoutBtn.style.display = '';
-      if (userEl) userEl.textContent = currentUser.displayName || currentUser.email || 'Conta';
+      if (userEl) {
+        userEl.style.display = '';
+        userEl.textContent = displayName() + ' ✎';
+        userEl.title = 'Clique para alterar o nome';
+      }
     } else {
       loginBtn.style.display = '';
       logoutBtn.style.display = 'none';
-      if (userEl) userEl.textContent = '';
+      if (userEl) { userEl.textContent = ''; userEl.style.display = 'none'; }
     }
   }
 
@@ -109,6 +199,10 @@
   }
 
   async function initFirebase() {
+    try {
+      customName = localStorage.getItem(NOME_LOCAL_KEY) || '';
+    } catch (e) { customName = ''; }
+
     ensureAuthUI();
     if (!configOk()) return;
 
@@ -134,7 +228,7 @@
         currentUser = user;
         updateAuthUI();
         if (user) {
-          toast('Logado: ' + (user.displayName || user.email));
+          toast('Logado: ' + displayName());
           await pullFromCloud();
           if (typeof renderAgentes === 'function') renderAgentes();
           if (typeof renderCampanhas === 'function') renderCampanhas();
@@ -155,6 +249,7 @@
     if (c === 'auth/unauthorized-domain') return 'Domínio não autorizado. Adicione matt1a1.github.io no Firebase.';
     if (c === 'auth/operation-not-allowed') return 'Login Google desativado no Firebase.';
     if (c === 'auth/network-request-failed') return 'Sem conexão com a internet.';
+    if (c === 'auth/api-key-not-valid.-please-pass-a-valid-api-key' || c.indexOf('api-key') !== -1) return 'API key inválida. Atualize o firebase-config.';
     if (c === 'auth/internal-error') return 'Erro interno. Tente de novo em alguns segundos.';
     return (e.message || c || 'erro desconhecido');
   }
@@ -242,6 +337,11 @@
         return;
       }
       const data = snap.data() || {};
+      if (data.customName && typeof data.customName === 'string') {
+        customName = data.customName;
+        try { localStorage.setItem(NOME_LOCAL_KEY, customName); } catch (e) {}
+        updateAuthUI();
+      }
       if (Array.isArray(data.agentes)) {
         localStorage.setItem(REGISTRO_KEY, JSON.stringify(data.agentes));
       }
@@ -275,6 +375,7 @@
       const payload = {
         email: currentUser.email || '',
         displayName: currentUser.displayName || '',
+        customName: customName || '',
         updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
         agentes: readLocalAgentes(),
         campanhas: readLocalCampanhas(),
@@ -303,6 +404,8 @@
     push: pushToCloud,
     pull: pullFromCloud,
     user: function () { return currentUser; },
+    displayName: displayName,
+    editName: abrirEditarNome,
     ready: configOk
   };
 
