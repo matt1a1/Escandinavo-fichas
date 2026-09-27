@@ -1,5 +1,6 @@
 /**
- * Login Google + sincronização de agentes/campanhas/fichas (Firebase)
+ * Login Google + sincronização (Firebase)
+ * - Popup no desktop; redirect no mobile se popup falhar
  */
 (function () {
   const REGISTRO_KEY = 'escandinavo-agentes-registro';
@@ -13,7 +14,11 @@
 
   function configOk() {
     const c = window.FIREBASE_CONFIG;
-    return window.FIREBASE_ENABLED && c && c.apiKey && c.apiKey !== 'COLE_AQUI' && c.projectId && c.projectId !== 'COLE_AQUI';
+    return !!(window.FIREBASE_ENABLED && c && c.apiKey && c.apiKey !== 'COLE_AQUI' && c.projectId && c.projectId !== 'COLE_AQUI');
+  }
+
+  function isMobile() {
+    return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || window.innerWidth <= 720;
   }
 
   function toast(msg, isErr) {
@@ -21,7 +26,7 @@
     if (!el) {
       el = document.createElement('div');
       el.id = 'auth-toast';
-      el.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:9999;padding:12px 18px;border-radius:10px;font-size:.9rem;max-width:90vw;box-shadow:0 8px 24px rgba(0,0,0,.4);transition:opacity .3s;';
+      el.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:9999;padding:12px 18px;border-radius:10px;font-size:.9rem;max-width:92vw;box-shadow:0 8px 24px rgba(0,0,0,.45);transition:opacity .3s;text-align:center;';
       document.body.appendChild(el);
     }
     el.style.background = isErr ? '#7f1d1d' : '#1e1b4b';
@@ -30,20 +35,23 @@
     el.textContent = msg;
     el.style.opacity = '1';
     clearTimeout(el._t);
-    el._t = setTimeout(function () { el.style.opacity = '0'; }, 3200);
+    el._t = setTimeout(function () { el.style.opacity = '0'; }, 4500);
   }
 
   function ensureAuthUI() {
-    if (document.getElementById('auth-bar')) return;
+    if (document.getElementById('auth-bar')) {
+      updateAuthUI();
+      return;
+    }
     const nav = document.querySelector('.ag-nav');
     if (!nav) return;
 
     const bar = document.createElement('div');
     bar.id = 'auth-bar';
-    bar.style.cssText = 'display:flex;align-items:center;gap:10px;margin-left:auto;';
+    bar.style.cssText = 'display:flex;align-items:center;gap:8px;margin-left:auto;flex-shrink:0;';
     bar.innerHTML =
-      '<span id="auth-user" style="font-size:.82rem;color:#9797a8;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>' +
-      '<button type="button" id="btn-auth-login" class="btn-primary" style="padding:8px 14px;font-size:.82rem;display:none;">Entrar com Google</button>' +
+      '<span id="auth-user" style="font-size:.8rem;color:#9797a8;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>' +
+      '<button type="button" id="btn-auth-login" class="btn-primary" style="padding:8px 14px;font-size:.82rem;display:none;white-space:nowrap;">Entrar com Google</button>' +
       '<button type="button" id="btn-auth-logout" class="btn-ghost" style="padding:8px 12px;font-size:.82rem;display:none;">Sair</button>';
 
     nav.appendChild(bar);
@@ -88,7 +96,7 @@
           const s = document.createElement('script');
           s.src = src;
           s.onload = res;
-          s.onerror = rej;
+          s.onerror = function () { rej(new Error('Falha ao carregar ' + src)); };
           document.head.appendChild(s);
         });
       }
@@ -101,10 +109,9 @@
   }
 
   async function initFirebase() {
-    if (!configOk()) {
-      ensureAuthUI();
-      return;
-    }
+    ensureAuthUI();
+    if (!configOk()) return;
+
     try {
       await loadScripts();
       if (!firebase.apps.length) {
@@ -112,6 +119,16 @@
       }
       auth = firebase.auth();
       db = firebase.firestore();
+
+      try {
+        const redirectResult = await auth.getRedirectResult();
+        if (redirectResult && redirectResult.user) {
+          toast('Login ok: ' + (redirectResult.user.displayName || redirectResult.user.email));
+        }
+      } catch (e) {
+        console.warn('redirect result', e);
+        if (e.code) toast('Erro no login: ' + friendlyError(e), true);
+      }
 
       auth.onAuthStateChanged(async function (user) {
         currentUser = user;
@@ -127,25 +144,50 @@
       ensureAuthUI();
     } catch (e) {
       console.error('Firebase init', e);
-      toast('Erro ao iniciar login Google', true);
+      toast('Erro ao iniciar Firebase: ' + (e.message || e), true);
     }
   }
 
+  function friendlyError(e) {
+    const c = e.code || '';
+    if (c === 'auth/popup-blocked') return 'Popup bloqueado. Permita popups ou tente de novo.';
+    if (c === 'auth/popup-closed-by-user') return 'Janela fechada antes de concluir.';
+    if (c === 'auth/unauthorized-domain') return 'Domínio não autorizado. Adicione matt1a1.github.io no Firebase.';
+    if (c === 'auth/operation-not-allowed') return 'Login Google desativado no Firebase.';
+    if (c === 'auth/network-request-failed') return 'Sem conexão com a internet.';
+    if (c === 'auth/internal-error') return 'Erro interno. Tente de novo em alguns segundos.';
+    return (e.message || c || 'erro desconhecido');
+  }
+
   async function loginGoogle() {
-    if (!configOk()) {
-      toast('Firebase ainda não configurado.', true);
+    if (!configOk() || !auth) {
+      toast('Firebase ainda não está pronto. Atualize a página (Ctrl+F5).', true);
       return;
     }
+    const provider = new firebase.auth.GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
+
+    toast('Abrindo login Google…');
+
     try {
-      const provider = new firebase.auth.GoogleAuthProvider();
+      if (isMobile()) {
+        await auth.signInWithRedirect(provider);
+        return;
+      }
       await auth.signInWithPopup(provider);
     } catch (e) {
-      console.error(e);
-      if (e.code === 'auth/popup-blocked') {
-        toast('Popup bloqueado — permita popups neste site', true);
-      } else {
-        toast('Falha no login: ' + (e.message || e.code), true);
+      console.error('login', e);
+      if (e.code === 'auth/popup-blocked' || e.code === 'auth/cancelled-popup-request') {
+        try {
+          toast('Popup bloqueado — redirecionando…');
+          await auth.signInWithRedirect(provider);
+          return;
+        } catch (e2) {
+          toast('Falha no login: ' + friendlyError(e2), true);
+          return;
+        }
       }
+      toast('Falha no login: ' + friendlyError(e), true);
     }
   }
 
@@ -153,6 +195,7 @@
     try {
       await auth.signOut();
       toast('Você saiu da conta');
+      updateAuthUI();
     } catch (e) {
       toast('Erro ao sair', true);
     }
@@ -195,7 +238,7 @@
       const snap = await ref.get();
       if (!snap.exists) {
         await pushToCloud();
-        toast('Conta criada — dados locais salvos na nuvem');
+        toast('Conta criada — dados salvos na nuvem');
         return;
       }
       const data = snap.data() || {};
@@ -214,7 +257,12 @@
       await pushToCloud();
     } catch (e) {
       console.error('pull', e);
-      toast('Erro ao carregar da nuvem', true);
+      var msg = (e.message || '');
+      if (msg.indexOf('permission') !== -1 || e.code === 'permission-denied') {
+        toast('Firestore bloqueou o acesso. Use regras de teste ou ajuste as rules.', true);
+      } else {
+        toast('Erro ao carregar da nuvem: ' + msg, true);
+      }
     } finally {
       syncing = false;
     }
