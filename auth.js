@@ -47,12 +47,20 @@
     el._t = setTimeout(function () { el.style.opacity = '0'; }, 4500);
   }
 
+  function fecharModalNome() {
+    const modal = document.getElementById('modal-nome-conta');
+    if (modal) {
+      modal.style.display = 'none';
+      modal.hidden = true;
+    }
+  }
+
   function ensureNameModal() {
     if (document.getElementById('modal-nome-conta')) return;
     const wrap = document.createElement('div');
     wrap.id = 'modal-nome-conta';
     wrap.hidden = true;
-    wrap.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:300;display:flex;align-items:center;justify-content:center;padding:16px;';
+    wrap.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:300;display:none;align-items:center;justify-content:center;padding:16px;';
     wrap.innerHTML =
       '<div style="background:#16161f;border:1px solid #2a2a38;border-radius:12px;padding:22px;max-width:400px;width:100%;">' +
         '<h3 style="margin:0 0 6px;font-size:1.05rem;color:#f2f2f6;">Nome da conta</h3>' +
@@ -60,24 +68,28 @@
         '<input id="input-nome-conta" type="text" maxlength="40" placeholder="Seu nome" ' +
           'style="width:100%;padding:11px 12px;border-radius:8px;border:1px solid #2a2a38;background:#0b0b10;color:#f2f2f6;font-size:.95rem;margin-bottom:16px;box-sizing:border-box;" />' +
         '<div style="display:flex;gap:10px;justify-content:flex-end;">' +
-          '<button type="button" id="btn-nome-cancelar" class="btn-ghost" style="padding:9px 14px;">Cancelar</button>' +
-          '<button type="button" id="btn-nome-salvar" class="btn-primary" style="padding:9px 16px;">Salvar</button>' +
+          '<button type="button" id="btn-nome-cancelar" style="padding:9px 14px;background:transparent;color:#9797a8;border:1px solid #2a2a38;border-radius:8px;cursor:pointer;font-size:.9rem;">Cancelar</button>' +
+          '<button type="button" id="btn-nome-salvar" style="padding:9px 16px;background:#8b5cf6;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:.9rem;">Salvar</button>' +
         '</div>' +
       '</div>';
     document.body.appendChild(wrap);
 
     wrap.addEventListener('click', function (e) {
-      if (e.target === wrap) wrap.hidden = true;
+      if (e.target === wrap) fecharModalNome();
     });
-    document.getElementById('btn-nome-cancelar').onclick = function () {
-      wrap.hidden = true;
-    };
-    document.getElementById('btn-nome-salvar').onclick = function () {
+    document.getElementById('btn-nome-cancelar').addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      fecharModalNome();
+    });
+    document.getElementById('btn-nome-salvar').addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
       salvarNomeConta();
-    };
+    });
     document.getElementById('input-nome-conta').addEventListener('keydown', function (e) {
       if (e.key === 'Enter') salvarNomeConta();
-      if (e.key === 'Escape') wrap.hidden = true;
+      if (e.key === 'Escape') fecharModalNome();
     });
   }
 
@@ -88,6 +100,7 @@
     const input = document.getElementById('input-nome-conta');
     input.value = displayName();
     modal.hidden = false;
+    modal.style.display = 'flex';
     setTimeout(function () { input.focus(); input.select(); }, 50);
   }
 
@@ -105,8 +118,7 @@
     customName = nome;
     try { localStorage.setItem(NOME_LOCAL_KEY, nome); } catch (e) {}
     updateAuthUI();
-    const modal = document.getElementById('modal-nome-conta');
-    if (modal) modal.hidden = true;
+    fecharModalNome();
     toast('Nome atualizado');
 
     if (currentUser && db) {
