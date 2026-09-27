@@ -18,6 +18,7 @@
   --accent: #7c5cff;
   --accent-2: #a78bfa;
   --danger: #ef4444;
+  --bg-card: #1a1a22;
 }
 
 * { box-sizing: border-box; }
@@ -35,25 +36,25 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 20px;
+  padding: 8px 16px;
   background: var(--bg-elevated);
   border-bottom: 1px solid var(--border);
   flex-wrap: wrap;
   gap: 10px;
 }
 .brand { display: flex; gap: 12px; align-items: center; }
-.brand-icon { font-size: 1.4rem; }
-.brand-title { font-weight: 700; letter-spacing: 0.04em; font-size: 0.95rem; }
-.brand-sub { font-size: 0.75rem; color: var(--text-dim); }
-.header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.brand-icon { font-size: 1.2rem; }
+.brand-title { font-weight: 700; letter-spacing: 0.04em; font-size: 0.9rem; }
+.brand-sub { font-size: 0.7rem; color: var(--text-dim); }
+.header-actions { display: flex; gap: 6px; flex-wrap: wrap; }
 
 .btn {
   background: var(--bg-panel);
   color: var(--text);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 8px 14px;
-  font-size: 0.85rem;
+  padding: 6px 12px;
+  font-size: 0.82rem;
   cursor: pointer;
   font-weight: 500;
 }
@@ -125,6 +126,47 @@ textarea { min-height: 70px; resize: vertical; }
 
 .nex-control { display: flex; align-items: center; gap: 8px; }
 .resource-bar { display: flex; align-items: center; gap: 4px; }
+
+/* Combat stats */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+}
+.stat-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.stat {
+  flex: 1;
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 8px;
+  text-align: center;
+}
+.stat.full { flex: 1 1 100%; }
+.stat label {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.stat span {
+  display: block;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+.combat-stats .class-summary,
+.class-summary {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  margin: 0 0 10px;
+  line-height: 1.4;
+}
 
 .pericias-info { font-size: 0.8rem; color: var(--text-dim); }
 .pericias-list { overflow-y: auto; flex: 1; max-height: calc(100vh - 160px); }
@@ -400,6 +442,6 @@ textarea { min-height: 70px; resize: vertical; }
 @media (max-width: 700px) {
   .catalog-filters { grid-template-columns: 1fr; }
   .header-actions { width: 100%; }
-  .top-bar { padding: 10px 12px; }
+  .top-bar { padding: 8px 12px; }
   .sheet { padding: 10px 12px; }
 }
