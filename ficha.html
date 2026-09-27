@@ -15,7 +15,7 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
       );
     }
 
-    html = html.replace(/href="styles\.css[^"]*"/g, 'href="styles.css?v=fix2"');
+    html = html.replace(/href="styles\.css[^"]*"/g, 'href="styles.css?v=fix3"');
     if (html.indexOf('styles-hab.css') === -1) {
       html = html.replace('</head>', '  <link rel="stylesheet" href="styles-hab.css?v=mob2" />\n</head>');
     }
