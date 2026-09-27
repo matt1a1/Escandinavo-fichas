@@ -115,7 +115,7 @@
 
   .ag-search {
     margin-bottom: 14px;
-    font-size: 16px; /* evita zoom iOS */
+    font-size: 16px;
   }
 
   .ag-grid {
@@ -160,29 +160,47 @@
   .classe-card h3 { color: #f2f2f6 !important; }
   .classe-card .cls-desc { color: #9797a8 !important; }
 
-  .sheet { grid-template-columns: 1fr !important; padding: 8px; }
+  /* Ficha: layout leve no celular — sem quebrar rituais/inventário */
+  .sheet {
+    padding: 10px !important;
+  }
   .tabs {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    border-bottom: none;
+    overflow-x: auto;
+    flex-wrap: nowrap !important;
+    -webkit-overflow-scrolling: touch;
   }
   .tabs button, .tab {
-    border: 1px solid #8b5cf6 !important;
-    border-radius: 8px !important;
-    padding: 14px 8px !important;
-    min-height: 48px;
-    font-size: .78rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    background: #12121a;
-    color: #e8e8f0;
+    flex-shrink: 0;
+    white-space: nowrap;
   }
-  .header-actions {
-    width: 100%;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+  .item-list, .catalog-list {
+    display: flex;
+    flex-direction: column;
     gap: 8px;
+  }
+  .item-card, .catalog-item {
+    max-width: 100%;
+  }
+  .modal-overlay {
+    z-index: 400 !important;
+    align-items: flex-start;
+    padding-top: 24px;
+    overflow-y: auto;
+  }
+  .modal {
+    max-width: 100%;
+    margin: 0 auto 24px;
+  }
+  #tab-rituais .list-header,
+  #tab-inventario .list-header {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  #ritual-catalog-list .catalog-item-actions,
+  #item-catalog-list .catalog-item-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
   }
 }
 
