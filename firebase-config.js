@@ -1,6 +1,6 @@
 // Configuração Firebase — Escandinavo Fichas
 window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyCwB1IUZs3ioay8Zq6-2JtaGmOewa1hdh0",
+  apiKey: "AIzaSyCWB1IUZs3ioay82q6-2JtaGmOewa1hdh0",
   authDomain: "escandinavo-fichas-8fa41.firebaseapp.com",
   projectId: "escandinavo-fichas-8fa41",
   storageBucket: "escandinavo-fichas-8fa41.firebasestorage.app",
