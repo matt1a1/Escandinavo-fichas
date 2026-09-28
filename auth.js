@@ -406,7 +406,6 @@
     if (!currentUser || !db || syncing) return;
     syncing = true;
     try {
-      // Snapshot do que já existe no aparelho ANTES de mexer
       const localAgentes = readLocalAgentes();
       const localCampanhas = readLocalCampanhas();
       const localFichas = collectLocalFichas();
@@ -415,7 +414,6 @@
       const snap = await ref.get();
 
       if (!snap.exists) {
-        // Conta nova: sobe tudo que já estava no celular
         syncing = false;
         await pushToCloud();
         toast('Conta criada — seus personagens foram salvos na nuvem');
@@ -433,7 +431,6 @@
       const cloudCampanhas = Array.isArray(data.campanhas) ? data.campanhas : [];
       const cloudFichas = (data.fichas && typeof data.fichas === 'object') ? data.fichas : {};
 
-      // MESCLA: local + nuvem (nunca apaga um lado)
       const mergedAgentes = mergeById(localAgentes, cloudAgentes);
       const mergedCampanhas = mergeById(localCampanhas, cloudCampanhas);
       const mergedFichas = mergeFichas(localFichas, cloudFichas);
@@ -444,7 +441,7 @@
         localStorage.setItem(FICHA_PREFIX + id, JSON.stringify(mergedFichas[id]));
       });
 
-      toast('Dados sincronizados (local + nuvem)');
+      toast('Dados sincronizados');
       syncing = false;
       await pushToCloud();
     } catch (e) {
