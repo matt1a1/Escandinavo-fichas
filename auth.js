@@ -1,6 +1,6 @@
 /**
  * Login Google + sincronização (Firebase)
- * - Popup no desktop; redirect no mobile se popup falhar
+ * - Popup no desktop; no mobile tenta popup e cai em redirect
  * - Nome de conta editável
  */
 (function () {
@@ -227,18 +227,30 @@
       db = firebase.firestore();
 
       try {
+        await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+      } catch (e) {
+        console.warn('persistence', e);
+      }
+
+      try {
         const redirectResult = await auth.getRedirectResult();
         if (redirectResult && redirectResult.user) {
+          currentUser = redirectResult.user;
+          updateAuthUI();
+          if (typeof window.__mobSyncAuth === 'function') window.__mobSyncAuth();
           toast('Login ok: ' + (redirectResult.user.displayName || redirectResult.user.email));
         }
       } catch (e) {
         console.warn('redirect result', e);
-        if (e.code) toast('Erro no login: ' + friendlyError(e), true);
+        if (e && e.code && e.code !== 'auth/redirect-cancelled-by-user') {
+          toast('Erro no login: ' + friendlyError(e), true);
+        }
       }
 
       auth.onAuthStateChanged(async function (user) {
         currentUser = user;
         updateAuthUI();
+        if (typeof window.__mobSyncAuth === 'function') window.__mobSyncAuth();
         if (user) {
           toast('Logado: ' + displayName());
           await pullFromCloud();
@@ -268,25 +280,39 @@
 
   async function loginGoogle() {
     if (!configOk() || !auth) {
-      toast('Firebase ainda não está pronto. Atualize a página (Ctrl+F5).', true);
+      toast('Firebase ainda não está pronto. Atualize a página.', true);
       return;
     }
     const provider = new firebase.auth.GoogleAuthProvider();
+    provider.addScope('email');
+    provider.addScope('profile');
     provider.setCustomParameters({ prompt: 'select_account' });
+
+    try {
+      await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+    } catch (e) {}
 
     toast('Abrindo login Google…');
 
     try {
       if (isMobile()) {
-        await auth.signInWithRedirect(provider);
-        return;
+        try {
+          await auth.signInWithPopup(provider);
+          if (typeof window.__mobSyncAuth === 'function') window.__mobSyncAuth();
+          return;
+        } catch (popupErr) {
+          console.warn('mobile popup', popupErr && popupErr.code, popupErr);
+          toast('Redirecionando para o Google…');
+          await auth.signInWithRedirect(provider);
+          return;
+        }
       }
       await auth.signInWithPopup(provider);
     } catch (e) {
       console.error('login', e);
-      if (e.code === 'auth/popup-blocked' || e.code === 'auth/cancelled-popup-request') {
+      if (e.code === 'auth/popup-blocked' || e.code === 'auth/cancelled-popup-request' || e.code === 'auth/popup-closed-by-user') {
         try {
-          toast('Popup bloqueado — redirecionando…');
+          toast('Redirecionando para o Google…');
           await auth.signInWithRedirect(provider);
           return;
         } catch (e2) {
