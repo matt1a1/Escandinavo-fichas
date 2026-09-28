@@ -125,7 +125,22 @@ textarea { min-height: 70px; resize: vertical; }
 .attr-value, #nex-display { min-width: 24px; text-align: center; font-weight: 700; }
 
 .nex-control { display: flex; align-items: center; gap: 8px; }
+
+/* Recursos coloridos */
+.resource { margin-bottom: 10px; }
 .resource-bar { display: flex; align-items: center; gap: 4px; }
+.res-value { flex: 1; text-align: center; font-weight: 600; }
+.resource.vida .res-value { color: #f87171; }
+.resource.sanidade .res-value { color: #60a5fa; }
+.resource.esforco .res-value { color: #c084fc; }
+.resource label {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
 
 /* Combat stats */
 .card {
