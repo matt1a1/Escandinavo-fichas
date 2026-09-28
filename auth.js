@@ -2,6 +2,7 @@
  * Login Google + sincronização (Firebase)
  * - Popup no desktop; no mobile tenta popup e cai em redirect
  * - Nome de conta editável
+ * - Merge local + nuvem (não apaga personagens)
  */
 (function () {
   const REGISTRO_KEY = 'escandinavo-agentes-registro';
@@ -363,35 +364,88 @@
     return out;
   }
 
+  function itemTime(obj) {
+    if (!obj || typeof obj !== 'object') return 0;
+    return Number(obj.atualizadoEm) || Number(obj.updatedAt) || Number(obj.criadoEm) || 0;
+  }
+
+  /** Junta listas por id — não apaga itens locais nem da nuvem */
+  function mergeById(localArr, cloudArr) {
+    const map = {};
+    (cloudArr || []).forEach(function (a) {
+      if (a && a.id) map[a.id] = a;
+    });
+    (localArr || []).forEach(function (a) {
+      if (!a || !a.id) return;
+      const cur = map[a.id];
+      if (!cur) {
+        map[a.id] = a;
+      } else {
+        map[a.id] = itemTime(a) >= itemTime(cur) ? a : cur;
+      }
+    });
+    return Object.keys(map).map(function (k) { return map[k]; });
+  }
+
+  function mergeFichas(localFichas, cloudFichas) {
+    const out = {};
+    const cloud = cloudFichas || {};
+    const local = localFichas || {};
+    Object.keys(cloud).forEach(function (id) { out[id] = cloud[id]; });
+    Object.keys(local).forEach(function (id) {
+      if (!out[id]) {
+        out[id] = local[id];
+      } else {
+        out[id] = itemTime(local[id]) >= itemTime(out[id]) ? local[id] : out[id];
+      }
+    });
+    return out;
+  }
+
   async function pullFromCloud() {
     if (!currentUser || !db || syncing) return;
     syncing = true;
     try {
+      // Snapshot do que já existe no aparelho ANTES de mexer
+      const localAgentes = readLocalAgentes();
+      const localCampanhas = readLocalCampanhas();
+      const localFichas = collectLocalFichas();
+
       const ref = db.collection('users').doc(currentUser.uid);
       const snap = await ref.get();
+
       if (!snap.exists) {
+        // Conta nova: sobe tudo que já estava no celular
+        syncing = false;
         await pushToCloud();
-        toast('Conta criada — dados salvos na nuvem');
+        toast('Conta criada — seus personagens foram salvos na nuvem');
         return;
       }
+
       const data = snap.data() || {};
       if (data.customName && typeof data.customName === 'string') {
         customName = data.customName;
         try { localStorage.setItem(NOME_LOCAL_KEY, customName); } catch (e) {}
         updateAuthUI();
       }
-      if (Array.isArray(data.agentes)) {
-        localStorage.setItem(REGISTRO_KEY, JSON.stringify(data.agentes));
-      }
-      if (Array.isArray(data.campanhas)) {
-        localStorage.setItem(CAMPANHAS_KEY, JSON.stringify(data.campanhas));
-      }
-      if (data.fichas && typeof data.fichas === 'object') {
-        Object.keys(data.fichas).forEach(function (id) {
-          localStorage.setItem(FICHA_PREFIX + id, JSON.stringify(data.fichas[id]));
-        });
-      }
-      toast('Dados da conta carregados');
+
+      const cloudAgentes = Array.isArray(data.agentes) ? data.agentes : [];
+      const cloudCampanhas = Array.isArray(data.campanhas) ? data.campanhas : [];
+      const cloudFichas = (data.fichas && typeof data.fichas === 'object') ? data.fichas : {};
+
+      // MESCLA: local + nuvem (nunca apaga um lado)
+      const mergedAgentes = mergeById(localAgentes, cloudAgentes);
+      const mergedCampanhas = mergeById(localCampanhas, cloudCampanhas);
+      const mergedFichas = mergeFichas(localFichas, cloudFichas);
+
+      localStorage.setItem(REGISTRO_KEY, JSON.stringify(mergedAgentes));
+      localStorage.setItem(CAMPANHAS_KEY, JSON.stringify(mergedCampanhas));
+      Object.keys(mergedFichas).forEach(function (id) {
+        localStorage.setItem(FICHA_PREFIX + id, JSON.stringify(mergedFichas[id]));
+      });
+
+      toast('Dados sincronizados (local + nuvem)');
+      syncing = false;
       await pushToCloud();
     } catch (e) {
       console.error('pull', e);
