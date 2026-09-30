@@ -118,23 +118,17 @@
     if (e.tipo === 'ritual') {
       state.rituais = state.rituais || [];
       state.rituais.push({
-        nome: e.nome,
-        elemento: e.elemento || '',
-        circulo: e.circulo || '',
+        nome: e.nome, elemento: e.elemento || '', circulo: e.circulo || '',
         execucao: '', alcance: '', area: '', alvo: '', duracao: '',
         efeito: e.desc, resistencia: '', dados: '', dadosDiscente: '', dadosVerdadeiro: '',
-        imagem: '',
-        desc: '[Arquivos Secretos — ' + e.livro + '] ' + e.desc,
+        imagem: '', desc: '[Arquivos Secretos — ' + e.livro + '] ' + e.desc
       });
       if (typeof renderRituais === 'function') renderRituais();
     } else if (e.tipo === 'item') {
       state.itens = state.itens || [];
       state.itens.push({
-        nome: e.nome,
-        tipo: 'geral',
-        categoria: e.categoria || '0',
-        espacos: e.espacos || '1',
-        desc: '[Arquivos Secretos — ' + e.livro + '] ' + e.desc,
+        nome: e.nome, tipo: 'geral', categoria: e.categoria || '0', espacos: e.espacos || '1',
+        desc: '[Arquivos Secretos — ' + e.livro + '] ' + e.desc
       });
       if (typeof renderItens === 'function') renderItens();
     } else {
@@ -146,7 +140,7 @@
           (e.nex ? ' NEX ' + e.nex + '.' : '') +
           (e.classe ? ' Classe: ' + e.classe + '.' : '') +
           (e.trilha ? ' Trilha: ' + e.trilha + '.' : '') +
-          ' ' + e.desc,
+          ' ' + e.desc
       });
       if (typeof renderHabilidades === 'function') renderHabilidades();
     }
@@ -177,7 +171,6 @@
       if (e.elemento) meta.push('<span class="catalog-tag">' + escapeHtml(e.elemento) + '</span>');
       if (e.categoria) meta.push('<span class="catalog-tag">Cat. ' + escapeHtml(e.categoria) + '</span>');
       if (e.espacos) meta.push('<span class="catalog-tag">' + escapeHtml(String(e.espacos)) + ' esp.</span>');
-
       card.innerHTML =
         '<div class="catalog-item-main"><h5>' + escapeHtml(e.nome) + '</h5>' +
         '<div class="catalog-item-meta arq-item-meta">' + meta.join('') + '</div></div>' +
@@ -186,7 +179,6 @@
         '<p class="catalog-item-desc" style="white-space:pre-wrap;margin-top:6px;">' + escapeHtml(e.desc) + '</p>';
       list.appendChild(card);
     });
-
     const current = items;
     list.querySelectorAll('[data-arq-add]').forEach((btn) => {
       btn.addEventListener('click', (ev) => {
@@ -202,7 +194,7 @@
     const t = setInterval(() => {
       n++;
       const tabsReady = !!document.querySelector('.tabs');
-      const dataReady = typeof ARQUIVOS_SECRETOS !== 'undefined' && ARQUIVOS_SECRETOS.length > 0;
+      const dataReady = typeof ARQUIVOS_SECRETOS !== 'undefined';
       if ((tabsReady && dataReady) || n > 100) {
         clearInterval(t);
         if (tabsReady) ensureTab();
