@@ -68,31 +68,37 @@
       }
       return;
     }
-    list.innerHTML = items.map(h => {
+    list.innerHTML = items.map((h) => {
       const have = alreadyHave(h.nome);
-      const meta = [
-        h.nex ? 'NEX ' + h.nex : '',
-        h.pe && h.pe !== '—' ? h.pe : ''
-      ].filter(Boolean).join(' · ');
+      const nexBadge = h.nex ? '<span class="hab-nex">' + escapeHtml(h.nex) + '</span>' : '';
+      const peBadge = h.pe && h.pe !== '—' ? '<span class="hab-pe">' + escapeHtml(h.pe) + '</span>' : '';
       return (
-        '<div class="hab-catalog-item">' +
-          '<div class="hab-catalog-head">' +
-            '<div class="hab-catalog-title">' +
-              '<strong>' + escapeHtml(h.nome) + '</strong>' +
-              (meta ? '<span class="hab-meta">' + escapeHtml(meta) + '</span>' : '') +
+        '<div class="hab-card">' +
+          '<div class="hab-card-head">' +
+            '<div class="hab-card-left">' +
+              '<span class="hab-card-title">' + escapeHtml(h.nome) + '</span>' +
+              nexBadge +
+              peBadge +
             '</div>' +
             '<button type="button" class="btn-add-hab' + (have ? ' have' : '') + '" data-nome="' + escapeAttr(h.nome) + '" title="' + (have ? 'Já adicionada' : 'Adicionar') + '">' + (have ? '✓' : '+') + '</button>' +
           '</div>' +
-          '<p class="hab-catalog-desc">' + escapeHtml(h.desc || '') + '</p>' +
+          '<div class="hab-card-body" hidden>' +
+            '<div class="hab-cat-label">' + escapeHtml(h.categoria) + (h.pe ? ' · Custo: ' + escapeHtml(h.pe) : '') + '</div>' +
+            '<p class="hab-card-desc">' + escapeHtml(h.desc) + '</p>' +
+          '</div>' +
         '</div>'
       );
     }).join('');
 
-    list.querySelectorAll('.hab-catalog-head').forEach(head => {
+    list.querySelectorAll('.hab-card-head').forEach(head => {
       head.addEventListener('click', (e) => {
         if (e.target.closest('.btn-add-hab')) return;
-        const item = head.closest('.hab-catalog-item');
-        if (item) item.classList.toggle('open');
+        const card = head.parentElement;
+        const body = card.querySelector('.hab-card-body');
+        if (!body) return;
+        const open = !body.hidden;
+        body.hidden = open;
+        card.classList.toggle('open', !open);
       });
     });
 
@@ -198,4 +204,9 @@
   } else {
     init();
   }
+
+  window.refreshHabilidadesCatalog = function () {
+    renderChips();
+    renderList();
+  };
 })();
