@@ -111,6 +111,10 @@
   }
 
   function addToSheet(e) {
+    if (typeof window.addArquivoSecretoToSheet === 'function') {
+      window.addArquivoSecretoToSheet(e);
+      return;
+    }
     if (!window.state) {
       alert('Ficha ainda não carregou.');
       return;
@@ -145,6 +149,7 @@
       if (typeof renderHabilidades === 'function') renderHabilidades();
     }
     if (typeof scheduleSave === 'function') scheduleSave();
+    else if (typeof saveState === 'function') saveState();
   }
 
   function renderList() {
