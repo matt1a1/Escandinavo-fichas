@@ -15,7 +15,7 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
       );
     }
 
-    html = html.replace(/href="styles\.css[^"]*"/g, 'href="styles.css?v=fix5"');
+    html = html.replace(/href="styles\.css[^"]*"/g, 'href="styles.css?v=fix6"');
     if (html.indexOf('styles-hab.css') === -1) {
       html = html.replace('</head>', '  <link rel="stylesheet" href="styles-hab.css?v=mob2" />\n</head>');
     }
@@ -25,13 +25,21 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
       html = html.replace(/mobile\.css\?v=[^"]*/g, 'mobile.css?v=5');
     }
 
+    // Force fresh catalogs (rituais, itens, habilidades, data)
+    html = html.replace(/rituais-catalog\.js[^"]*/g, 'rituais-catalog.js?v=livro1');
+    html = html.replace(/rituais-extra\.js[^"]*/g, 'rituais-extra.js?v=livro1');
+    html = html.replace(/itens-catalog\.js[^"]*/g, 'itens-catalog.js?v=livro1');
+    html = html.replace(/habilidades-catalog\.js[^"]*/g, 'habilidades-catalog.js?v=livro1');
+    html = html.replace(/data\.js[^"]*/g, 'data.js?v=livro1');
+    html = html.replace(/origens-poderes\.js[^"]*/g, 'origens-poderes.js?v=livro1');
+
     var extras = '';
     if (html.indexOf('firebase-config.js') === -1) {
       extras += '<script src="firebase-config.js"><\/script>\n';
-      extras += '<script src="auth.js?v=2"><\/script>\n';
+      extras += '<script src="auth.js?v=5"><\/script>\n';
     }
     if (html.indexOf('origens-poderes.js') === -1) {
-      extras += '<script src="origens-poderes.js?v=1"><\/script>\n';
+      extras += '<script src="origens-poderes.js?v=livro1"><\/script>\n';
     }
     if (html.indexOf('habilidades-fix.js') === -1) {
       extras += '<script src="habilidades-fix.js?v=hab1"><\/script>\n';
