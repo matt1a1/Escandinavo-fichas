@@ -25,13 +25,16 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
       html = html.replace(/mobile\.css\?v=[^"]*/g, 'mobile.css?v=5');
     }
 
-    // Force fresh catalogs (rituais, itens, habilidades, data)
     html = html.replace(/rituais-catalog\.js[^"]*/g, 'rituais-catalog.js?v=livro1');
     html = html.replace(/rituais-extra\.js[^"]*/g, 'rituais-extra.js?v=livro1');
     html = html.replace(/itens-catalog\.js[^"]*/g, 'itens-catalog.js?v=livro1');
     html = html.replace(/habilidades-catalog\.js[^"]*/g, 'habilidades-catalog.js?v=livro1');
     html = html.replace(/data\.js[^"]*/g, 'data.js?v=livro1');
     html = html.replace(/origens-poderes\.js[^"]*/g, 'origens-poderes.js?v=livro1');
+    html = html.replace(/app\.js[^"]*/g, 'app.js?v=fmt1');
+    html = html.replace(/catalog-ui\.js[^"]*/g, 'catalog-ui.js?v=livro1');
+
+    html = html.replace(/<textarea/g, '<textarea spellcheck="true" lang="pt-BR"');
 
     var extras = '';
     if (html.indexOf('firebase-config.js') === -1) {
@@ -43,6 +46,9 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
     }
     if (html.indexOf('habilidades-fix.js') === -1) {
       extras += '<script src="habilidades-fix.js?v=hab1"><\/script>\n';
+    }
+    if (html.indexOf('text-format.js') === -1) {
+      extras += '<script src="text-format.js?v=1"><\/script>\n';
     }
     if (extras) html = html.replace('</body>', extras + '</body>');
 
