@@ -55,6 +55,9 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
     } else {
       html = html.replace(/text-format\.js[^"]*/g, 'text-format.js?v=2');
     }
+    if (html.indexOf('attrs-wheel.js') === -1) {
+      extras += '<script src="attrs-wheel.js?v=1"><\/script>\n';
+    }
     if (extras) html = html.replace('</body>', extras + '</body>');
 
     document.open();
