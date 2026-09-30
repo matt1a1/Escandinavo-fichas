@@ -1,0 +1,273 @@
+/* habilidades-bridge.js — garante catálogo + botões de habilidades/trilhas após o loader */
+(function () {
+  function $(sel) { return document.querySelector(sel); }
+  function $$(sel) { return Array.from(document.querySelectorAll(sel)); }
+
+  function ensureCatalogGlobals() {
+    if (typeof window.HABILIDADES_CATALOG === 'undefined') window.HABILIDADES_CATALOG = [];
+    if (typeof window.HABILIDADES_CATEGORIAS === 'undefined') {
+      window.HABILIDADES_CATEGORIAS = {
+        Combatente: ['Poderes de Combatente', 'Aniquilador', 'Comandante de Campo', 'Guerreiro', 'Operações Especiais', 'Tropa de Choque'],
+        Especialista: ['Poderes de Especialista', 'Atirador de Elite', 'Infiltrador', 'Médico de Campo', 'Negociador', 'Técnico'],
+        Ocultista: ['Poderes de Ocultista', 'Conduíte', 'Flagelador', 'Graduado', 'Intuitivo', 'Lâmina Paranormal'],
+        'Poderes Paranormais': ['Conhecimento', 'Energia', 'Morte', 'Sangue', 'Varia'],
+        Origens: ['Poder de Origem']
+      };
+    }
+    if (!window.HABILIDADES_CATEGORIAS.Origens) {
+      window.HABILIDADES_CATEGORIAS.Origens = ['Poder de Origem'];
+    }
+  }
+
+  function mergeArquivosSecretosIntoCatalog() {
+    if (typeof ARQUIVOS_SECRETOS === 'undefined' || !ARQUIVOS_SECRETOS.length) return 0;
+    ensureCatalogGlobals();
+    var added = 0;
+    ARQUIVOS_SECRETOS.forEach(function (e) {
+      if (!e || !e.nome) return;
+      if (e.tipo !== 'trilha' && e.tipo !== 'poder') return;
+
+      var cls = e.classe || (e.tipo === 'trilha' ? 'Ocultista' : 'Poderes Paranormais');
+      if (cls !== 'Combatente' && cls !== 'Especialista' && cls !== 'Ocultista' && cls !== 'Poderes Paranormais' && cls !== 'Origens') {
+        if (/combatente/i.test(cls)) cls = 'Combatente';
+        else if (/especialista/i.test(cls)) cls = 'Especialista';
+        else if (/ocultista/i.test(cls)) cls = 'Ocultista';
+        else cls = 'Poderes Paranormais';
+      }
+
+      var categoria;
+      if (e.tipo === 'trilha') {
+        categoria = e.trilha || e.nome;
+      } else if (e.elemento) {
+        categoria = e.elemento;
+        cls = 'Poderes Paranormais';
+      } else if (cls === 'Combatente') {
+        categoria = 'Poderes de Combatente';
+      } else if (cls === 'Especialista') {
+        categoria = 'Poderes de Especialista';
+      } else if (cls === 'Ocultista') {
+        categoria = 'Poderes de Ocultista';
+      } else {
+        categoria = 'Varia';
+      }
+
+      if (!window.HABILIDADES_CATEGORIAS[cls]) window.HABILIDADES_CATEGORIAS[cls] = [];
+      if (window.HABILIDADES_CATEGORIAS[cls].indexOf(categoria) === -1) {
+        window.HABILIDADES_CATEGORIAS[cls].push(categoria);
+      }
+
+      var exists = HABILIDADES_CATALOG.some(function (h) {
+        return h.classe === cls && h.nome === e.nome;
+      });
+      if (exists) return;
+
+      HABILIDADES_CATALOG.push({
+        nome: e.nome,
+        classe: cls,
+        categoria: categoria,
+        nex: e.nex || '',
+        pe: '',
+        desc: '[Arquivos Secretos — ' + (e.livro || '') + '] ' + (e.desc || '')
+      });
+      added++;
+    });
+    return added;
+  }
+
+  function addHabToSheet(item) {
+    if (typeof state === 'undefined') {
+      alert('Ficha ainda não carregou.');
+      return false;
+    }
+    if (!Array.isArray(state.habilidades)) state.habilidades = [];
+    var nome = item.nome || '';
+    var already = state.habilidades.some(function (h) {
+      return String(h.nome || '').toLowerCase() === nome.toLowerCase();
+    });
+    if (already) return false;
+
+    var meta = [
+      item.nex ? 'NEX ' + item.nex : '',
+      item.pe && item.pe !== '—' ? 'Custo: ' + item.pe : '',
+      item.categoria || ''
+    ].filter(Boolean).join(' · ');
+
+    state.habilidades.push({
+      nome: nome,
+      desc: (item.desc || '') + (meta ? '\n(' + meta + ')' : ''),
+      pe: item.pe || ''
+    });
+
+    if (typeof scheduleSave === 'function') scheduleSave();
+    else if (typeof saveState === 'function') saveState();
+    if (typeof renderHabilidades === 'function') renderHabilidades();
+    if (typeof renderRecursos === 'function') renderRecursos();
+    return true;
+  }
+
+  window.addHabToSheet = addHabToSheet;
+
+  function bindCatalogButtons() {
+    var list = $('#hab-catalog-list');
+    if (!list) return;
+
+    list.querySelectorAll('.btn-add-hab').forEach(function (btn) {
+      if (btn._habBound) return;
+      btn._habBound = true;
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var nome = btn.getAttribute('data-nome') || btn.dataset.nome || '';
+        if (!nome || typeof HABILIDADES_CATALOG === 'undefined') return;
+        var item = HABILIDADES_CATALOG.find(function (h) {
+          return h.nome === nome;
+        });
+        if (!item) {
+          item = { nome: nome, desc: '', pe: '', nex: '', categoria: '' };
+        }
+        var ok = addHabToSheet(item);
+        if (ok) {
+          btn.classList.add('have');
+          btn.textContent = '✓';
+          btn.title = 'Já adicionada';
+        }
+      });
+    });
+  }
+
+  function bindClassTabs() {
+    $$('.hab-class-tab').forEach(function (btn) {
+      if (btn._habBound) return;
+      btn._habBound = true;
+      btn.addEventListener('click', function () {
+        $$('.hab-class-tab').forEach(function (b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        setTimeout(function () {
+          if (typeof window.__habRenderList === 'function') window.__habRenderList();
+          bindCatalogButtons();
+        }, 50);
+      });
+    });
+  }
+
+  function bindPersonalizada() {
+    var btn = $('#btn-add-hab');
+    if (!btn || btn._habBound) return;
+    btn._habBound = true;
+    btn.addEventListener('click', function () {
+      if (typeof state === 'undefined') return;
+      if (!Array.isArray(state.habilidades)) state.habilidades = [];
+      state.habilidades.push({ nome: '', desc: '', pe: '' });
+      if (typeof renderHabilidades === 'function') renderHabilidades();
+      if (typeof scheduleSave === 'function') scheduleSave();
+      var mineTab = document.querySelector('.hab-subtab[data-hab-view="mine"]');
+      if (mineTab) mineTab.click();
+    });
+  }
+
+  function enhanceHabilidadesUI() {
+    var list = $('#hab-catalog-list');
+    if (list && !list._habObserver) {
+      var obs = new MutationObserver(function () {
+        bindCatalogButtons();
+      });
+      obs.observe(list, { childList: true, subtree: true });
+      list._habObserver = obs;
+    }
+  }
+
+  function tryInitHabilidadesUI() {
+    ensureCatalogGlobals();
+    mergeArquivosSecretosIntoCatalog();
+
+    if (typeof window.initHabilidadesUI === 'function') {
+      try { window.initHabilidadesUI(); } catch (e) {}
+    }
+
+    bindClassTabs();
+    bindPersonalizada();
+    bindCatalogButtons();
+    enhanceHabilidadesUI();
+
+    var list = $('#hab-catalog-list');
+    if (list && !list.children.length) {
+      var tab = document.querySelector('.hab-class-tab[data-hab-class="Combatente"]') ||
+                document.querySelector('.hab-class-tab');
+      if (tab) tab.click();
+    }
+  }
+
+  function patchArquivosSecretos() {
+    window.addArquivoSecretoToSheet = function (e) {
+      if (!e) return;
+      if (e.tipo === 'ritual') {
+        if (typeof state === 'undefined') return;
+        state.rituais = state.rituais || [];
+        state.rituais.push({
+          nome: e.nome,
+          elemento: e.elemento || '',
+          circulo: e.circulo || '',
+          execucao: '', alcance: '', area: '', alvo: '', duracao: '',
+          efeito: e.desc || '', resistencia: '', dados: '',
+          dadosDiscente: '', dadosVerdadeiro: '', imagem: '',
+          desc: '[Arquivos Secretos — ' + (e.livro || '') + '] ' + (e.desc || '')
+        });
+        if (typeof renderRituais === 'function') renderRituais();
+        if (typeof scheduleSave === 'function') scheduleSave();
+        return;
+      }
+      if (e.tipo === 'item') {
+        if (typeof state === 'undefined') return;
+        state.itens = state.itens || [];
+        state.itens.push({
+          nome: e.nome,
+          tipo: 'geral',
+          categoria: e.categoria || '0',
+          espacos: e.espacos || '1',
+          desc: '[Arquivos Secretos — ' + (e.livro || '') + '] ' + (e.desc || '')
+        });
+        if (typeof renderItens === 'function') renderItens();
+        if (typeof scheduleSave === 'function') scheduleSave();
+        return;
+      }
+      var prefix = e.tipo === 'origem' ? 'Origem: ' : e.tipo === 'trilha' ? 'Trilha: ' : e.tipo === 'regra' ? 'Regra: ' : '';
+      addHabToSheet({
+        nome: prefix + e.nome,
+        desc: '[Arquivos Secretos — ' + (e.livro || '') + ']' +
+          (e.nex ? ' NEX ' + e.nex + '.' : '') +
+          (e.classe ? ' Classe: ' + e.classe + '.' : '') +
+          (e.trilha ? ' Trilha: ' + e.trilha + '.' : '') +
+          ' ' + (e.desc || ''),
+        pe: '',
+        nex: e.nex || '',
+        categoria: e.trilha || e.tipo || ''
+      });
+    };
+  }
+
+  function boot() {
+    ensureCatalogGlobals();
+    patchArquivosSecretos();
+    var tries = 0;
+    var t = setInterval(function () {
+      tries++;
+      var hasList = !!$('#hab-catalog-list');
+      var hasCat = typeof HABILIDADES_CATALOG !== 'undefined' && HABILIDADES_CATALOG.length > 0;
+      var hasState = typeof state !== 'undefined';
+      if ((hasList && hasCat && hasState) || tries > 80) {
+        clearInterval(t);
+        tryInitHabilidadesUI();
+        setTimeout(function () {
+          mergeArquivosSecretosIntoCatalog();
+          tryInitHabilidadesUI();
+        }, 800);
+      }
+    }, 100);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+})();

@@ -68,37 +68,31 @@
       }
       return;
     }
-    list.innerHTML = items.map((h) => {
+    list.innerHTML = items.map(h => {
       const have = alreadyHave(h.nome);
-      const nexBadge = h.nex ? '<span class="hab-nex">' + escapeHtml(h.nex) + '</span>' : '';
-      const peBadge = h.pe && h.pe !== '—' && h.pe !== '—' ? '<span class="hab-pe">' + escapeHtml(h.pe) + '</span>' : '';
+      const meta = [
+        h.nex ? 'NEX ' + h.nex : '',
+        h.pe && h.pe !== '—' ? h.pe : ''
+      ].filter(Boolean).join(' · ');
       return (
-        '<div class="hab-card">' +
-          '<div class="hab-card-head">' +
-            '<div class="hab-card-left">' +
-              '<span class="hab-card-title">' + escapeHtml(h.nome) + '</span>' +
-              nexBadge +
-              peBadge +
+        '<div class="hab-catalog-item">' +
+          '<div class="hab-catalog-head">' +
+            '<div class="hab-catalog-title">' +
+              '<strong>' + escapeHtml(h.nome) + '</strong>' +
+              (meta ? '<span class="hab-meta">' + escapeHtml(meta) + '</span>' : '') +
             '</div>' +
             '<button type="button" class="btn-add-hab' + (have ? ' have' : '') + '" data-nome="' + escapeAttr(h.nome) + '" title="' + (have ? 'Já adicionada' : 'Adicionar') + '">' + (have ? '✓' : '+') + '</button>' +
           '</div>' +
-          '<div class="hab-card-body" hidden>' +
-            '<div class="hab-cat-label">' + escapeHtml(h.categoria) + (h.pe ? ' · Custo: ' + escapeHtml(h.pe) : '') + '</div>' +
-            '<p class="hab-card-desc">' + escapeHtml(h.desc) + '</p>' +
-          '</div>' +
+          '<p class="hab-catalog-desc">' + escapeHtml(h.desc || '') + '</p>' +
         '</div>'
       );
     }).join('');
 
-    list.querySelectorAll('.hab-card-head').forEach(head => {
+    list.querySelectorAll('.hab-catalog-head').forEach(head => {
       head.addEventListener('click', (e) => {
         if (e.target.closest('.btn-add-hab')) return;
-        const card = head.parentElement;
-        const body = card.querySelector('.hab-card-body');
-        if (!body) return;
-        const open = !body.hidden;
-        body.hidden = open;
-        card.classList.toggle('open', !open);
+        const item = head.closest('.hab-catalog-item');
+        if (item) item.classList.toggle('open');
       });
     });
 
@@ -107,13 +101,15 @@
         e.preventDefault();
         e.stopPropagation();
         const nome = btn.dataset.nome;
-        const item = getCatalog().find(x => x.nome === nome);
-        if (!item || typeof state === 'undefined') return;
-        if (alreadyHave(nome)) return;
+        if (!nome) return;
+        const item = getCatalog().find(h => h.nome === nome);
+        if (!item) return;
+        if (typeof state === 'undefined') return;
         if (!Array.isArray(state.habilidades)) state.habilidades = [];
+        if (alreadyHave(nome)) return;
         const meta = [
           item.nex ? 'NEX ' + item.nex : '',
-          item.pe && item.pe !== '—' && item.pe !== '—' ? 'Custo: ' + item.pe : '',
+          item.pe && item.pe !== '—' ? 'Custo: ' + item.pe : '',
           item.categoria
         ].filter(Boolean).join(' · ');
         state.habilidades.push({
@@ -121,7 +117,8 @@
           desc: item.desc + (meta ? '\n(' + meta + ')' : ''),
           pe: item.pe || ''
         });
-        if (typeof saveState === 'function') saveState();
+        if (typeof scheduleSave === 'function') scheduleSave();
+        else if (typeof saveState === 'function') saveState();
         if (typeof renderHabilidades === 'function') renderHabilidades();
         if (typeof renderRecursos === 'function') renderRecursos();
         if (typeof renderItens === 'function') renderItens();
@@ -188,19 +185,17 @@
       bind();
       renderChips();
       renderList();
+      window.__habRenderList = renderList;
+      window.__habRenderChips = renderChips;
     } catch (err) {
       console.error('habilidades-ui init error:', err);
     }
   }
+  window.initHabilidadesUI = init;
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
     init();
   }
-
-  window.refreshHabilidadesCatalog = function () {
-    renderChips();
-    renderList();
-  };
 })();
