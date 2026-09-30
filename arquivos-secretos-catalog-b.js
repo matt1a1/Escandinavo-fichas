@@ -1,1 +1,1 @@
-/* arquivos-secretos-catalog-b.js — no-op (dados na parte A por enquanto) */
+/* no-op: dados em arquivos-secretos-a/b.json */

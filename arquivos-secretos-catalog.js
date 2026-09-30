@@ -1,29 +1,15 @@
-/* arquivos-secretos-catalog.js — Arquivos Secretos 01–07 (parcial; expansão em seguida) */
-var ARQUIVOS_SECRETOS = [
-{"nome":"Identificação Macabra","tipo":"trilha","livro":"Sangue","desc":"Gasta 1 PE para +1d10 ao identificar item amaldiçoado/ritual; sofre só –O para identificar item amaldiçoado como ação completa.","classe":"Ocultista","trilha":"Maledictólogo","nex":"10%"},
-{"nome":"Compreensão de Maldições","tipo":"trilha","livro":"Sangue","desc":"Ação de interlúdio + 3 PE para estudar item amaldiçoado; teste de Ocultismo (DT 10 + 5 por categoria).","classe":"Ocultista","trilha":"Maledictólogo","nex":"40%"},
-{"nome":"Reproduzir Maldição","tipo":"trilha","livro":"Sangue","desc":"Memoriza e aplica maldição a novo item.","classe":"Ocultista","trilha":"Maledictólogo","nex":"65%"},
-{"nome":"Maldição Suprema","tipo":"trilha","livro":"Sangue","desc":"Trata item-alvo como 3 categorias abaixo ao reproduzir maldição.","classe":"Ocultista","trilha":"Maledictólogo","nex":"99%"},
-{"nome":"Passagem de Conhecimento Expandido","tipo":"ritual","livro":"Sangue","desc":"Sangue/Conhecimento, 4º círculo. Troca de consciência entre grupos. Só quem já conjura Passagem de Conhecimento.","circulo":"4","elemento":"Sangue/Conhecimento"},
-{"nome":"Ensaio","tipo":"trilha","livro":"Hexatombe II","desc":"Ação de interlúdio: +1 margem de ameaça até próximo interlúdio (+2/+3/+4 em NEX 40/65/99%).","trilha":"Performático","nex":"10%"},
-{"nome":"Frase de Efeito","tipo":"trilha","livro":"Hexatombe II","desc":"Quando você ou aliado em curto tira crítico, 2 PE muda multiplicador para sua Presença.","trilha":"Performático","nex":"40%"},
-{"nome":"Mosh Pit","tipo":"trilha","livro":"Hexatombe II","desc":"Flanqueando: +1d6 dano por aliado cercando (máx +5d6).","trilha":"Performático","nex":"65%"},
-{"nome":"Ritmo Contagiante","tipo":"trilha","livro":"Hexatombe II","desc":"Início do combate: +5 Defesa para você e aliados em médio; +1 por crítico seu.","trilha":"Performático","nex":"99%"},
-{"nome":"Influencer Paranormal","tipo":"origem","livro":"Anfitrião","desc":"Perícias: Enganação, Tecnologia. Poder Registrar o Paranormal: registra criatura/ritual e usa depois para +5 ou memorizar ritual."},
-{"nome":"Caçador de Recompensas","tipo":"origem","livro":"Anfitrião","desc":"Perícias: Crime, Investigação. +2 contra condições mentais/medo; se falhar, +1d20 no próximo teste."},
-{"nome":"Ufólogo","tipo":"origem","livro":"SDOL","desc":"Perícias: Ciências, Ocultismo. Teoria Absurda: PE temporários e +1 PE máximo se confirmar."},
-{"nome":"Funcionário de Beira de Estrada","tipo":"origem","livro":"SDOL","desc":"Perícias: Fortitude, Intuição. Turno Invertido: benefícios de dormir sem dormir, 1x/missão."},
-{"nome":"Cientista Ex-Panacea","tipo":"origem","livro":"Panacea","desc":"Perícias: Atualidades, Ciências. Pode gastar 2 PE para usar Ciências no lugar de Ocultismo."},
-{"nome":"Cobaia Sobrevivente","tipo":"origem","livro":"Panacea","desc":"Perícias: Fortitude, Vontade. Imunidade a medo ligada ao trauma de cobaia."},
-{"nome":"Segurança Ex-Panacea","tipo":"origem","livro":"Panacea","desc":"Perícias: Luta, Pontaria. +5 em manobras de combate por 2 PE."},
-{"nome":"Exorcizado","tipo":"origem","livro":"Vampyr","desc":"Perícias: Fortitude, Ocultismo. RD 10 a um elemento; –3 SAN ao contato na cena."},
-{"nome":"Sensitivo Rebelde","tipo":"origem","livro":"Vampyr","desc":"Perícias: Intuição, Vontade. Pode perder 2 SAN para +5 em testes sociais/intuição."},
-{"nome":"Backup","tipo":"ritual","livro":"Anfitrião","desc":"Energia, 2º círculo. Cria chamariz; reação troca de lugar (–2d4 SAN). Discente/Verdadeiro aprimoram.","circulo":"2","elemento":"Energia"},
-{"nome":"Vampirismo","tipo":"ritual","livro":"Vampyr","desc":"Sangue, 2º círculo. Transforma corpo em refeição paranormal (vasos Visão/Audição/Paladar/Olfato/Tato).","circulo":"2","elemento":"Sangue"},
-{"nome":"Hesitação Forçada","tipo":"ritual","livro":"Panacea","desc":"Sangue/Conhecimento, 1º círculo. Alvo rerrola o maior dado se falhar Vontade.","circulo":"1","elemento":"Sangue/Conhecimento"},
-{"nome":"Meus Bebês","tipo":"trilha","livro":"Anfitrião","desc":"Treino em Profissão (químico); explosivos autorais –1 categoria.","classe":"Especialista","trilha":"Granadeiro Blaster","nex":"10%"},
-{"nome":"Método Intuitivo","tipo":"trilha","livro":"SDOL","desc":"Ganha Criar Selo; dobra selos se adquirir de novo.","classe":"Ocultista","trilha":"Criptologista do Oculto","nex":"10%"},
-{"nome":"Ser Experimentado","tipo":"trilha","livro":"Vampyr","desc":"Trilha Monstruoso Especialista 10%: experimento diário, efeitos por elemento.","classe":"Especialista","trilha":"Monstruoso","nex":"10%"},
-{"nome":"Ser Escarificado","tipo":"trilha","livro":"Vampyr","desc":"Trilha Monstruoso Ocultista 10%: escarificação recupera PE; atributo do elemento para PE/DT.","classe":"Ocultista","trilha":"Monstruoso","nex":"10%"},
-{"nome":"Forma Suprema (As Máscaras)","tipo":"regra","livro":"Hexatombe I","desc":"Ativar: movimento + 6 SAN. +20 PV, +10 PE, +10 Defesa, dano +2 dados, +5 testes/DT, até 3 habilidades extras."}
-];
+/* arquivos-secretos-catalog.js — carrega 177 entradas dos Arquivos Secretos */
+var ARQUIVOS_SECRETOS = [];
+(function () {
+  function done(parts) {
+    ARQUIVOS_SECRETOS = (parts[0] || []).concat(parts[1] || []);
+    if (typeof window !== 'undefined') window.ARQUIVOS_SECRETOS = ARQUIVOS_SECRETOS;
+    try {
+      document.dispatchEvent(new CustomEvent('arquivos-secretos-ready', { detail: { total: ARQUIVOS_SECRETOS.length } }));
+    } catch (e) {}
+  }
+  Promise.all([
+    fetch('arquivos-secretos-a.json?v=2').then(function (r) { return r.json(); }).catch(function () { return []; }),
+    fetch('arquivos-secretos-b.json?v=2').then(function (r) { return r.json(); }).catch(function () { return []; })
+  ]).then(done).catch(function () { done([[], []]); });
+})();
