@@ -77,6 +77,7 @@
       document.querySelectorAll('.tab-content').forEach((c) => c.classList.remove('active'));
       btn.classList.add('active');
       panel.classList.add('active');
+      renderList();
     });
 
     document.querySelectorAll('.tab:not([data-tab="arquivos"])').forEach((t) => {
@@ -120,16 +121,8 @@
         nome: e.nome,
         elemento: e.elemento || '',
         circulo: e.circulo || '',
-        execucao: '',
-        alcance: '',
-        area: '',
-        alvo: '',
-        duracao: '',
-        efeito: e.desc,
-        resistencia: '',
-        dados: '',
-        dadosDiscente: '',
-        dadosVerdadeiro: '',
+        execucao: '', alcance: '', area: '', alvo: '', duracao: '',
+        efeito: e.desc, resistencia: '', dados: '', dadosDiscente: '', dadosVerdadeiro: '',
         imagem: '',
         desc: '[Arquivos Secretos — ' + e.livro + '] ' + e.desc,
       });
@@ -191,7 +184,6 @@
         '<div class="catalog-item-actions">' +
         '<button type="button" class="btn primary small" data-arq-add="' + idx + '">Adicionar</button></div>' +
         '<p class="catalog-item-desc" style="white-space:pre-wrap;margin-top:6px;">' + escapeHtml(e.desc) + '</p>';
-
       list.appendChild(card);
     });
 
@@ -206,18 +198,16 @@
   }
 
   function boot() {
-    if (document.querySelector('.tabs')) {
-      ensureTab();
-      return;
-    }
     let n = 0;
     const t = setInterval(() => {
       n++;
-      if (document.querySelector('.tabs') || n > 50) {
+      const tabsReady = !!document.querySelector('.tabs');
+      const dataReady = typeof ARQUIVOS_SECRETOS !== 'undefined' && ARQUIVOS_SECRETOS.length > 0;
+      if ((tabsReady && dataReady) || n > 100) {
         clearInterval(t);
-        ensureTab();
+        if (tabsReady) ensureTab();
       }
-    }, 80);
+    }, 100);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
