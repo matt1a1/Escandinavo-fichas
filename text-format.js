@@ -1,4 +1,4 @@
-/* text-format.js — corretor + negrito/itálico/sublinhado nos textos da ficha */
+/* text-format.js — corretor pt-BR + negrito/itálico/sublinhado nos textos da ficha */
 (function () {
   const RICH_IDS = ['aparencia', 'personalidade', 'historico', 'objetivo', 'anotacoes'];
 
@@ -10,7 +10,12 @@
   }
 
   function wrapSelection(cmd) {
-    document.execCommand(cmd, false, null);
+    try { document.execCommand(cmd, false, null); } catch (e) {}
+  }
+
+  function syncState(id, html) {
+    if (window.state) window.state[id] = html || '';
+    if (typeof scheduleSave === 'function') scheduleSave();
   }
 
   function makeToolbar(forId) {
@@ -20,14 +25,17 @@
       '<button type="button" class="tf-btn" data-cmd="bold" title="Negrito (Ctrl+B)"><b>N</b></button>' +
       '<button type="button" class="tf-btn" data-cmd="italic" title="Itálico (Ctrl+I)"><i>I</i></button>' +
       '<button type="button" class="tf-btn" data-cmd="underline" title="Sublinhar (Ctrl+U)"><u>S</u></button>' +
-      '<span class="tf-hint">selecione o texto e clique</span>';
+      '<span class="tf-hint">selecione o texto · N / I / S</span>';
     bar.querySelectorAll('.tf-btn').forEach((btn) => {
       btn.addEventListener('mousedown', (e) => {
         e.preventDefault();
         const ed = document.getElementById(forId);
         if (ed) ed.focus();
         wrapSelection(btn.dataset.cmd);
-        ed && ed.dispatchEvent(new Event('input', { bubbles: true }));
+        if (ed) {
+          syncState(forId, ed.innerHTML);
+          ed.dispatchEvent(new Event('input', { bubbles: true }));
+        }
       });
     });
     return bar;
@@ -36,14 +44,15 @@
   function enhanceRichField(id) {
     const ta = document.getElementById(id);
     if (!ta || ta.dataset.tfEnhanced) return;
+    if (ta.getAttribute('contenteditable') === 'true') return;
     ta.dataset.tfEnhanced = '1';
 
+    const parent = ta.parentNode;
     const wrap = document.createElement('div');
     wrap.className = 'tf-wrap';
-    ta.parentNode.insertBefore(wrap, ta);
+    parent.insertBefore(wrap, ta);
 
-    const toolbar = makeToolbar(id);
-    wrap.appendChild(toolbar);
+    wrap.appendChild(makeToolbar(id));
 
     const ed = document.createElement('div');
     ed.id = id;
@@ -53,7 +62,16 @@
     ed.setAttribute('lang', 'pt-BR');
     ed.setAttribute('role', 'textbox');
     ed.setAttribute('data-rich', '1');
-    ed.innerHTML = ta.value ? ta.value.replace(/\n/g, '<br>') : '';
+
+    let initial = ta.value || '';
+    if (!initial && window.state && state[id]) initial = state[id];
+    if (initial && !/[<>]/.test(initial)) {
+      ed.innerHTML = String(initial)
+        .replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>')
+        .replace(/\n/g, '<br>');
+    } else {
+      ed.innerHTML = initial || '';
+    }
 
     ta.style.display = 'none';
     ta.removeAttribute('id');
@@ -66,22 +84,26 @@
       get() { return ed.innerHTML; },
       set(v) {
         const s = v == null ? '' : String(v);
-        if (s && !/[<>]/.test(s)) ed.innerHTML = s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
-        else ed.innerHTML = s;
+        if (s && !/[<>]/.test(s)) {
+          ed.innerHTML = s.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>').replace(/\n/g, '<br>');
+        } else {
+          ed.innerHTML = s;
+        }
       }
     });
 
     ed.addEventListener('input', () => {
       ta.value = ed.innerHTML;
-      ed.dispatchEvent(new Event('change', { bubbles: true }));
+      syncState(id, ed.innerHTML);
     });
 
     ed.addEventListener('keydown', (e) => {
-      if (e.ctrlKey || e.metaKey) {
-        const k = e.key.toLowerCase();
-        if (k === 'b') { e.preventDefault(); wrapSelection('bold'); ed.dispatchEvent(new Event('input', { bubbles: true })); }
-        if (k === 'i') { e.preventDefault(); wrapSelection('italic'); ed.dispatchEvent(new Event('input', { bubbles: true })); }
-        if (k === 'u') { e.preventDefault(); wrapSelection('underline'); ed.dispatchEvent(new Event('input', { bubbles: true })); }
+      if (!(e.ctrlKey || e.metaKey)) return;
+      const k = e.key.toLowerCase();
+      if (k === 'b' || k === 'i' || k === 'u') {
+        e.preventDefault();
+        wrapSelection(k === 'b' ? 'bold' : k === 'i' ? 'italic' : 'underline');
+        syncState(id, ed.innerHTML);
       }
     });
   }
@@ -93,7 +115,7 @@
     s.textContent = `
       .tf-wrap { display:flex; flex-direction:column; gap:6px; width:100%; }
       .tf-toolbar {
-        display:flex; align-items:center; gap:6px;
+        display:flex; align-items:center; gap:6px; flex-wrap:wrap;
         padding:6px 8px; border-radius:8px;
         background:#14141c; border:1px solid #2a2a35;
       }
@@ -137,11 +159,11 @@
     let n = 0;
     const t = setInterval(() => {
       n++;
-      if (document.getElementById('aparencia') || n > 40) {
+      if (document.getElementById('aparencia') || n > 50) {
         clearInterval(t);
         init();
       }
-    }, 100);
+    }, 80);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
@@ -150,13 +172,14 @@
   window.TF = {
     getHtml(id) {
       const el = document.getElementById(id);
-      return el ? (el.dataset.rich ? el.innerHTML : el.value) : '';
+      return el ? (el.dataset && el.dataset.rich ? el.innerHTML : el.value) : '';
     },
     setHtml(id, html) {
       const el = document.getElementById(id);
       if (!el) return;
-      if (el.dataset.rich) el.value = html || '';
+      if (el.dataset && el.dataset.rich) el.value = html || '';
       else el.value = html || '';
-    }
+    },
+    reinit: init
   };
 })();
