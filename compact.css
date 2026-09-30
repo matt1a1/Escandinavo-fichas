@@ -63,7 +63,7 @@ textarea { min-height: 52px; }
   margin-bottom: 6px;
 }
 
-/* Atributos em linha densa (5 colunas) */
+/* Atributos em linha densa (5 colunas) — sobrescrito pela roda CRIS */
 .attr-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -237,7 +237,7 @@ textarea { min-height: 52px; }
   font-size: var(--fs);
 }
 
-/* Telas médias: 2 colunas */
+/* Telas médias */
 @media (max-width: 1200px) {
   .sheet { grid-template-columns: 240px 1fr 260px; }
 }
@@ -250,4 +250,12 @@ textarea { min-height: 52px; }
   .attr-grid { grid-template-columns: repeat(3, 1fr); }
   .sheet { padding: 6px 8px; gap: 6px; }
   .top-bar { padding: 6px 8px; }
+}
+
+/* Esconde fórmulas/descrições longas de resumo */
+#res-formula,
+.res-formula,
+#grau-info,
+.attr-nex-hint {
+  display: none !important;
 }
