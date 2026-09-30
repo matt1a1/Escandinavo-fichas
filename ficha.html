@@ -48,7 +48,9 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
       extras += '<script src="habilidades-fix.js?v=hab1"><\/script>\n';
     }
     if (html.indexOf('text-format.js') === -1) {
-      extras += '<script src="text-format.js?v=1"><\/script>\n';
+      extras += '<script src="text-format.js?v=2"><\/script>\n';
+    } else {
+      html = html.replace(/text-format\.js[^"]*/g, 'text-format.js?v=2');
     }
     if (extras) html = html.replace('</body>', extras + '</body>');
 
