@@ -62,6 +62,7 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
     }
     if (html.indexOf('arquivos-secretos-catalog.js') === -1) {
       extras += '<script src="arquivos-secretos-catalog.js?v=1"><\/script>\n';
+      extras += '<script src="arquivos-secretos-catalog-b.js?v=1"><\/script>\n';
       extras += '<script src="arquivos-secretos-ui.js?v=1"><\/script>\n';
     }
     if (extras) html = html.replace('</body>', extras + '</body>');
