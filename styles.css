@@ -66,7 +66,11 @@ body {
 .btn-remove { background: transparent; border: none; color: var(--text-dim); cursor: pointer; font-size: 0.8rem; }
 .btn-remove:hover { color: var(--danger); }
 
-.sheet { display: grid; grid-template-columns: 280px 1fr 340px; gap: 12px; padding: 12px; flex: 1; }
+/* 2 colunas: esquerda empilha identidade+perícias, direita = abas */
+.sheet { display: grid; grid-template-columns: minmax(300px, 400px) 1fr; grid-template-rows: auto 1fr; gap: 12px; padding: 12px; flex: 1; }
+.left-panel { grid-column: 1; grid-row: 1; }
+.center-panel { grid-column: 1; grid-row: 2; }
+.right-panel { grid-column: 2; grid-row: 1 / span 2; min-width: 0; }
 .left-panel, .center-panel, .right-panel { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
 
 .panel {
@@ -451,7 +455,11 @@ textarea { min-height: 70px; resize: vertical; }
 }
 
 @media (max-width: 1100px) {
-  .sheet { grid-template-columns: 1fr; }
+  .sheet { grid-template-columns: 1fr; grid-template-rows: auto; }
+  .left-panel, .center-panel, .right-panel {
+    grid-column: 1;
+    grid-row: auto;
+  }
   .pericias-list { max-height: 400px; }
 }
 @media (max-width: 700px) {
