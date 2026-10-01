@@ -305,7 +305,21 @@
         '<textarea class="hab-mine-desc" data-field="desc" data-idx="' + i + '" placeholder="Descrição...">' + esc(desc) + '</textarea>';
       list.appendChild(card);
     });
+    list.querySelectorAll('.hab-mine-head').forEach(function (head) {
+      head.addEventListener('click', function (e) {
+        if (e.target.closest && (e.target.closest('.btn-remove') || e.target.closest('input'))) return;
+        var card = head.closest('.hab-mine-card');
+        if (!card) return;
+        var wasOpen = card.classList.contains('open');
+        list.querySelectorAll('.hab-mine-card.open').forEach(function (c) {
+          if (c !== card) c.classList.remove('open');
+        });
+        if (wasOpen) card.classList.remove('open');
+        else card.classList.add('open');
+      });
+    });
     list.querySelectorAll('input, textarea').forEach(function (el) {
+      el.addEventListener('click', function (e) { e.stopPropagation(); });
       el.addEventListener('change', function (e) {
         var idx = +e.target.dataset.idx;
         var field = e.target.dataset.field;
@@ -315,7 +329,8 @@
       });
     });
     list.querySelectorAll('.btn-remove').forEach(function (btn) {
-      btn.addEventListener('click', function () {
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
         state.habilidades.splice(+btn.dataset.idx, 1);
         if (typeof scheduleSave === 'function') scheduleSave();
         renderHabilidadesPadrao();
