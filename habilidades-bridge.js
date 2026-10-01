@@ -67,7 +67,7 @@
         categoria: categoria,
         nex: e.nex || '',
         pe: '',
-        desc: '[Arquivos Secretos — ' + (e.livro || '') + '] ' + (e.desc || '')
+        desc: e.desc || ''
       });
       added++;
     });
@@ -210,7 +210,7 @@
           execucao: '', alcance: '', area: '', alvo: '', duracao: '',
           efeito: e.desc || '', resistencia: '', dados: '',
           dadosDiscente: '', dadosVerdadeiro: '', imagem: '',
-          desc: '[Arquivos Secretos — ' + (e.livro || '') + '] ' + (e.desc || '')
+          desc: e.desc || ''
         });
         if (typeof renderRituais === 'function') renderRituais();
         if (typeof scheduleSave === 'function') scheduleSave();
@@ -224,23 +224,26 @@
           tipo: 'geral',
           categoria: e.categoria || '0',
           espacos: e.espacos || '1',
-          desc: '[Arquivos Secretos — ' + (e.livro || '') + '] ' + (e.desc || '')
+          desc: e.desc || ''
         });
         if (typeof renderItens === 'function') renderItens();
         if (typeof scheduleSave === 'function') scheduleSave();
         return;
       }
-      var prefix = e.tipo === 'origem' ? 'Origem: ' : e.tipo === 'trilha' ? 'Trilha: ' : e.tipo === 'regra' ? 'Regra: ' : '';
+      var categoria = '';
+      if (e.tipo === 'trilha' && e.trilha) categoria = e.trilha;
+      else if (e.tipo === 'origem') categoria = 'Origem';
+      else if (e.tipo === 'regra') categoria = 'Regra';
+      else if (e.tipo === 'poder') categoria = 'Poder';
+      else categoria = e.tipo || '';
+      if (e.classe && categoria) categoria = categoria + ' · ' + e.classe;
+      else if (e.classe) categoria = e.classe;
       addHabToSheet({
-        nome: prefix + e.nome,
-        desc: '[Arquivos Secretos — ' + (e.livro || '') + ']' +
-          (e.nex ? ' NEX ' + e.nex + '.' : '') +
-          (e.classe ? ' Classe: ' + e.classe + '.' : '') +
-          (e.trilha ? ' Trilha: ' + e.trilha + '.' : '') +
-          ' ' + (e.desc || ''),
-        pe: '',
+        nome: e.nome || '',
+        desc: e.desc || '',
+        pe: e.pe || '',
         nex: e.nex || '',
-        categoria: e.trilha || e.tipo || ''
+        categoria: categoria
       });
     };
   }
@@ -270,4 +273,38 @@
   } else {
     boot();
   }
+})();
+
+/* Merge itens dos Arquivos Secretos no catálogo de inventário */
+(function () {
+  function merge() {
+    if (typeof ARQUIVOS_SECRETOS === 'undefined' || !ARQUIVOS_SECRETOS.length) return;
+    if (typeof ITENS_CATALOG === 'undefined') return;
+    var added = 0;
+    ARQUIVOS_SECRETOS.forEach(function (e) {
+      if (!e || e.tipo !== 'item') return;
+      var exists = ITENS_CATALOG.some(function (i) { return (i.nome || '').toLowerCase() === (e.nome || '').toLowerCase(); });
+      if (exists) return;
+      ITENS_CATALOG.push({
+        nome: e.nome,
+        tipo: 'paranormal',
+        categoria: e.categoria || 'I',
+        espacos: e.espacos || '1',
+        desc: e.desc || '',
+        livro: e.livro || 'Arquivos Secretos'
+      });
+      added++;
+    });
+    if (added && typeof window.refreshItensCatalog === 'function') {
+      try { window.refreshItensCatalog(); } catch (err) {}
+    }
+  }
+  var n = 0;
+  var t = setInterval(function () {
+    n++;
+    if ((typeof ARQUIVOS_SECRETOS !== 'undefined' && ARQUIVOS_SECRETOS.length && typeof ITENS_CATALOG !== 'undefined') || n > 60) {
+      clearInterval(t);
+      merge();
+    }
+  }, 150);
 })();
