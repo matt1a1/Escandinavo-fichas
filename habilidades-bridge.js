@@ -153,8 +153,13 @@
   function bindPersonalizada() {
     var btn = $('#btn-add-hab');
     if (!btn || btn._habBound) return;
-    btn._habBound = true;
-    btn.addEventListener('click', function () {
+    // remove listeners do app.js (evita criar 2 cards)
+    var clone = btn.cloneNode(true);
+    clone._habBound = true;
+    btn.parentNode.replaceChild(clone, btn);
+    clone.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
       if (typeof state === 'undefined') return;
       if (!Array.isArray(state.habilidades)) state.habilidades = [];
       state.habilidades.push({ nome: '', desc: '', pe: '' });
@@ -248,7 +253,6 @@
     };
   }
 
-  // Padroniza "Minhas Habilidades" no estilo hab-mine-card
   function renderHabilidadesPadrao() {
     var list = document.getElementById('habilidades-list');
     if (!list || typeof state === 'undefined') return;
@@ -303,9 +307,6 @@
   }
 
   function installRenderOverride() {
-    if (typeof window.renderHabilidades === 'function' && window.renderHabilidades !== renderHabilidadesPadrao) {
-      /* keep original reference if needed */
-    }
     window.renderHabilidades = renderHabilidadesPadrao;
   }
 
