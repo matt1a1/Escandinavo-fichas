@@ -229,6 +229,7 @@
   overflow: hidden;
 }
 .hab-mine-card:hover { border-color: rgba(124, 92, 255, 0.4); }
+.hab-mine-card.open { border-color: rgba(124, 92, 255, 0.45); }
 .hab-mine-head {
   display: flex;
   align-items: center;
@@ -236,6 +237,7 @@
   gap: 10px;
   padding: 12px 14px;
   min-height: 48px;
+  cursor: pointer;
 }
 .hab-mine-title-row {
   flex: 1;
@@ -257,9 +259,7 @@
   outline: none;
   line-height: 1.35;
 }
-.hab-mine-nome:focus {
-  border-bottom: 1px solid #8b5cf6;
-}
+.hab-mine-nome:focus { border-bottom: 1px solid #8b5cf6; }
 .hab-mine-nex {
   display: inline-block;
   color: #c4b5fd;
@@ -284,6 +284,7 @@
   border: 1px solid rgba(124, 92, 255, 0.2);
 }
 .hab-mine-desc {
+  display: none;
   width: 100%;
   min-height: 56px;
   background: transparent;
@@ -297,6 +298,7 @@
   font-family: inherit;
   box-sizing: border-box;
 }
+.hab-mine-card.open .hab-mine-desc { display: block; }
 .hab-mine-desc:focus {
   outline: none;
   color: #e8e8ef;
