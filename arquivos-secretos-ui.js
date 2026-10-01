@@ -1,4 +1,4 @@
-/* arquivos-secretos-ui.js — aba Arquivos Secretos (botões + cards expansíveis) */
+/* arquivos-secretos-ui.js — aba Arquivos Secretos (botões + cards claros) */
 (function () {
   const TIPOS = [
     { id: 'todos', label: 'Todos' },
@@ -71,35 +71,33 @@
       var s = document.createElement('style');
       s.id = 'arq-styles';
       s.textContent = [
-        '.arq-wrap { display:flex; flex-direction:column; gap:10px; }',
-        '.arq-top { display:flex; align-items:center; justify-content:space-between; gap:8px; }',
-        '.arq-title { margin:0; font-size:0.95rem; color:#f0c674; }',
-        '.arq-count { font-size:0.72rem; color:var(--text-dim,#8888a0); background:rgba(240,198,116,0.1); border:1px solid rgba(240,198,116,0.25); border-radius:999px; padding:2px 8px; }',
-        '.arq-search { width:100%; box-sizing:border-box; padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.08); background:rgba(0,0,0,0.25); color:inherit; font-size:0.85rem; }',
-        '.arq-search:focus { outline:none; border-color:rgba(240,198,116,0.5); }',
-        '.arq-section { display:flex; flex-direction:column; gap:6px; }',
-        '.arq-label { font-size:0.68rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-dim,#8888a0); }',
-        '.arq-btns { display:flex; flex-wrap:wrap; gap:6px; }',
-        '.arq-chip { border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:var(--text-dim,#aaa); border-radius:999px; padding:5px 11px; font-size:0.75rem; cursor:pointer; transition:all .15s; }',
-        '.arq-chip:hover { border-color:rgba(240,198,116,0.4); color:#f0c674; }',
-        '.arq-chip.active { background:rgba(240,198,116,0.15); border-color:rgba(240,198,116,0.55); color:#f0c674; font-weight:600; }',
-        '.arq-list { display:flex; flex-direction:column; gap:8px; max-height:calc(100vh - 280px); overflow:auto; padding-right:2px; }',
-        '.arq-card { border:1px solid rgba(255,255,255,0.08); background:rgba(0,0,0,0.18); border-radius:10px; overflow:hidden; }',
-        '.arq-card-btn { width:100%; text-align:left; display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 12px; background:transparent; border:0; color:inherit; cursor:pointer; }',
-        '.arq-card-btn:hover { background:rgba(255,255,255,0.03); }',
-        '.arq-card-main { display:flex; flex-direction:column; gap:4px; min-width:0; }',
-        '.arq-card-name { font-size:0.88rem; font-weight:600; }',
-        '.arq-card-tags { display:flex; flex-wrap:wrap; gap:4px; }',
-        '.arq-tag { font-size:0.65rem; padding:2px 7px; border-radius:999px; border:1px solid rgba(255,255,255,0.1); color:#bbb; }',
-        '.arq-tag-tipo { color:#c4b5fd; border-color:rgba(124,92,255,0.35); background:rgba(124,92,255,0.12); }',
-        '.arq-tag-livro { color:#f0c674; border-color:rgba(240,198,116,0.35); background:rgba(240,198,116,0.1); }',
-        '.arq-card-arrow { font-size:0.85rem; color:var(--text-dim,#888); flex-shrink:0; }',
-        '.arq-card.open .arq-card-arrow { transform:rotate(90deg); }',
-        '.arq-card-body { display:none; padding:0 12px 12px; border-top:1px solid rgba(255,255,255,0.06); }',
-        '.arq-card.open .arq-card-body { display:block; }',
-        '.arq-card-desc { font-size:0.8rem; line-height:1.45; color:#d0d0dc; white-space:pre-wrap; margin:10px 0 12px; }',
-        '.arq-add { width:100%; }',
-        '.arq-empty { font-size:0.8rem; color:var(--text-dim,#888); padding:16px 4px; text-align:center; }',
+        '#tab-arquivos .arq-wrap { display:flex; flex-direction:column; gap:12px; padding:4px 2px 12px; }',
+        '#tab-arquivos .arq-top { display:flex; align-items:center; justify-content:space-between; gap:8px; }',
+        '#tab-arquivos .arq-title { margin:0; font-size:1rem; color:#f0c674; font-weight:700; }',
+        '#tab-arquivos .arq-count { font-size:0.75rem; color:#f0c674; background:rgba(240,198,116,0.12); border:1px solid rgba(240,198,116,0.3); border-radius:999px; padding:3px 10px; }',
+        '#tab-arquivos .arq-search { width:100%; box-sizing:border-box; padding:10px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.12); background:#12121a; color:#e8e8f0; font-size:0.9rem; }',
+        '#tab-arquivos .arq-search:focus { outline:none; border-color:#f0c674; }',
+        '#tab-arquivos .arq-section { display:flex; flex-direction:column; gap:8px; }',
+        '#tab-arquivos .arq-label { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.05em; color:#9a9ab0; font-weight:600; }',
+        '#tab-arquivos .arq-btns { display:flex; flex-wrap:wrap; gap:8px; }',
+        '#tab-arquivos .arq-chip { border:1px solid rgba(255,255,255,0.14); background:#1a1a24; color:#c8c8d8; border-radius:999px; padding:7px 14px; font-size:0.8rem; cursor:pointer; line-height:1.2; }',
+        '#tab-arquivos .arq-chip:hover { border-color:rgba(240,198,116,0.5); color:#f0c674; }',
+        '#tab-arquivos .arq-chip.active { background:rgba(240,198,116,0.18); border-color:#f0c674; color:#f0c674; font-weight:700; }',
+        '#tab-arquivos .arq-list { display:flex; flex-direction:column; gap:12px; max-height:calc(100vh - 300px); overflow-y:auto; padding:4px 2px 20px; }',
+        '#tab-arquivos .arq-card { border:1px solid rgba(255,255,255,0.1); background:#16161f; border-radius:12px; padding:14px; display:flex; flex-direction:column; gap:10px; min-height:72px; }',
+        '#tab-arquivos .arq-card-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }',
+        '#tab-arquivos .arq-card-info { flex:1; min-width:0; cursor:pointer; }',
+        '#tab-arquivos .arq-card-name { font-size:0.95rem; font-weight:700; color:#f2f2f8; margin:0 0 6px; line-height:1.3; }',
+        '#tab-arquivos .arq-card-tags { display:flex; flex-wrap:wrap; gap:5px; }',
+        '#tab-arquivos .arq-tag { font-size:0.68rem; padding:3px 8px; border-radius:999px; border:1px solid rgba(255,255,255,0.12); color:#b8b8c8; background:rgba(255,255,255,0.04); }',
+        '#tab-arquivos .arq-tag-tipo { color:#c4b5fd; border-color:rgba(124,92,255,0.4); background:rgba(124,92,255,0.14); }',
+        '#tab-arquivos .arq-tag-livro { color:#f0c674; border-color:rgba(240,198,116,0.4); background:rgba(240,198,116,0.12); }',
+        '#tab-arquivos .arq-add { flex-shrink:0; white-space:nowrap; padding:8px 14px !important; font-size:0.8rem !important; min-height:36px; }',
+        '#tab-arquivos .arq-card-desc { display:none; font-size:0.84rem; line-height:1.5; color:#d0d0dc; white-space:pre-wrap; margin:0; padding-top:8px; border-top:1px solid rgba(255,255,255,0.08); }',
+        '#tab-arquivos .arq-card.open .arq-card-desc { display:block; }',
+        '#tab-arquivos .arq-card-toggle { font-size:0.72rem; color:#f0c674; background:none; border:none; padding:0; cursor:pointer; text-align:left; margin-top:2px; }',
+        '#tab-arquivos .arq-card-toggle:hover { text-decoration:underline; }',
+        '#tab-arquivos .arq-empty { font-size:0.85rem; color:#9a9ab0; padding:24px 8px; text-align:center; }',
         '.tab[data-tab="arquivos"].active { color:#f0c674; border-bottom-color:#f0c674; }'
       ].join('\n');
       document.head.appendChild(s);
@@ -225,7 +223,7 @@
     var count = document.getElementById('arq-count');
     if (!list) return;
     var items = filtered();
-    if (count) count.textContent = items.length;
+    if (count) count.textContent = String(items.length);
 
     list.innerHTML = '';
     if (!items.length) {
@@ -251,31 +249,31 @@
       card.className = 'arq-card' + (isOpen ? ' open' : '');
 
       card.innerHTML =
-        '<button type="button" class="arq-card-btn" data-arq-key="' + escapeHtml(key) + '">' +
-        '  <div class="arq-card-main">' +
+        '<div class="arq-card-head">' +
+        '  <div class="arq-card-info" data-arq-toggle="' + escapeHtml(key) + '">' +
         '    <div class="arq-card-name">' + escapeHtml(e.nome) + '</div>' +
         '    <div class="arq-card-tags">' + tags.join('') + '</div>' +
+        '    <button type="button" class="arq-card-toggle">' + (isOpen ? 'Ocultar descrição' : 'Ver descrição') + '</button>' +
         '  </div>' +
-        '  <span class="arq-card-arrow">›</span>' +
-        '</button>' +
-        '<div class="arq-card-body">' +
-        '  <div class="arq-card-desc">' + escapeHtml(e.desc || '') + '</div>' +
-        '  <button type="button" class="btn primary small arq-add" data-arq-add="' + idx + '">Adicionar à ficha</button>' +
-        '</div>';
+        '  <button type="button" class="btn primary small arq-add" data-arq-add="' + idx + '">Adicionar</button>' +
+        '</div>' +
+        '<div class="arq-card-desc">' + escapeHtml(e.desc || '') + '</div>';
 
       list.appendChild(card);
     });
 
     var current = items;
-    list.querySelectorAll('.arq-card-btn').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var key = btn.getAttribute('data-arq-key');
+    list.querySelectorAll('[data-arq-toggle]').forEach(function (el) {
+      el.addEventListener('click', function (ev) {
+        if (ev.target && ev.target.classList && ev.target.classList.contains('arq-add')) return;
+        var key = el.getAttribute('data-arq-toggle');
         stateFiltro.aberto = (stateFiltro.aberto === key) ? null : key;
         renderList();
       });
     });
     list.querySelectorAll('[data-arq-add]').forEach(function (btn) {
       btn.addEventListener('click', function (ev) {
+        ev.preventDefault();
         ev.stopPropagation();
         var i = +btn.getAttribute('data-arq-add');
         if (current[i]) addToSheet(current[i]);
