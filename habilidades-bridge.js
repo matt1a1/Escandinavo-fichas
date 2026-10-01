@@ -95,7 +95,8 @@
     state.habilidades.push({
       nome: nome,
       desc: (item.desc || '') + (meta ? '\n(' + meta + ')' : ''),
-      pe: item.pe || ''
+      pe: item.pe || '',
+      nex: item.nex || ''
     });
 
     if (typeof scheduleSave === 'function') scheduleSave();
@@ -153,7 +154,6 @@
   function bindPersonalizada() {
     var btn = $('#btn-add-hab');
     if (!btn || btn._habBound) return;
-    // remove listeners do app.js (evita criar 2 cards)
     var clone = btn.cloneNode(true);
     clone._habBound = true;
     btn.parentNode.replaceChild(clone, btn);
@@ -270,10 +270,27 @@
       var nome = String(h.nome || '');
       nome = nome.replace(/^Trilha:\s*/i, '').replace(/^Origem:\s*/i, '').replace(/^Regra:\s*/i, '').replace(/^Poder:\s*/i, '');
       var desc = String(h.desc || '');
+      var nex = '';
+      var metaTag = '';
+      var nexMatch = (h.nex && String(h.nex)) || '';
+      if (!nexMatch) {
+        var m1 = desc.match(/NEX\s*([\d]+%?)/i);
+        if (m1) nexMatch = m1[1];
+      }
+      if (nexMatch) {
+        if (!/%/.test(nexMatch)) nexMatch = nexMatch + '%';
+        nex = nexMatch;
+      }
+      var trilhaMatch = desc.match(/Trilha:\s*([^·\n\)]+)/i);
+      if (trilhaMatch) metaTag = trilhaMatch[1].trim();
       desc = desc.replace(/^\[Arquivos Secretos[^\]]*\]\s*/i, '');
       desc = desc.replace(/^\s*NEX\s*[\d%]+\.\s*/i, '');
       desc = desc.replace(/^\s*Classe:\s*[^\.]+\.\s*/i, '');
       desc = desc.replace(/^\s*Trilha:\s*[^\.]+\.\s*/i, '');
+
+      var badges = '';
+      if (nex) badges += '<span class="hab-mine-nex">NEX ' + esc(nex) + '</span>';
+      if (metaTag) badges += '<span class="hab-mine-meta">' + esc(metaTag) + '</span>';
 
       var card = document.createElement('div');
       card.className = 'hab-mine-card';
@@ -281,6 +298,7 @@
         '<div class="hab-mine-head">' +
         '  <div class="hab-mine-title-row">' +
         '    <input type="text" class="hab-mine-nome" value="' + esc(nome) + '" data-field="nome" data-idx="' + i + '" placeholder="Nome da habilidade" />' +
+        badges +
         '  </div>' +
         '  <button type="button" class="btn-remove" data-idx="' + i + '">Remover</button>' +
         '</div>' +
