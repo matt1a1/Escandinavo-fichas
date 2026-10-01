@@ -1,13 +1,13 @@
 /* arquivos-secretos-ui.js — aba Arquivos Secretos */
 (function () {
   const TIPOS = ['todos', 'origem', 'trilha', 'poder', 'ritual', 'item', 'regra'];
-  const LIVROS = ['todos', 'Sangue', 'Hexatombe I', 'Hexatombe II', 'Anfitrião', 'SDOL', 'Panacea', 'Vampyr'];
+  const LIVROS = ['todos', 'Sangue', 'Hexatombe I', 'Hexatombe II', 'Anfitrião', 'SDOL', 'Panacea', 'Vampyr', 'Hellhunters'];
 
   function escapeHtml(str) {
     if (!str) return '';
     return String(str)
-      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      .replace(/&/g, '&').replace(/</g, '<')
+      .replace(/>/g, '>').replace(/"/g, '"');
   }
 
   function ensureTab() {
@@ -30,7 +30,7 @@
       '    <h4>Arquivos Secretos</h4>' +
       '    <span class="catalog-count" id="arq-count">0</span>' +
       '  </div>' +
-      '  <p class="arq-hint">Conteúdo dos livros Arquivos Secretos (01–07). Filtre e adicione à ficha.</p>' +
+      '  <p class="arq-hint">Conteúdo dos livros Arquivos Secretos (01–09). Filtre e adicione à ficha.</p>' +
       '  <div class="catalog-filters arq-filters">' +
       '    <input type="search" id="arq-search" placeholder="Buscar..." autocomplete="off" />' +
       '    <select id="arq-tipo"></select>' +
