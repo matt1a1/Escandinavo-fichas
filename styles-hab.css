@@ -213,7 +213,7 @@
   line-height: 1.5;
 }
 
-/* Minhas Habilidades */
+/* Minhas Habilidades — mesmo visual do catálogo */
 #habilidades-list {
   display: flex;
   flex-direction: column;
@@ -223,77 +223,98 @@
   background: #14141c;
   border: 1px solid #2a2a35;
   border-radius: 10px;
-  padding: 12px 14px;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  overflow: hidden;
 }
-.hab-mine-card:hover { border-color: rgba(124, 92, 255, 0.35); }
+.hab-mine-card:hover { border-color: rgba(124, 92, 255, 0.4); }
 .hab-mine-head {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 10px;
+  padding: 12px 14px;
+  min-height: 48px;
 }
 .hab-mine-title-row {
   flex: 1;
   min-width: 0;
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 .hab-mine-nome {
-  width: 100%;
+  width: auto;
+  max-width: 100%;
   background: transparent;
   border: none;
   color: #f0f0f5;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   padding: 0;
   outline: none;
+  line-height: 1.35;
 }
-.hab-mine-nome:focus { border-bottom: 1px solid #8b5cf6; }
-.hab-mine-tags { display: flex; flex-wrap: wrap; gap: 6px; }
-.hab-cat-tag {
+.hab-mine-nome:focus {
+  border-bottom: 1px solid #8b5cf6;
+}
+.hab-mine-nex {
   display: inline-block;
-  font-size: 0.72rem;
+  color: #c4b5fd;
   font-weight: 600;
+  font-size: 0.72rem;
+  background: rgba(124, 92, 255, 0.15);
+  border: 1px solid rgba(124, 92, 255, 0.35);
   padding: 2px 7px;
   border-radius: 6px;
-  color: #a0a0b0;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid #2a2a35;
+  white-space: nowrap;
+}
+.hab-mine-meta {
+  display: inline-block;
+  color: #a78bfa;
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: rgba(124, 92, 255, 0.08);
+  border: 1px solid rgba(124, 92, 255, 0.2);
 }
 .hab-mine-desc {
   width: 100%;
-  min-height: 64px;
-  background: rgba(0,0,0,0.25);
-  border: 1px solid #2a2a35;
-  border-radius: 8px;
+  min-height: 56px;
+  background: transparent;
+  border: none;
+  border-top: 1px solid #2a2a35;
   color: #b0b0c0;
-  font-size: 0.84rem;
+  font-size: 0.82rem;
   line-height: 1.5;
-  padding: 10px 12px;
+  padding: 12px 14px;
   resize: vertical;
   font-family: inherit;
   box-sizing: border-box;
 }
 .hab-mine-desc:focus {
   outline: none;
-  border-color: rgba(124, 92, 255, 0.45);
-  color: #f0f0f5;
+  color: #e8e8ef;
+  background: rgba(124, 92, 255, 0.04);
 }
 #habilidades-list .hab-mine-card .btn-remove {
   flex-shrink: 0;
   background: transparent;
-  border: 1px solid #2a2a35;
-  color: #a0a0b0;
+  border: 1px solid rgba(124, 92, 255, 0.25);
+  color: #c4b5fd;
   border-radius: 8px;
-  padding: 6px 10px;
+  padding: 6px 12px;
   font-size: 0.75rem;
+  font-weight: 600;
   cursor: pointer;
 }
 #habilidades-list .hab-mine-card .btn-remove:hover {
-  border-color: #c44;
-  color: #f88;
+  background: rgba(124, 92, 255, 0.15);
+  border-color: #8b5cf6;
+  color: #fff;
 }
