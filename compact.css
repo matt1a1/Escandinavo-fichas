@@ -25,13 +25,17 @@ body { font-size: var(--fs); }
 }
 .btn.small { padding: 3px 8px; font-size: 0.72rem; }
 
-/* Grid principal mais estreito nas laterais */
+/* 2 colunas: esquerda empilha identidade+perícias, direita = abas */
 .sheet {
-  grid-template-columns: 240px 1fr 300px;
+  grid-template-columns: minmax(280px, 380px) 1fr;
+  grid-template-rows: auto 1fr;
   gap: 8px;
   padding: 8px;
 }
 .left-panel, .center-panel, .right-panel { gap: 8px; }
+.left-panel { grid-column: 1; grid-row: 1; }
+.center-panel { grid-column: 1; grid-row: 2; }
+.right-panel { grid-column: 2; grid-row: 1 / span 2; min-width: 0; }
 
 .panel, .card {
   padding: var(--pad);
@@ -239,10 +243,14 @@ textarea { min-height: 52px; }
 
 /* Telas médias */
 @media (max-width: 1200px) {
-  .sheet { grid-template-columns: 240px 1fr 260px; }
+  .sheet { grid-template-columns: minmax(260px, 340px) 1fr; }
 }
 @media (max-width: 1100px) {
   .sheet { grid-template-columns: 1fr; }
+  .left-panel, .center-panel, .right-panel {
+    grid-column: 1;
+    grid-row: auto;
+  }
   .attr-grid { grid-template-columns: repeat(5, 1fr); }
   .pericias-list { max-height: 360px; }
 }
