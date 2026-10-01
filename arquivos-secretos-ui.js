@@ -1,4 +1,4 @@
-/* arquivos-secretos-ui.js — cards com descrição sob demanda */
+/* arquivos-secretos-ui.js — trilhas agrupadas por nome */
 (function () {
   const TIPOS = [
     { id: 'todos', label: 'Todos' },
@@ -94,9 +94,16 @@
         '#tab-arquivos .arq-tag-tipo { color:#c4b5fd; border-color:rgba(124,92,255,0.4); background:rgba(124,92,255,0.14); }',
         '#tab-arquivos .arq-tag-livro { color:#f0c674; border-color:rgba(240,198,116,0.4); background:rgba(240,198,116,0.12); }',
         '#tab-arquivos .arq-add { flex-shrink:0; white-space:nowrap; padding:8px 14px !important; font-size:0.8rem !important; min-height:36px; cursor:pointer; }',
-        '#tab-arquivos .arq-card-desc { display:none; font-size:0.84rem; line-height:1.5; color:#d0d0dc; white-space:pre-wrap; margin:10px 0 0; padding-top:10px; border-top:1px solid rgba(255,255,255,0.08); word-break:break-word; overflow:visible; max-height:none; }',
+        '#tab-arquivos .arq-card-desc { display:none; font-size:0.84rem; line-height:1.5; color:#d0d0dc; white-space:pre-wrap; margin:10px 0 0; padding-top:10px; border-top:1px solid rgba(255,255,255,0.08); word-break:break-word; }',
         '#tab-arquivos .arq-card.open .arq-card-desc { display:block; }',
         '#tab-arquivos .arq-card.open { border-color:rgba(240,198,116,0.35); }',
+        '#tab-arquivos .arq-trilha-body { display:none; margin-top:12px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.08); }',
+        '#tab-arquivos .arq-card.open .arq-trilha-body { display:flex; flex-direction:column; gap:10px; }',
+        '#tab-arquivos .arq-hab { background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:10px 12px; }',
+        '#tab-arquivos .arq-hab-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:6px; }',
+        '#tab-arquivos .arq-hab-name { font-size:0.88rem; font-weight:700; color:#f2f2f8; margin:0; }',
+        '#tab-arquivos .arq-hab-nex { font-size:0.7rem; color:#f0c674; margin-left:6px; font-weight:600; }',
+        '#tab-arquivos .arq-hab-desc { font-size:0.82rem; line-height:1.45; color:#d0d0dc; white-space:pre-wrap; word-break:break-word; margin:0; }',
         '#tab-arquivos .arq-empty { font-size:0.85rem; color:#9a9ab0; padding:24px 8px; text-align:center; }',
         '.tab[data-tab="arquivos"].active { color:#f0c674; border-bottom-color:#f0c674; }'
       ].join('\n');
@@ -173,6 +180,47 @@
     });
   }
 
+  function buildRows(items) {
+    var trilhaMap = {};
+    var result = [];
+    var seenTrilha = {};
+
+    items.forEach(function (e, idx) {
+      if (e.tipo === 'trilha' && e.trilha) {
+        var key = (e.livro || '') + '|' + (e.classe || '') + '|' + e.trilha;
+        if (!trilhaMap[key]) {
+          trilhaMap[key] = {
+            kind: 'trilha-group',
+            trilha: e.trilha,
+            livro: e.livro || '',
+            classe: e.classe || '',
+            habilidades: []
+          };
+        }
+        trilhaMap[key].habilidades.push({ item: e, idx: idx });
+      }
+    });
+
+    items.forEach(function (e, idx) {
+      if (e.tipo === 'trilha' && e.trilha) {
+        var key = (e.livro || '') + '|' + (e.classe || '') + '|' + e.trilha;
+        if (!seenTrilha[key]) {
+          seenTrilha[key] = true;
+          result.push(trilhaMap[key]);
+        }
+      } else {
+        result.push({ kind: 'single', item: e, idx: idx });
+      }
+    });
+    return result;
+  }
+
+  function nexSortValue(nex) {
+    if (!nex) return 999;
+    var n = parseInt(String(nex).replace(/[^0-9]/g, ''), 10);
+    return isNaN(n) ? 999 : n;
+  }
+
   function addToSheet(e) {
     if (typeof window.addArquivoSecretoToSheet === 'function') {
       window.addArquivoSecretoToSheet(e);
@@ -201,8 +249,11 @@
     } else {
       state.habilidades = state.habilidades || [];
       var prefix = e.tipo === 'origem' ? 'Origem: ' : e.tipo === 'trilha' ? 'Trilha: ' : e.tipo === 'regra' ? 'Regra: ' : '';
+      var nome = e.tipo === 'trilha' && e.trilha
+        ? (e.trilha + ' — ' + e.nome + (e.nex ? ' (' + e.nex + ')' : ''))
+        : (prefix + e.nome);
       state.habilidades.push({
-        nome: prefix + e.nome,
+        nome: nome,
         desc: '[Arquivos Secretos — ' + e.livro + ']' +
           (e.nex ? ' NEX ' + e.nex + '.' : '') +
           (e.classe ? ' Classe: ' + e.classe + '.' : '') +
@@ -221,50 +272,100 @@
     if (!list) return;
     var items = filtered();
     cachedItems = items;
+    var rows = buildRows(items);
     if (count) count.textContent = String(items.length);
 
     list.innerHTML = '';
-    if (!items.length) {
+    if (!rows.length) {
       list.innerHTML = '<p class="arq-empty">Nada encontrado com esses filtros.</p>';
       return;
     }
 
-    items.forEach(function (e, idx) {
-      var tags = [];
-      tags.push('<span class="arq-tag arq-tag-tipo">' + escapeHtml(e.tipo) + '</span>');
-      tags.push('<span class="arq-tag arq-tag-livro">' + escapeHtml(e.livro) + '</span>');
-      if (e.nex) tags.push('<span class="arq-tag">NEX ' + escapeHtml(e.nex) + '</span>');
-      if (e.classe) tags.push('<span class="arq-tag">' + escapeHtml(e.classe) + '</span>');
-      if (e.trilha) tags.push('<span class="arq-tag">' + escapeHtml(e.trilha) + '</span>');
-      if (e.circulo) tags.push('<span class="arq-tag">' + escapeHtml(String(e.circulo)) + 'º</span>');
-      if (e.elemento) tags.push('<span class="arq-tag">' + escapeHtml(e.elemento) + '</span>');
-      if (e.categoria) tags.push('<span class="arq-tag">Cat. ' + escapeHtml(e.categoria) + '</span>');
-
-      var card = document.createElement('div');
-      card.className = 'arq-card';
-      card.setAttribute('data-arq-idx', String(idx));
-
-      card.innerHTML =
-        '<div class="arq-card-head">' +
-        '  <div class="arq-card-info">' +
-        '    <div class="arq-card-name">' + escapeHtml(e.nome) + '</div>' +
-        '    <div class="arq-card-tags">' + tags.join('') + '</div>' +
-        '  </div>' +
-        '  <button type="button" class="btn primary small arq-add" data-arq-add="' + idx + '">Adicionar</button>' +
-        '</div>' +
-        '<div class="arq-card-desc">' + escapeHtml(e.desc || '') + '</div>';
-
-      card.querySelector('.arq-card-head').addEventListener('click', function (ev) {
-        if (ev.target.closest && ev.target.closest('.arq-add')) return;
-        var wasOpen = card.classList.contains('open');
-        list.querySelectorAll('.arq-card.open').forEach(function (c) {
-          if (c !== card) c.classList.remove('open');
+    rows.forEach(function (row) {
+      if (row.kind === 'trilha-group') {
+        row.habilidades.sort(function (a, b) {
+          return nexSortValue(a.item.nex) - nexSortValue(b.item.nex);
         });
-        if (wasOpen) card.classList.remove('open');
-        else card.classList.add('open');
-      });
 
-      list.appendChild(card);
+        var card = document.createElement('div');
+        card.className = 'arq-card';
+
+        var tags = [];
+        tags.push('<span class="arq-tag arq-tag-tipo">trilha</span>');
+        tags.push('<span class="arq-tag arq-tag-livro">' + escapeHtml(row.livro) + '</span>');
+        if (row.classe) tags.push('<span class="arq-tag">' + escapeHtml(row.classe) + '</span>');
+        tags.push('<span class="arq-tag">' + row.habilidades.length + ' habilidades</span>');
+
+        var bodyHtml = '';
+        row.habilidades.forEach(function (h) {
+          var e = h.item;
+          bodyHtml +=
+            '<div class="arq-hab">' +
+            '  <div class="arq-hab-head">' +
+            '    <div><span class="arq-hab-name">' + escapeHtml(e.nome) + '</span>' +
+            (e.nex ? '<span class="arq-hab-nex">NEX ' + escapeHtml(e.nex) + '</span>' : '') +
+            '</div>' +
+            '    <button type="button" class="btn primary small arq-add" data-arq-add="' + h.idx + '">Adicionar</button>' +
+            '  </div>' +
+            '  <p class="arq-hab-desc">' + escapeHtml(e.desc || '') + '</p>' +
+            '</div>';
+        });
+
+        card.innerHTML =
+          '<div class="arq-card-head">' +
+          '  <div class="arq-card-info">' +
+          '    <div class="arq-card-name">' + escapeHtml(row.trilha) + '</div>' +
+          '    <div class="arq-card-tags">' + tags.join('') + '</div>' +
+          '  </div>' +
+          '</div>' +
+          '<div class="arq-trilha-body">' + bodyHtml + '</div>';
+
+        card.querySelector('.arq-card-head').addEventListener('click', function () {
+          var wasOpen = card.classList.contains('open');
+          list.querySelectorAll('.arq-card.open').forEach(function (c) {
+            if (c !== card) c.classList.remove('open');
+          });
+          if (wasOpen) card.classList.remove('open');
+          else card.classList.add('open');
+        });
+
+        list.appendChild(card);
+      } else {
+        var e = row.item;
+        var idx = row.idx;
+        var tags2 = [];
+        tags2.push('<span class="arq-tag arq-tag-tipo">' + escapeHtml(e.tipo) + '</span>');
+        tags2.push('<span class="arq-tag arq-tag-livro">' + escapeHtml(e.livro) + '</span>');
+        if (e.nex) tags2.push('<span class="arq-tag">NEX ' + escapeHtml(e.nex) + '</span>');
+        if (e.classe) tags2.push('<span class="arq-tag">' + escapeHtml(e.classe) + '</span>');
+        if (e.circulo) tags2.push('<span class="arq-tag">' + escapeHtml(String(e.circulo)) + 'º</span>');
+        if (e.elemento) tags2.push('<span class="arq-tag">' + escapeHtml(e.elemento) + '</span>');
+        if (e.categoria) tags2.push('<span class="arq-tag">Cat. ' + escapeHtml(e.categoria) + '</span>');
+
+        var card2 = document.createElement('div');
+        card2.className = 'arq-card';
+        card2.innerHTML =
+          '<div class="arq-card-head">' +
+          '  <div class="arq-card-info">' +
+          '    <div class="arq-card-name">' + escapeHtml(e.nome) + '</div>' +
+          '    <div class="arq-card-tags">' + tags2.join('') + '</div>' +
+          '  </div>' +
+          '  <button type="button" class="btn primary small arq-add" data-arq-add="' + idx + '">Adicionar</button>' +
+          '</div>' +
+          '<div class="arq-card-desc">' + escapeHtml(e.desc || '') + '</div>';
+
+        card2.querySelector('.arq-card-head').addEventListener('click', function (ev) {
+          if (ev.target.closest && ev.target.closest('.arq-add')) return;
+          var wasOpen = card2.classList.contains('open');
+          list.querySelectorAll('.arq-card.open').forEach(function (c) {
+            if (c !== card2) c.classList.remove('open');
+          });
+          if (wasOpen) card2.classList.remove('open');
+          else card2.classList.add('open');
+        });
+
+        list.appendChild(card2);
+      }
     });
 
     list.querySelectorAll('[data-arq-add]').forEach(function (btn) {
