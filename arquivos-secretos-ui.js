@@ -1,4 +1,4 @@
-/* arquivos-secretos-ui.js — aba Arquivos Secretos (botões + cards claros) */
+/* arquivos-secretos-ui.js — cards com descrição sob demanda */
 (function () {
   const TIPOS = [
     { id: 'todos', label: 'Todos' },
@@ -21,7 +21,8 @@
     { id: 'Hellhunters', label: 'Hellhunters' }
   ];
 
-  var stateFiltro = { tipo: 'todos', livro: 'todos', q: '', aberto: null };
+  var stateFiltro = { tipo: 'todos', livro: 'todos', q: '' };
+  var cachedItems = [];
 
   function escapeHtml(str) {
     if (!str) return '';
@@ -83,20 +84,19 @@
         '#tab-arquivos .arq-chip { border:1px solid rgba(255,255,255,0.14); background:#1a1a24; color:#c8c8d8; border-radius:999px; padding:7px 14px; font-size:0.8rem; cursor:pointer; line-height:1.2; }',
         '#tab-arquivos .arq-chip:hover { border-color:rgba(240,198,116,0.5); color:#f0c674; }',
         '#tab-arquivos .arq-chip.active { background:rgba(240,198,116,0.18); border-color:#f0c674; color:#f0c674; font-weight:700; }',
-        '#tab-arquivos .arq-list { display:flex; flex-direction:column; gap:12px; max-height:calc(100vh - 300px); overflow-y:auto; padding:4px 2px 20px; }',
-        '#tab-arquivos .arq-card { border:1px solid rgba(255,255,255,0.1); background:#16161f; border-radius:12px; padding:14px; display:flex; flex-direction:column; gap:10px; min-height:72px; }',
-        '#tab-arquivos .arq-card-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }',
-        '#tab-arquivos .arq-card-info { flex:1; min-width:0; cursor:pointer; }',
+        '#tab-arquivos .arq-list { display:flex; flex-direction:column; gap:10px; max-height:calc(100vh - 300px); overflow-y:auto; padding:4px 2px 24px; }',
+        '#tab-arquivos .arq-card { border:1px solid rgba(255,255,255,0.1); background:#16161f; border-radius:12px; padding:12px 14px; }',
+        '#tab-arquivos .arq-card-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; cursor:pointer; }',
+        '#tab-arquivos .arq-card-info { flex:1; min-width:0; }',
         '#tab-arquivos .arq-card-name { font-size:0.95rem; font-weight:700; color:#f2f2f8; margin:0 0 6px; line-height:1.3; }',
         '#tab-arquivos .arq-card-tags { display:flex; flex-wrap:wrap; gap:5px; }',
         '#tab-arquivos .arq-tag { font-size:0.68rem; padding:3px 8px; border-radius:999px; border:1px solid rgba(255,255,255,0.12); color:#b8b8c8; background:rgba(255,255,255,0.04); }',
         '#tab-arquivos .arq-tag-tipo { color:#c4b5fd; border-color:rgba(124,92,255,0.4); background:rgba(124,92,255,0.14); }',
         '#tab-arquivos .arq-tag-livro { color:#f0c674; border-color:rgba(240,198,116,0.4); background:rgba(240,198,116,0.12); }',
-        '#tab-arquivos .arq-add { flex-shrink:0; white-space:nowrap; padding:8px 14px !important; font-size:0.8rem !important; min-height:36px; }',
-        '#tab-arquivos .arq-card-desc { display:none; font-size:0.84rem; line-height:1.5; color:#d0d0dc; white-space:pre-wrap; margin:0; padding-top:8px; border-top:1px solid rgba(255,255,255,0.08); }',
+        '#tab-arquivos .arq-add { flex-shrink:0; white-space:nowrap; padding:8px 14px !important; font-size:0.8rem !important; min-height:36px; cursor:pointer; }',
+        '#tab-arquivos .arq-card-desc { display:none; font-size:0.84rem; line-height:1.5; color:#d0d0dc; white-space:pre-wrap; margin:10px 0 0; padding-top:10px; border-top:1px solid rgba(255,255,255,0.08); word-break:break-word; overflow:visible; max-height:none; }',
         '#tab-arquivos .arq-card.open .arq-card-desc { display:block; }',
-        '#tab-arquivos .arq-card-toggle { font-size:0.72rem; color:#f0c674; background:none; border:none; padding:0; cursor:pointer; text-align:left; margin-top:2px; }',
-        '#tab-arquivos .arq-card-toggle:hover { text-decoration:underline; }',
+        '#tab-arquivos .arq-card.open { border-color:rgba(240,198,116,0.35); }',
         '#tab-arquivos .arq-empty { font-size:0.85rem; color:#9a9ab0; padding:24px 8px; text-align:center; }',
         '.tab[data-tab="arquivos"].active { color:#f0c674; border-bottom-color:#f0c674; }'
       ].join('\n');
@@ -112,7 +112,6 @@
       b.textContent = l.label;
       b.addEventListener('click', function () {
         stateFiltro.livro = l.id;
-        stateFiltro.aberto = null;
         livrosEl.querySelectorAll('.arq-chip').forEach(function (c) { c.classList.remove('active'); });
         b.classList.add('active');
         renderList();
@@ -129,7 +128,6 @@
       b.textContent = t.label;
       b.addEventListener('click', function () {
         stateFiltro.tipo = t.id;
-        stateFiltro.aberto = null;
         tiposEl.querySelectorAll('.arq-chip').forEach(function (c) { c.classList.remove('active'); });
         b.classList.add('active');
         renderList();
@@ -140,7 +138,6 @@
     var search = document.getElementById('arq-search');
     search.addEventListener('input', function () {
       stateFiltro.q = (search.value || '').trim().toLowerCase();
-      stateFiltro.aberto = null;
       renderList();
     });
 
@@ -223,6 +220,7 @@
     var count = document.getElementById('arq-count');
     if (!list) return;
     var items = filtered();
+    cachedItems = items;
     if (count) count.textContent = String(items.length);
 
     list.innerHTML = '';
@@ -232,9 +230,6 @@
     }
 
     items.forEach(function (e, idx) {
-      var key = (e.livro || '') + '|' + (e.tipo || '') + '|' + (e.nome || '') + '|' + idx;
-      var isOpen = stateFiltro.aberto === key;
-
       var tags = [];
       tags.push('<span class="arq-tag arq-tag-tipo">' + escapeHtml(e.tipo) + '</span>');
       tags.push('<span class="arq-tag arq-tag-livro">' + escapeHtml(e.livro) + '</span>');
@@ -246,37 +241,38 @@
       if (e.categoria) tags.push('<span class="arq-tag">Cat. ' + escapeHtml(e.categoria) + '</span>');
 
       var card = document.createElement('div');
-      card.className = 'arq-card' + (isOpen ? ' open' : '');
+      card.className = 'arq-card';
+      card.setAttribute('data-arq-idx', String(idx));
 
       card.innerHTML =
         '<div class="arq-card-head">' +
-        '  <div class="arq-card-info" data-arq-toggle="' + escapeHtml(key) + '">' +
+        '  <div class="arq-card-info">' +
         '    <div class="arq-card-name">' + escapeHtml(e.nome) + '</div>' +
         '    <div class="arq-card-tags">' + tags.join('') + '</div>' +
-        '    <button type="button" class="arq-card-toggle">' + (isOpen ? 'Ocultar descrição' : 'Ver descrição') + '</button>' +
         '  </div>' +
         '  <button type="button" class="btn primary small arq-add" data-arq-add="' + idx + '">Adicionar</button>' +
         '</div>' +
         '<div class="arq-card-desc">' + escapeHtml(e.desc || '') + '</div>';
 
+      card.querySelector('.arq-card-head').addEventListener('click', function (ev) {
+        if (ev.target.closest && ev.target.closest('.arq-add')) return;
+        var wasOpen = card.classList.contains('open');
+        list.querySelectorAll('.arq-card.open').forEach(function (c) {
+          if (c !== card) c.classList.remove('open');
+        });
+        if (wasOpen) card.classList.remove('open');
+        else card.classList.add('open');
+      });
+
       list.appendChild(card);
     });
 
-    var current = items;
-    list.querySelectorAll('[data-arq-toggle]').forEach(function (el) {
-      el.addEventListener('click', function (ev) {
-        if (ev.target && ev.target.classList && ev.target.classList.contains('arq-add')) return;
-        var key = el.getAttribute('data-arq-toggle');
-        stateFiltro.aberto = (stateFiltro.aberto === key) ? null : key;
-        renderList();
-      });
-    });
     list.querySelectorAll('[data-arq-add]').forEach(function (btn) {
       btn.addEventListener('click', function (ev) {
         ev.preventDefault();
         ev.stopPropagation();
         var i = +btn.getAttribute('data-arq-add');
-        if (current[i]) addToSheet(current[i]);
+        if (cachedItems[i]) addToSheet(cachedItems[i]);
       });
     });
   }
