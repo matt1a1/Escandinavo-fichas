@@ -248,9 +248,71 @@
     };
   }
 
+  // Padroniza "Minhas Habilidades" no estilo hab-mine-card
+  function renderHabilidadesPadrao() {
+    var list = document.getElementById('habilidades-list');
+    if (!list || typeof state === 'undefined') return;
+    list.innerHTML = '';
+    if (!state.habilidades || !state.habilidades.length) {
+      list.innerHTML = '<p class="empty-msg">Nenhuma habilidade adicionada ainda.</p>';
+      return;
+    }
+    function esc(s) {
+      return String(s == null ? '' : s)
+        .replace(/&/g, '&').replace(/</g, '<')
+        .replace(/>/g, '>').replace(/"/g, '"');
+    }
+    state.habilidades.forEach(function (h, i) {
+      var nome = String(h.nome || '');
+      nome = nome.replace(/^Trilha:\s*/i, '').replace(/^Origem:\s*/i, '').replace(/^Regra:\s*/i, '').replace(/^Poder:\s*/i, '');
+      var desc = String(h.desc || '');
+      desc = desc.replace(/^\[Arquivos Secretos[^\]]*\]\s*/i, '');
+      desc = desc.replace(/^\s*NEX\s*[\d%]+\.\s*/i, '');
+      desc = desc.replace(/^\s*Classe:\s*[^\.]+\.\s*/i, '');
+      desc = desc.replace(/^\s*Trilha:\s*[^\.]+\.\s*/i, '');
+
+      var card = document.createElement('div');
+      card.className = 'hab-mine-card';
+      card.innerHTML =
+        '<div class="hab-mine-head">' +
+        '  <div class="hab-mine-title-row">' +
+        '    <input type="text" class="hab-mine-nome" value="' + esc(nome) + '" data-field="nome" data-idx="' + i + '" placeholder="Nome da habilidade" />' +
+        '  </div>' +
+        '  <button type="button" class="btn-remove" data-idx="' + i + '">Remover</button>' +
+        '</div>' +
+        '<textarea class="hab-mine-desc" data-field="desc" data-idx="' + i + '" placeholder="Descrição...">' + esc(desc) + '</textarea>';
+      list.appendChild(card);
+    });
+    list.querySelectorAll('input, textarea').forEach(function (el) {
+      el.addEventListener('change', function (e) {
+        var idx = +e.target.dataset.idx;
+        var field = e.target.dataset.field;
+        if (!state.habilidades[idx]) return;
+        state.habilidades[idx][field] = e.target.value;
+        if (typeof scheduleSave === 'function') scheduleSave();
+      });
+    });
+    list.querySelectorAll('.btn-remove').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        state.habilidades.splice(+btn.dataset.idx, 1);
+        if (typeof scheduleSave === 'function') scheduleSave();
+        renderHabilidadesPadrao();
+        if (typeof renderRecursos === 'function') renderRecursos();
+      });
+    });
+  }
+
+  function installRenderOverride() {
+    if (typeof window.renderHabilidades === 'function' && window.renderHabilidades !== renderHabilidadesPadrao) {
+      /* keep original reference if needed */
+    }
+    window.renderHabilidades = renderHabilidadesPadrao;
+  }
+
   function boot() {
     ensureCatalogGlobals();
     patchArquivosSecretos();
+    installRenderOverride();
     var tries = 0;
     var t = setInterval(function () {
       tries++;
@@ -260,9 +322,13 @@
       if ((hasList && hasCat && hasState) || tries > 80) {
         clearInterval(t);
         tryInitHabilidadesUI();
+        installRenderOverride();
+        if (typeof renderHabilidades === 'function') renderHabilidades();
         setTimeout(function () {
           mergeArquivosSecretosIntoCatalog();
           tryInitHabilidadesUI();
+          installRenderOverride();
+          if (typeof renderHabilidades === 'function') renderHabilidades();
         }, 800);
       }
     }, 100);
