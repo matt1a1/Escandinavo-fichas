@@ -61,25 +61,28 @@
       desc: '+1 PE, e mais 1 PE adicional a cada NEX ímpar (15%, 25%...); seu limite de PE por turno também sobe em 1 (não afeta a DT dos seus efeitos).' },
     { nome: 'Cicatrizes Psicológicas', classe: 'Origens', categoria: 'Poder de Origem', nex: '', pe: '—',
       desc: '+1 de Sanidade para cada 5% de NEX.' },
-    // Arquivos Secretos
     { nome: 'Registrar o Paranormal', classe: 'Origens', categoria: 'Poder de Origem', nex: '', pe: '2 PE',
-      desc: '1x/cena, ação padrão + 2 PE: cria um registro (foto/vídeo) de uma criatura paranormal ou de um ritual conjurado na mesma cena. Depois, 1x/cena, pode gastar uma ação de interlúdio + um registro de criatura para +5 em testes de identificá-la e de resistir à presença perturbadora dela (até a próxima cena de interlúdio); ou usar um registro de ritual para memorizá-lo e poder conjurá-lo até a próxima cena de interlúdio — respeitando o NEX necessário por círculo (1º a partir de 5%, 2º a partir de 45%, 3º a partir de 75%) — com +5 para identificá-lo; esse ritual não conta no limite de rituais conhecidos.' },
+      desc: '1x/cena, ação padrão + 2 PE: cria um registro de criatura/ritual; depois usa registro para +5 ou memorizar ritual.' },
     { nome: 'Quem Não Arrisca, Não Petisca', classe: 'Origens', categoria: 'Poder de Origem', nex: '', pe: '—',
-      desc: '+2 em testes para resistir a condições mentais e de medo; se falhar mesmo assim, ganha +1d20 no próximo teste que fizer até o fim da cena (não cumulativo consigo mesmo).' },
+      desc: '+2 em testes contra condições mentais e de medo; se falhar, +1d20 no próximo teste até o fim da cena.' },
     { nome: 'Minha Teoria Absurda', classe: 'Origens', categoria: 'Poder de Origem', nex: '', pe: '—',
-      desc: '1x por cena de interlúdio, apresenta ao grupo uma teoria sobre a investigação (antes de terem todas as respostas); se a teoria for boa (a critério do mestre, não precisa estar certa), ganha 1d4+1 PE temporários até serem gastos; se, ao fim da missão, uma das teorias se confirmar, ganha +1 PE máximo e atual permanente.' },
+      desc: '1x por interlúdio, teoria sobre a investigação: se boa, 1d4+1 PE temp.; se confirmar na missão, +1 PE máximo permanente.' },
     { nome: 'Turno Invertido', classe: 'Origens', categoria: 'Poder de Origem', nex: '', pe: '—',
-      desc: '1x por missão, numa cena de interlúdio, recebe os benefícios da ação dormir sem precisar realizá-la; além disso, +2 em testes contra qualquer efeito que tente deixá-lo inconsciente.' },
+      desc: '1x por missão, benefícios de dormir sem dormir; +2 contra efeitos que tentem deixar inconsciente.' },
     { nome: 'Existe uma Explicação', classe: 'Origens', categoria: 'Poder de Origem', nex: '', pe: '2 PE',
-      desc: 'Ao fazer um teste de Ocultismo, pode gastar 2 PE para usar Ciências no lugar dessa perícia.' },
+      desc: 'Em teste de Ocultismo, gasta 2 PE para usar Ciências no lugar.' },
     { nome: 'Forças para Enfrentar', classe: 'Origens', categoria: 'Poder de Origem', nex: '', pe: '2 PE',
-      desc: 'Descreve ao mestre a parte mais traumática de ter sido cobaia; quando uma cena toca nesse trauma (a critério do mestre), fica abalado, mas pode gastar 2 PE para, até o fim da cena, ficar imune a efeitos de medo (inclusive ao próprio "abalado" desta habilidade).' },
+      desc: 'Trauma de cobaia: cena que toque nele deixa abalado, mas 2 PE concede imunidade a medo até o fim da cena.' },
     { nome: 'Técnicas de Contenção', classe: 'Origens', categoria: 'Poder de Origem', nex: '', pe: '2 PE',
-      desc: 'Ao fazer uma manobra de combate, pode gastar 2 PE para +5 no teste de manobra.' },
+      desc: 'Em manobra de combate, gasta 2 PE para +5 no teste.' },
     { nome: 'O Que Restou', classe: 'Origens', categoria: 'Poder de Origem', nex: '', pe: '—',
-      desc: 'Escolhe um elemento (exceto Medo); ganha RD 10 contra ele, mas perde 3 SAN toda vez que entra em contato com esse elemento pela primeira vez numa cena (ritual, item amaldiçoado, criatura ou poder daquele elemento).' },
+      desc: 'Escolhe um elemento (exceto Medo); RD 10 contra ele, mas –3 SAN no 1º contato da cena.' },
     { nome: 'Sussurros e Vultos', classe: 'Origens', categoria: 'Poder de Origem', nex: '', pe: '—',
-      desc: 'Num teste de Diplomacia, Enganação, Intimidação ou Intuição, pode perder 2 SAN para +5 no teste.' }
+      desc: 'Em Diplomacia, Enganação, Intimidação ou Intuição, pode perder 2 SAN para +5 no teste.' },
+    { nome: 'Resistência do Treinamento', classe: 'Origens', categoria: 'Poder de Origem', nex: '', pe: '—',
+      desc: 'Se escolheu Luta+Fortitude: +2 PV no NEX 5% e +1 PV a cada 10% de NEX. Se Pontaria+Reflexos: +1 PE no NEX 5% e +1 PE a cada 10% de NEX.' },
+    { nome: 'Full Metal Jacket', classe: 'Origens', categoria: 'Poder de Origem', nex: '', pe: '2 PE',
+      desc: 'Ao fazer teste de Luta ou Pontaria com alguma penalidade, gasta 2 PE para ignorar essa penalidade no teste.' }
   ];
 
   poderes.forEach(function (p) {
