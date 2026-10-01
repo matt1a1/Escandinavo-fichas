@@ -62,7 +62,6 @@ const ORIGENS = {
   trambiqueiro: { nome: 'Trambiqueiro', pericias: ['crime', 'enganacao'], poder: 'Impostor' },
   universitario: { nome: 'Universitário', pericias: ['atualidades', 'investigacao'], poder: 'Dedicação' },
   vitima: { nome: 'Vítima', pericias: ['reflexos', 'vontade'], poder: 'Cicatrizes Psicológicas' },
-  // Arquivos Secretos
   influencer_paranormal: { nome: 'Influencer Paranormal', pericias: ['enganacao', 'tecnologia'], poder: 'Registrar o Paranormal' },
   cacador_recompensas: { nome: 'Caçador de Recompensas', pericias: ['crime', 'investigacao'], poder: 'Quem Não Arrisca, Não Petisca' },
   ufologo: { nome: 'Ufólogo', pericias: ['ciencias', 'ocultismo'], poder: 'Minha Teoria Absurda' },
@@ -72,6 +71,8 @@ const ORIGENS = {
   seguranca_ex_panacea: { nome: 'Segurança Ex-Panacea', pericias: ['luta', 'pontaria'], poder: 'Técnicas de Contenção' },
   exorcizado: { nome: 'Exorcizado', pericias: ['fortitude', 'ocultismo'], poder: 'O Que Restou' },
   sensitivo_rebelde: { nome: 'Sensitivo Rebelde', pericias: ['intuicao', 'vontade'], poder: 'Sussurros e Vultos' },
+  treinado_hell_hunters: { nome: 'Treinado pela Hell Hunters', pericias: ['luta', 'fortitude'], poder: 'Resistência do Treinamento' },
+  veterano_conflito_armado: { nome: 'Veterano de Conflito Armado', pericias: ['luta', 'pontaria'], poder: 'Full Metal Jacket' },
 };
 
 const CLASSES = {
@@ -80,8 +81,8 @@ const CLASSES = {
     pvBase: 20, pvPorNex: 4,
     sanBase: 12, sanPorNex: 3,
     peBase: 2, pePorNex: 2,
-    periciasBase: 1,
-    proficiencias: 'Armas simples e táticas, proteções leves e pesadas',
+    periciasBase: 4,
+    proficiencias: 'Armas simples, táticas e proteções leves e pesadas',
     habilidadesIniciais: ['Ataque Especial'],
   },
   especialista: {
