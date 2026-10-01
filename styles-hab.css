@@ -14,11 +14,14 @@
   background: transparent;
   border: none;
   color: var(--text-dim);
-  padding: 8px 12px;
+  padding: 9px 12px;
   border-radius: 8px;
   cursor: pointer;
   font-size: 0.82rem;
-  font-weight: 500;
+  font-weight: 600;
+  line-height: 1.2;
+  min-height: 38px;
+  box-sizing: border-box;
 }
 .hab-subtab:hover { color: var(--text); }
 .hab-subtab.active {
@@ -211,6 +214,11 @@
 }
 
 /* Minhas Habilidades */
+#habilidades-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
 .hab-mine-card {
   background: #14141c;
   border: 1px solid #2a2a35;
@@ -268,9 +276,24 @@
   padding: 10px 12px;
   resize: vertical;
   font-family: inherit;
+  box-sizing: border-box;
 }
 .hab-mine-desc:focus {
   outline: none;
   border-color: rgba(124, 92, 255, 0.45);
   color: #f0f0f5;
+}
+#habilidades-list .hab-mine-card .btn-remove {
+  flex-shrink: 0;
+  background: transparent;
+  border: 1px solid #2a2a35;
+  color: #a0a0b0;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+#habilidades-list .hab-mine-card .btn-remove:hover {
+  border-color: #c44;
+  color: #f88;
 }
