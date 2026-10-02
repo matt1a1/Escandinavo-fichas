@@ -266,6 +266,11 @@
         .replace(/&/g, '&').replace(/</g, '<')
         .replace(/>/g, '>').replace(/"/g, '"');
     }
+    function autosize(ta) {
+      if (!ta || ta.tagName !== 'TEXTAREA') return;
+      ta.style.height = 'auto';
+      ta.style.height = Math.max(48, ta.scrollHeight) + 'px';
+    }
     state.habilidades.forEach(function (h, i) {
       var nome = String(h.nome || '');
       nome = nome.replace(/^Trilha:\s*/i, '').replace(/^Origem:\s*/i, '').replace(/^Regra:\s*/i, '').replace(/^Poder:\s*/i, '');
@@ -316,10 +321,22 @@
         });
         if (wasOpen) card.classList.remove('open');
         else card.classList.add('open');
+        setTimeout(function () {
+          if (card.classList.contains('open')) autosize(card.querySelector('.hab-mine-desc'));
+        }, 0);
       });
     });
     list.querySelectorAll('input, textarea').forEach(function (el) {
       el.addEventListener('click', function (e) { e.stopPropagation(); });
+      if (el.tagName === 'TEXTAREA') {
+        autosize(el);
+        el.addEventListener('input', function () {
+          autosize(el);
+          var idx = +el.dataset.idx;
+          if (state.habilidades[idx]) state.habilidades[idx].desc = el.value;
+          if (typeof scheduleSave === 'function') scheduleSave();
+        });
+      }
       el.addEventListener('change', function (e) {
         var idx = +e.target.dataset.idx;
         var field = e.target.dataset.field;
