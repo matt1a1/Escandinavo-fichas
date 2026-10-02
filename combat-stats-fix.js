@@ -1,11 +1,11 @@
 /* combat-stats-fix.js
- * Bônus passivos de poderes/origens nos cálculos da ficha:
- * - Patrulha: +2 Defesa
- * - Calejado: +1 PV por 5% de NEX
- * - Cicatrizes Psicológicas: +1 SAN por 5% de NEX
- * - Dedicação: +1 PE (+1 a cada NEX ímpar) e +1 no limite de PE/turno
- * - Bloqueio/Esquiva: Defesa + Fortitude/Reflexos
- * Também aplica bônus de habilidades cujo nome/desc indique +X Defesa passivo.
+ * Cálculos oficiais:
+ * - Defesa Passiva = 10 + AGI + armadura (+ bônus passivos, ex: Patrulha +2)
+ *   mínimo 15 na ficha
+ * - Esquiva (precisa Reflexos treinado) = Defesa Passiva + bônus Reflexos
+ * - Bloqueio (precisa Fortitude treinada): na ficha marca-se Defesa + Fortitude;
+ *   efeito mecânico = RD igual ao bônus de Fortitude
+ * - Bônus de origem: Calejado, Cicatrizes Psicológicas, Dedicação
  */
 (function () {
   function temHab(nome) {
@@ -21,12 +21,10 @@
     return Math.max(5, Number(state && state.nex) || 5);
   }
 
-  /** Quantos "degraus" de 5% de NEX (5% = 1, 10% = 2, ...) */
   function nexBlocos5() {
     return Math.floor(nexPct() / 5);
   }
 
-  /** NEX ímpares no sentido do livro: 15, 25, 35... (e o +1 base da Dedicação) */
   function dedicacaoBonusPe() {
     var n = nexPct();
     var extra = 0;
@@ -34,36 +32,73 @@
     return 1 + extra;
   }
 
-  /** Soma bônus numéricos de Defesa vindos de habilidades passivas conhecidas */
   function bonusDefesaDeHabilidades() {
     var bonus = 0;
     if (temHab('Patrulha')) bonus += 2;
-
     if (typeof state !== 'undefined' && Array.isArray(state.habilidades)) {
       state.habilidades.forEach(function (h) {
         var nome = String(h.nome || '');
         var desc = String(h.desc || '');
         if (/^Patrulha$/i.test(nome)) return;
-        if (/\b\d+\s*PE\b/i.test(desc) && !/\+2 na Defesa/i.test(desc)) return;
+        if (/\b\d+\s*PE\b/i.test(desc)) return;
         var m = desc.match(/\+(\d+)\s*(?:na\s+)?Defesa\b/i);
-        if (m && !/\bapt[eé]\b|\bat[eé]\s+o\s+fim|\bat[eé]\s+seu\s+pr[oó]ximo/i.test(desc)) {
-          if (/at[eé]\s+(o\s+)?(fim|pr[oó]ximo|in[ií]cio)/i.test(desc)) return;
-          if (/quando\s+usa|pode\s+gastar|a[cç][aã]o\s+de\s+movimento/i.test(desc)) return;
-          bonus += parseInt(m[1], 10) || 0;
-        }
+        if (!m) return;
+        if (/at[eé]\s+(o\s+)?(fim|pr[oó]ximo|in[ií]cio)/i.test(desc)) return;
+        if (/quando\s+usa|pode\s+gastar|a[cç][aã]o\s+de\s+movimento/i.test(desc)) return;
+        bonus += parseInt(m[1], 10) || 0;
       });
     }
     return bonus;
   }
 
+  function floor15(v) {
+    return Math.max(15, v);
+  }
+
+  function periciaTreinada(id) {
+    return typeof getPericiaRank === 'function' && getPericiaRank(id) > 0;
+  }
+
   function install() {
     if (typeof state === 'undefined') return false;
-    if (typeof calcularDefesa !== 'function') return false;
-    if (typeof getPericiaBonus !== 'function') return false;
+    if (typeof getAttr !== 'function') return false;
 
-    if (!window.__calcDefesaBase) {
-      window.__calcDefesaBase = calcularDefesa;
-    }
+    window.__calcDefesaRaw = function () {
+      var def = 10 + getAttr('agi');
+      var prot = 0;
+      var escudo = 0;
+      (state.itens || []).forEach(function (item) {
+        if (item.tipo !== 'protecao') return;
+        var d = Number(item.defesa) || 0;
+        if (/escudo/i.test(item.nome || '')) escudo += d;
+        else if (d > prot) prot = d;
+      });
+      return def + prot + escudo;
+    };
+
+    window.calcularDefesa = function () {
+      return floor15(window.__calcDefesaRaw() + bonusDefesaDeHabilidades());
+    };
+
+    window.calcularEsquiva = function () {
+      var def = calcularDefesa();
+      if (!periciaTreinada('reflexos')) return def;
+      var b = typeof getPericiaBonus === 'function' ? getPericiaBonus('reflexos') : 0;
+      return floor15(def + b);
+    };
+
+    window.calcularBloqueio = function () {
+      var def = calcularDefesa();
+      if (!periciaTreinada('fortitude')) return def;
+      var b = typeof getPericiaBonus === 'function' ? getPericiaBonus('fortitude') : 0;
+      return floor15(def + b);
+    };
+
+    window.calcularBloqueioRD = function () {
+      if (!periciaTreinada('fortitude')) return 0;
+      return typeof getPericiaBonus === 'function' ? getPericiaBonus('fortitude') : 0;
+    };
+
     if (!window.__calcRecursosBase && typeof calcularRecursos === 'function') {
       window.__calcRecursosBase = calcularRecursos;
     }
@@ -71,34 +106,13 @@
       window.__calcPeTurnoBase = calcularPeTurno;
     }
 
-    window.calcularDefesa = function () {
-      var base = window.__calcDefesaBase();
-      return base + bonusDefesaDeHabilidades();
-    };
-
-    window.calcularBloqueio = function () {
-      var b = getPericiaBonus('fortitude');
-      return b > 0 ? calcularDefesa() + b : calcularDefesa();
-    };
-
-    window.calcularEsquiva = function () {
-      var b = getPericiaBonus('reflexos');
-      return b > 0 ? calcularDefesa() + b : calcularDefesa();
-    };
-
     if (window.__calcRecursosBase) {
       window.calcularRecursos = function () {
         var r = window.__calcRecursosBase();
         var blocos = nexBlocos5();
-        if (temHab('Calejado')) {
-          r.pvMax = Math.max(1, r.pvMax + blocos);
-        }
-        if (temHab('Cicatrizes Psicológicas')) {
-          r.sanMax = Math.max(1, r.sanMax + blocos);
-        }
-        if (temHab('Dedicação')) {
-          r.peMax = Math.max(1, r.peMax + dedicacaoBonusPe());
-        }
+        if (temHab('Calejado')) r.pvMax = Math.max(1, r.pvMax + blocos);
+        if (temHab('Cicatrizes Psicológicas')) r.sanMax = Math.max(1, r.sanMax + blocos);
+        if (temHab('Dedicação')) r.peMax = Math.max(1, r.peMax + dedicacaoBonusPe());
         return r;
       };
     }
