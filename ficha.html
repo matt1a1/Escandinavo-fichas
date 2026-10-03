@@ -53,12 +53,13 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
       extras += '<script src="arquivos-secretos-hellhunters.js?v=2"><\/script>\n';
       extras += '<script src="arquivos-secretos-ui.js?v=trilha1"><\/script>\n';
     }
-    if (html.indexOf('habilidades-bridge.js') === -1) extras += '<script src="habilidades-bridge.js?v=9"><\/script>\n';
+    if (html.indexOf('habilidades-bridge.js') === -1) extras += '<script src="habilidades-bridge.js?v=10"><\/script>\n';
     if (html.indexOf('origem-classe-reset.js') === -1) extras += '<script src="origem-classe-reset.js?v=2"><\/script>\n';
     if (html.indexOf('combat-stats-fix.js') === -1) extras += '<script src="combat-stats-fix.js?v=4"><\/script>\n';
     if (html.indexOf('ficha-custom.js') === -1) extras += '<script src="ficha-custom.js?v=4"><\/script>\n';
     if (html.indexOf('ficha-custom-limits.js') === -1) extras += '<script src="ficha-custom-limits.js?v=3"><\/script>\n';
     if (html.indexOf('ficha-mascaras.js') === -1) extras += '<script src="ficha-mascaras.js?v=1"><\/script>\n';
+    if (html.indexOf('app-hotfix.js') === -1) extras += '<script src="app-hotfix.js?v=1"><\/script>\n';
     html = html.replace(/habilidades-ui\.js[^"]*/g, 'habilidades-ui.js?v=card2');
     html = html.replace(/habilidades-catalog\.js[^"]*/g, 'habilidades-catalog.js?v=livro1');
     if (extras) html = html.replace('</body>', extras + '</body>');
