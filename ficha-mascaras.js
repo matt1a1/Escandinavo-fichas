@@ -34,9 +34,9 @@
       'body.mascara-ativa .panel,body.mascara-ativa .stat-box,body.mascara-ativa .card,body.mascara-ativa .hab-mine-card{border-color:rgba(239,68,68,.4) !important;}',
       'body.mascara-ativa .tab.active{border-bottom-color:#ef4444 !important;color:#fca5a5 !important;}',
       'body.mascara-ativa .attr-value{color:#fca5a5 !important;}',
-      '#mascara-wrap{display:none;margin:8px 0 12px;padding:12px;border-radius:10px;border:1px solid rgba(239,68,68,.35);background:rgba(127,29,29,.15);}',
+      '#mascara-wrap{display:none;margin:6px 0 8px;padding:10px 12px;border-radius:10px;border:1px solid rgba(239,68,68,.35);background:rgba(127,29,29,.18);}',
       'body.ficha-mascaras #mascara-wrap{display:block;}',
-      '#mascara-wrap .mascara-title{margin:0 0 8px;font-size:0.95rem;font-weight:700;color:#fca5a5;}',
+      '#mascara-wrap .mascara-title{margin:0 0 8px;font-size:0.85rem;font-weight:700;color:#fca5a5;letter-spacing:.02em;}',
       '#mascara-wrap .mascara-help{margin:0 0 10px;font-size:0.78rem;color:#fecaca;line-height:1.4;opacity:.9;}',
       '#mascara-wrap .mascara-actions{display:flex;flex-wrap:wrap;gap:8px;}',
       '#btn-colocar-mascara,#btn-ficar-mascara,#btn-tirar-mascara{font-weight:700;}',
@@ -59,12 +59,6 @@
     wrap.id = 'mascara-wrap';
     wrap.innerHTML =
       '<p class="mascara-title">Forma Suprema — Máscara</p>' +
-      '<p class="mascara-help">' +
-      'A máscara representa a desumanização (não precisa ser literal). ' +
-      'Ao ativar: <strong>+20 PV</strong>, <strong>+10 PE</strong>, <strong>+10 Defesa</strong> ' +
-      '(+5 testes, +5 DT e +2 dados de dano — a mesa aplica). ' +
-      'Custo ao ficar: <strong>2 SAN</strong>. Desativar é ação livre; se ficar com menos de 20 PV atuais ao tirar, vai a 0 PV (morrendo).' +
-      '</p>' +
       '<div class="mascara-actions">' +
       '  <button type="button" id="btn-colocar-mascara" class="btn">Colocar Máscara</button>' +
       '  <button type="button" id="btn-ficar-mascara" class="btn" hidden>Ficar com a máscara (−2 SAN)</button>' +
@@ -72,23 +66,19 @@
       '</div>' +
       '<div id="mascara-status"></div>';
 
-    var anchor =
-      document.querySelector('.resources') ||
-      document.querySelector('.stat-row') ||
-      document.getElementById('vida-max') ||
-      document.querySelector('.brand') ||
-      document.querySelector('.left-panel') ||
-      document.body;
+    // Entre atributos e vida (resources)
+    var attrs = document.querySelector('section.card.attributes') || document.querySelector('.attr-wheel') || document.querySelector('.attributes');
+    var resources = document.querySelector('section.card.resources') || document.querySelector('.resources');
 
-    if (anchor.id === 'vida-max' || (anchor.classList && anchor.classList.contains('stat-row'))) {
-      var panel = anchor.closest('.panel') || anchor.closest('section') || anchor.parentElement;
-      if (panel && panel.parentElement) panel.parentElement.insertBefore(wrap, panel.nextSibling);
-      else if (panel) panel.appendChild(wrap);
-      else document.body.insertBefore(wrap, document.body.firstChild);
-    } else if (anchor.parentElement) {
-      anchor.parentElement.insertBefore(wrap, anchor.nextSibling);
+    if (resources && resources.parentElement) {
+      resources.parentElement.insertBefore(wrap, resources);
+    } else if (attrs && attrs.parentElement) {
+      if (attrs.nextSibling) attrs.parentElement.insertBefore(wrap, attrs.nextSibling);
+      else attrs.parentElement.appendChild(wrap);
     } else {
-      document.body.insertBefore(wrap, document.body.firstChild);
+      var brand = document.querySelector('.brand');
+      if (brand && brand.parentElement) brand.parentElement.insertBefore(wrap, brand.nextSibling);
+      else document.body.insertBefore(wrap, document.body.firstChild);
     }
 
     document.getElementById('btn-colocar-mascara').addEventListener('click', function () {
