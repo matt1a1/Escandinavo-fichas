@@ -1,4 +1,4 @@
-/* app-res-fix.js — setas Vida/Sanidade/Esforço: 1 e 5, sem double-bind */
+/* app-res-fix.js — setas Vida/Sanidade/Esforço: 1 e 5, sem double-bind; atual pode > max */
 (function () {
   function rebind() {
     document.querySelectorAll('.res-btn').forEach(function (btn) {
@@ -12,9 +12,9 @@
         var res = neo.dataset.res;
         var delta = Number(neo.dataset.delta || 0);
         var r = calcularRecursos();
-        if (res === 'vida') state.vidaAtual = Math.max(0, Math.min(r.pvMax, (state.vidaAtual != null ? Number(state.vidaAtual) : r.pvMax) + delta));
-        else if (res === 'sanidade') state.sanAtual = Math.max(0, Math.min(r.sanMax, (state.sanAtual != null ? Number(state.sanAtual) : r.sanMax) + delta));
-        else if (res === 'esforco') state.peAtual = Math.max(0, Math.min(r.peMax, (state.peAtual != null ? Number(state.peAtual) : r.peMax) + delta));
+        if (res === 'vida') state.vidaAtual = Math.max(0, (state.vidaAtual != null ? Number(state.vidaAtual) : r.pvMax) + delta);
+        else if (res === 'sanidade') state.sanAtual = Math.max(0, (state.sanAtual != null ? Number(state.sanAtual) : r.sanMax) + delta);
+        else if (res === 'esforco') state.peAtual = Math.max(0, (state.peAtual != null ? Number(state.peAtual) : r.peMax) + delta);
         if (typeof renderRecursos === 'function') renderRecursos();
         if (typeof scheduleSave === 'function') scheduleSave();
       });
