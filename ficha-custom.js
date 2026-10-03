@@ -15,27 +15,9 @@
       '.res-max-edit{display:inline-block;min-width:2ch;border-bottom:1px dashed rgba(125,211,252,.5);cursor:pointer;color:#7dd3fc;}',
       '.res-max-edit:hover{color:#bae6fd;}',
       '.res-max-input{width:3.2rem;background:#121218;border:1px solid #38bdf8;color:#e0f2fe;border-radius:4px;padding:1px 4px;font-size:inherit;text-align:center;}',
-      '.custom-banner{display:none;margin:8px 0 0;padding:8px 12px;border-radius:8px;background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.25);color:#7dd3fc;font-size:0.8rem;line-height:1.4;}',
-      'body.ficha-custom .custom-banner{display:block;}',
       'body.ficha-custom #attr-points{opacity:0.35;}'
     ].join('\n');
     document.head.appendChild(s);
-  }
-
-  function injectBanner() {
-    if (document.getElementById('custom-banner')) return;
-    var b = document.createElement('div');
-    b.id = 'custom-banner';
-    b.className = 'custom-banner';
-    b.textContent = 'Ficha Customizada — sem limites de atributos/perícias. Clique nos máximos de Vida, Sanidade ou PE para sobrescrever o valor calculado.';
-    var res = document.getElementById('vida-max') || document.getElementById('attr-points');
-    if (res) {
-      var panel = res.closest('.panel') || res.closest('section') || res.parentElement;
-      if (panel && panel.parentElement) panel.parentElement.insertBefore(b, panel);
-      else document.body.insertBefore(b, document.body.firstChild);
-    } else {
-      document.body.insertBefore(b, document.body.firstChild);
-    }
   }
 
   function injectTipoBadge() {
@@ -58,7 +40,7 @@
     } else if (state.tipoFicha === 'mascaras') {
       span.style.display = '';
       span.className = 'ficha-tipo-badge tipo-mascaras';
-      span.textContent = 'Máscaras';
+      span.textContent = 'M\u00e1scaras';
       document.body.classList.remove('ficha-custom');
     } else {
       span.style.display = 'none';
@@ -124,9 +106,9 @@
       var el = document.getElementById(id);
       if (!el) return;
       if (state[map[id]] != null && state[map[id]] !== '') {
-        el.title = 'Valor sobrescrito (custom). Clique para editar. Apague o número e saia do campo para voltar ao calculado.';
+        el.title = 'Valor sobrescrito (custom). Clique para editar. Apague o n\u00famero e saia do campo para voltar ao calculado.';
       } else {
-        el.title = 'Clique para sobrescrever o máximo calculado';
+        el.title = 'Clique para sobrescrever o m\u00e1ximo calculado';
       }
     });
   }
@@ -150,7 +132,6 @@
   function install() {
     if (typeof state === 'undefined') return false;
     ensureStyles();
-    injectBanner();
     injectTipoBadge();
     updateTipoBadge();
     makeMaxEditable('vida-max', 'pvMaxOverride');

@@ -11,7 +11,7 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
     if (html.indexOf('btn-voltar-agentes') === -1) {
       html = html.replace(
         '<button id="btn-new" class="btn secondary">Nova Ficha</button>',
-        '<button id="btn-voltar-agentes" class="btn secondary">← Agentes</button>\n        <button id="btn-new" class="btn secondary">Nova Ficha</button>'
+        '<button id="btn-voltar-agentes" class="btn secondary">\u2190 Agentes</button>\n        <button id="btn-new" class="btn secondary">Nova Ficha</button>'
       );
     }
     html = html.replace(/href="styles\.css[^"]*"/g, 'href="styles.css?v=fix7"');
@@ -56,7 +56,7 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
     if (html.indexOf('habilidades-bridge.js') === -1) extras += '<script src="habilidades-bridge.js?v=8"><\/script>\n';
     if (html.indexOf('origem-classe-reset.js') === -1) extras += '<script src="origem-classe-reset.js?v=2"><\/script>\n';
     if (html.indexOf('combat-stats-fix.js') === -1) extras += '<script src="combat-stats-fix.js?v=4"><\/script>\n';
-    if (html.indexOf('ficha-custom.js') === -1) extras += '<script src="ficha-custom.js?v=2"><\/script>\n';
+    if (html.indexOf('ficha-custom.js') === -1) extras += '<script src="ficha-custom.js?v=3"><\/script>\n';
     if (html.indexOf('ficha-custom-limits.js') === -1) extras += '<script src="ficha-custom-limits.js?v=3"><\/script>\n';
     html = html.replace(/habilidades-ui\.js[^"]*/g, 'habilidades-ui.js?v=card2');
     html = html.replace(/habilidades-catalog\.js[^"]*/g, 'habilidades-catalog.js?v=livro1');
@@ -68,11 +68,11 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
     }, 800);
   })
   .catch(function () {
-    document.body.innerHTML = '<p style="font-family:sans-serif;padding:40px;color:#c00">Não foi possível carregar a ficha. Tente Ctrl+F5.</p>';
+    document.body.innerHTML = '<p style="font-family:sans-serif;padding:40px;color:#c00">N\u00e3o foi poss\u00edvel carregar a ficha. Tente Ctrl+F5.</p>';
   });
 </script>
 </head>
 <body>
-<p style="font-family:sans-serif;padding:40px;color:#888">Carregando ficha…</p>
+<p style="font-family:sans-serif;padding:40px;color:#888">Carregando ficha\u2026</p>
 </body>
 </html>
