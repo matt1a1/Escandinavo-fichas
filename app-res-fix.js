@@ -1,4 +1,4 @@
-/* app-res-fix.js — setas Vida/Sanidade/Esforço: 1 e 5, sem double-bind; atual pode > max */
+/* app-res-fix.js — setas 1/5 sem double-bind; atual pode > max */
 (function () {
   function rebind() {
     document.querySelectorAll('.res-btn').forEach(function (btn) {
@@ -20,10 +20,22 @@
       });
     });
   }
+  function patchClamp() {
+    if (typeof window.clampRecurso !== 'function' || window.clampRecurso.__overMax) return;
+    window.clampRecurso = function (atual, max, lastMax) {
+      if (atual == null || atual === undefined) return max;
+      var v = Number(atual);
+      if (isNaN(v)) return max;
+      return Math.max(0, v);
+    };
+    window.clampRecurso.__overMax = true;
+  }
   var n = 0;
   var t = setInterval(function () {
     n++;
     rebind();
+    patchClamp();
     if (n > 20) clearInterval(t);
   }, 250);
+  setInterval(patchClamp, 300);
 })();
