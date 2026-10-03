@@ -58,8 +58,8 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
     if (html.indexOf('combat-stats-fix.js') === -1) extras += '<script src="combat-stats-fix.js?v=4"><\/script>\n';
     if (html.indexOf('ficha-custom.js') === -1) extras += '<script src="ficha-custom.js?v=4"><\/script>\n';
     if (html.indexOf('ficha-custom-limits.js') === -1) extras += '<script src="ficha-custom-limits.js?v=3"><\/script>\n';
-    html = html.replace(/ficha-mascaras\.js[^"']*/g, 'ficha-mascaras.js?v=5');
-    if (html.indexOf('ficha-mascaras.js') === -1) extras += '<script src="ficha-mascaras.js?v=5"><\/script>\n';
+    // NÃO carrega ficha-mascaras.js externo (apagava o botão)
+    html = html.replace(/<script[^>]*ficha-mascaras\.js[^>]*><\/script>/g, '');
     if (html.indexOf('app-hotfix.js') === -1) extras += '<script src="app-hotfix.js?v=1"><\/script>\n';
     if (html.indexOf('tabs-fix.js') === -1) extras += '<script src="tabs-fix.js?v=2"><\/script>\n';
     html = html.replace(/habilidades-ui\.js[^"]*/g, 'habilidades-ui.js?v=card2');
@@ -110,7 +110,14 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
         }
         if (!isMask) return true;
 
-        if (document.getElementById('msk-box')) return true;
+        var existing = document.getElementById('msk-box');
+        if (existing) {
+          var res2 = document.querySelector('section.card.resources') || document.querySelector('.resources');
+          if (res2 && existing.nextElementSibling !== res2) {
+            try { res2.parentNode.insertBefore(existing, res2); } catch (e) {}
+          }
+          return true;
+        }
 
         if (!document.getElementById('msk-css')) {
           var st = document.createElement('style');
@@ -218,12 +225,11 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
         return true;
       }
 
-      var tries = 0;
-      var iv = setInterval(function () {
-        tries++;
-        if (injectMascaraInline() || tries > 40) clearInterval(iv);
-      }, 200);
-    }, 400);
+      // Reinjeta para sempre se algo apagar o botão
+      setInterval(function () {
+        try { injectMascaraInline(); } catch (e) {}
+      }, 500);
+    }, 600);
   })
   .catch(function () {
     document.body.innerHTML = '<p style="font-family:sans-serif;padding:40px;color:#c00">N\u00e3o foi poss\u00edvel carregar a ficha. Tente Ctrl+F5.</p>';
