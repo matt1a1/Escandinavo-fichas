@@ -58,7 +58,6 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
     if (html.indexOf('combat-stats-fix.js') === -1) extras += '<script src="combat-stats-fix.js?v=4"><\/script>\n';
     if (html.indexOf('ficha-custom.js') === -1) extras += '<script src="ficha-custom.js?v=4"><\/script>\n';
     if (html.indexOf('ficha-custom-limits.js') === -1) extras += '<script src="ficha-custom-limits.js?v=3"><\/script>\n';
-    // NÃO carrega ficha-mascaras.js externo (apagava o botão)
     html = html.replace(/<script[^>]*ficha-mascaras\.js[^>]*><\/script>/g, '');
     if (html.indexOf('app-hotfix.js') === -1) extras += '<script src="app-hotfix.js?v=1"><\/script>\n';
     if (html.indexOf('tabs-fix.js') === -1) extras += '<script src="tabs-fix.js?v=2"><\/script>\n';
@@ -110,111 +109,180 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
         }
         if (!isMask) return true;
 
+        if (!document.getElementById('msk-css')) {
+          var st = document.createElement('style');
+          st.id = 'msk-css';
+          st.textContent = [
+            '#msk-box{margin:10px 0 12px;padding:14px 14px 12px;border-radius:12px;',
+            'border:1px solid rgba(239,68,68,.45);background:linear-gradient(180deg,rgba(127,29,29,.28),rgba(20,10,12,.55));',
+            'box-shadow:0 0 0 1px rgba(0,0,0,.25),0 8px 24px rgba(0,0,0,.25);}',
+            '#msk-box .msk-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;}',
+            '#msk-box .msk-title{margin:0;font-size:.92rem;font-weight:700;color:#fca5a5;letter-spacing:.02em;}',
+            '#msk-box .msk-badge{font-size:.68rem;font-weight:700;padding:3px 8px;border-radius:999px;',
+            'background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.4);color:#fecaca;}',
+            '#msk-box .msk-badge.on{background:rgba(239,68,68,.35);color:#fff;border-color:#ef4444;}',
+            '#msk-box .msk-help{margin:0 0 10px;font-size:.72rem;line-height:1.4;color:#e7b0b0;opacity:.9;}',
+            '#msk-box .msk-actions{display:flex;flex-wrap:wrap;gap:8px;}',
+            '#msk-box button{border:none;border-radius:8px;padding:9px 14px;font-weight:700;font-size:.82rem;',
+            'cursor:pointer;transition:filter .15s,transform .1s;}',
+            '#msk-box button:hover{filter:brightness(1.08);}',
+            '#msk-box button:active{transform:scale(.98);}',
+            '#msk-on{background:linear-gradient(135deg,#9f1239,#e11d48);color:#fff;box-shadow:0 2px 10px rgba(225,29,72,.35);}',
+            '#msk-stay{background:linear-gradient(135deg,#b91c1c,#dc2626);color:#fff;}',
+            '#msk-off{background:#1c1917;color:#e7e5e4;border:1px solid #57534e !important;}',
+            '#msk-msg{margin-top:8px;font-size:.75rem;color:#fecaca;min-height:1.1em;}',
+            'body.msk-red{--accent:#ef4444;--accent-2:#b91c1c;}',
+            'body.msk-red .brand h1{color:#fca5a5 !important;}',
+            'body.msk-red .tab.active{border-bottom-color:#ef4444 !important;color:#fca5a5 !important;}'
+          ].join('');
+          document.head.appendChild(st);
+        }
+
         var existing = document.getElementById('msk-box');
         if (existing) {
           var res2 = document.querySelector('section.card.resources') || document.querySelector('.resources');
           if (res2 && existing.nextElementSibling !== res2) {
             try { res2.parentNode.insertBefore(existing, res2); } catch (e) {}
           }
+          var badge = existing.querySelector('.msk-badge');
+          if (badge) {
+            if (state.mascaraAtiva) { badge.textContent = 'ATIVA'; badge.classList.add('on'); document.body.classList.add('msk-red'); }
+            else { badge.textContent = 'INATIVA'; badge.classList.remove('on'); document.body.classList.remove('msk-red'); }
+          }
           return true;
-        }
-
-        if (!document.getElementById('msk-css')) {
-          var st = document.createElement('style');
-          st.id = 'msk-css';
-          st.textContent = '#msk-box{margin:8px 0;padding:12px;border:2px solid #ef4444;border-radius:8px;background:rgba(127,29,29,.35);z-index:50;position:relative;}'
-            + '#msk-box button{margin:4px 6px 4px 0;padding:10px 14px;font-weight:700;border-radius:6px;cursor:pointer;font-size:14px;}'
-            + '#msk-on{background:#b91c1c;color:#fff;border:1px solid #ef4444;}'
-            + '#msk-stay{background:#dc2626;color:#fff;border:1px solid #f87171;}'
-            + '#msk-off{background:#292524;color:#e7e5e4;border:1px solid #78716c;}'
-            + '#msk-msg{font-size:12px;color:#fecaca;margin-top:6px;}'
-            + 'body.msk-red{--accent:#ef4444;} body.msk-red .brand h1{color:#fca5a5!important;}';
-          document.head.appendChild(st);
         }
 
         var box = document.createElement('div');
         box.id = 'msk-box';
-        box.innerHTML = '<div style="color:#fca5a5;font-weight:700;margin-bottom:8px;">Forma Suprema — Máscara</div>'
-          + '<button type="button" id="msk-on">Colocar Máscara</button>'
-          + '<button type="button" id="msk-stay" style="display:none">Ficar com a máscara (−2 SAN)</button>'
-          + '<button type="button" id="msk-off" style="display:none">Tirar máscara</button>'
-          + '<div id="msk-msg">Clique em Colocar Máscara.</div>';
+        box.innerHTML =
+          '<div class="msk-head">' +
+          '  <p class="msk-title">Forma Suprema</p>' +
+          '  <span class="msk-badge" id="msk-badge">INATIVA</span>' +
+          '</div>' +
+          '<p class="msk-help">Ativar: a\u00e7\u00e3o de movimento + <b>6 SAN</b> \u00b7 Manter: <b>2 SAN</b>/rodada \u00b7 ' +
+          'B\u00f4nus: <b>+20 PV</b>, <b>+10 PE</b>, <b>+10 Defesa</b> (+5 testes, +5 DT, +2 dados \u2014 mesa). ' +
+          'Tirar: a\u00e7\u00e3o livre; se PV atuais < 20 ao perder o b\u00f4nus \u2192 0 PV (morrendo).</p>' +
+          '<div class="msk-actions">' +
+          '  <button type="button" id="msk-on">Colocar M\u00e1scara</button>' +
+          '  <button type="button" id="msk-stay" style="display:none">Ficar com a m\u00e1scara (\u22126 SAN)</button>' +
+          '  <button type="button" id="msk-off" style="display:none">Tirar m\u00e1scara</button>' +
+          '</div>' +
+          '<div id="msk-msg"></div>';
 
         var res = document.querySelector('section.card.resources') || document.querySelector('.resources');
-        if (res && res.parentNode) {
-          res.parentNode.insertBefore(box, res);
-        } else {
+        if (res && res.parentNode) res.parentNode.insertBefore(box, res);
+        else {
           var at = document.querySelector('section.card.attributes') || document.querySelector('.attributes') || document.querySelector('.attr-wheel');
           if (at && at.parentNode) at.parentNode.insertBefore(box, at.nextSibling);
           else document.body.insertBefore(box, document.body.firstChild);
         }
 
-        function msg(t) { var e = document.getElementById('msk-msg'); if (e) e.textContent = t; }
+        function msg(t) { var e = document.getElementById('msk-msg'); if (e) e.textContent = t || ''; }
         function isOn() { return !!state.mascaraAtiva; }
+        function setBadge(active) {
+          var b = document.getElementById('msk-badge');
+          if (!b) return;
+          if (active) { b.textContent = 'ATIVA'; b.classList.add('on'); document.body.classList.add('msk-red'); }
+          else { b.textContent = 'INATIVA'; b.classList.remove('on'); document.body.classList.remove('msk-red'); }
+        }
+        function save() {
+          if (typeof scheduleSave === 'function') scheduleSave();
+          else if (typeof saveState === 'function') saveState();
+          if (typeof renderRecursos === 'function') renderRecursos();
+        }
+        function showChoice(first) {
+          document.getElementById('msk-on').style.display = 'none';
+          var stay = document.getElementById('msk-stay');
+          var off = document.getElementById('msk-off');
+          stay.style.display = '';
+          off.style.display = '';
+          stay.textContent = first ? 'Ficar com a m\u00e1scara (\u22126 SAN)' : 'Manter m\u00e1scara (\u22122 SAN)';
+        }
+        function showIdle() {
+          document.getElementById('msk-on').style.display = '';
+          document.getElementById('msk-stay').style.display = 'none';
+          document.getElementById('msk-off').style.display = 'none';
+          document.getElementById('msk-stay').textContent = 'Ficar com a m\u00e1scara (\u22126 SAN)';
+        }
 
         document.getElementById('msk-on').onclick = function () {
-          document.getElementById('msk-on').style.display = 'none';
-          document.getElementById('msk-stay').style.display = '';
-          document.getElementById('msk-off').style.display = '';
-          msg('Escolha: ficar (−2 SAN) ou tirar.');
+          showChoice(!isOn());
+          msg(isOn() ? 'M\u00e1scara j\u00e1 ativa. Mantenha (\u22122 SAN) ou tire.' : 'Confirme para ativar (\u22126 SAN).');
         };
+
         document.getElementById('msk-stay').onclick = function () {
+          var first = !isOn();
+          var custo = first ? 6 : 2;
           var san = state.sanAtual != null ? Number(state.sanAtual) : 0;
-          state.sanAtual = Math.max(0, san - 2);
-          if (!isOn()) {
+          if (san < custo && !confirm('SAN insuficiente (' + san + '). Continuar? SAN pode ir a 0.')) return;
+          state.sanAtual = Math.max(0, san - custo);
+
+          if (first) {
             state.mascaraAtiva = true;
             var curPv = state.vidaAtual != null ? Number(state.vidaAtual) : 0;
             var curPe = state.peAtual != null ? Number(state.peAtual) : 0;
             state.vidaAtual = curPv + 20;
             state.peAtual = curPe + 10;
-            document.body.classList.add('msk-red');
-            msg('ATIVA · −2 SAN · +20 PV · +10 PE · +10 Defesa');
-            document.getElementById('msk-stay').textContent = 'Manter máscara (−2 SAN)';
+            setBadge(true);
+            showChoice(false);
+            msg('Forma Suprema ATIVA. \u22126 SAN \u00b7 +20 PV \u00b7 +10 PE \u00b7 +10 Defesa.');
           } else {
-            msg('Mantida · −2 SAN');
+            msg('Forma mantida. \u22122 SAN (rodada).');
           }
-          if (typeof scheduleSave === 'function') scheduleSave();
-          if (typeof renderRecursos === 'function') renderRecursos();
+          save();
         };
+
         document.getElementById('msk-off').onclick = function () {
-          if (!isOn()) { msg('Não estava ativa.'); return; }
-          if (!confirm('Tirar máscara? Perde bônus. Se PV < 20 → 0 (morrendo).')) return;
+          if (!isOn()) {
+            showIdle();
+            msg('Ativa\u00e7\u00e3o cancelada.');
+            return;
+          }
+          if (!confirm('Tirar a m\u00e1scara? Voc\u00ea perde +20 PV / +10 PE / +10 Defesa.\nSe PV atuais < 20 ao perder o b\u00f4nus, ficam 0 (morrendo).')) return;
           var curPv = state.vidaAtual != null ? Number(state.vidaAtual) : 0;
           var curPe = state.peAtual != null ? Number(state.peAtual) : 0;
           state.mascaraAtiva = false;
-          var npv = curPv - 20; if (npv < 0) npv = 0;
+          var npv = curPv - 20;
+          if (npv < 0) npv = 0;
           state.vidaAtual = npv;
           state.peAtual = Math.max(0, curPe - 10);
-          document.body.classList.remove('msk-red');
-          document.getElementById('msk-on').style.display = '';
-          document.getElementById('msk-stay').style.display = 'none';
-          document.getElementById('msk-off').style.display = 'none';
-          document.getElementById('msk-stay').textContent = 'Ficar com a máscara (−2 SAN)';
-          if (npv === 0) alert('0 PV — morrendo.');
-          msg('Máscara removida.');
-          if (typeof scheduleSave === 'function') scheduleSave();
-          if (typeof renderRecursos === 'function') renderRecursos();
+          setBadge(false);
+          showIdle();
+          if (npv === 0) {
+            alert('Ao tirar a m\u00e1scara voc\u00ea ficou com 0 PV e est\u00e1 morrendo.');
+            msg('M\u00e1scara removida. 0 PV \u2014 morrendo.');
+          } else {
+            msg('M\u00e1scara removida. B\u00f4nus perdidos.');
+          }
+          save();
         };
 
         if (isOn()) {
-          document.body.classList.add('msk-red');
-          document.getElementById('msk-on').style.display = 'none';
-          document.getElementById('msk-stay').style.display = '';
-          document.getElementById('msk-off').style.display = '';
-          document.getElementById('msk-stay').textContent = 'Manter máscara (−2 SAN)';
-          msg('ATIVA · +20 PV · +10 PE · +10 Defesa');
+          setBadge(true);
+          showChoice(false);
+          msg('Forma Suprema ATIVA \u00b7 +20 PV \u00b7 +10 PE \u00b7 +10 Defesa');
+        } else {
+          setBadge(false);
+          showIdle();
+          msg('');
         }
 
         if (typeof calcularDefesa === 'function' && !calcularDefesa.__mskInline) {
           var _d = calcularDefesa;
-          window.calcularDefesa = function () { var v = _d.apply(this, arguments); return state.mascaraAtiva ? v + 10 : v; };
+          window.calcularDefesa = function () {
+            var v = _d.apply(this, arguments);
+            return state.mascaraAtiva ? v + 10 : v;
+          };
           calcularDefesa.__mskInline = true;
         }
         if (typeof calcularRecursos === 'function' && !calcularRecursos.__mskInline) {
           var _r = calcularRecursos;
           window.calcularRecursos = function () {
             var r = _r.apply(this, arguments);
-            if (state.mascaraAtiva) { r.pvMax = (r.pvMax||1)+20; r.peMax = (r.peMax||1)+10; }
+            if (state.mascaraAtiva) {
+              r.pvMax = (r.pvMax || 1) + 20;
+              r.peMax = (r.peMax || 1) + 10;
+            }
             return r;
           };
           calcularRecursos.__mskInline = true;
@@ -225,7 +293,6 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
         return true;
       }
 
-      // Reinjeta para sempre se algo apagar o botão
       setInterval(function () {
         try { injectMascaraInline(); } catch (e) {}
       }, 500);
