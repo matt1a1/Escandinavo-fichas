@@ -62,6 +62,7 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
     if (html.indexOf('app-hotfix.js') === -1) extras += '<script src="app-hotfix.js?v=1"><\/script>\n';
     if (html.indexOf('tabs-fix.js') === -1) extras += '<script src="tabs-fix.js?v=3"><\/script>\n';
     if (html.indexOf('app-res-fix.js') === -1) extras += '<script src="app-res-fix.js?v=1"><\/script>\n';
+    if (html.indexOf('ficha-mascaras.js') === -1) extras += '<script src="ficha-mascaras.js?v=6"><\/script>\n';
     html = html.replace(/habilidades-ui\.js[^"]*/g, 'habilidades-ui.js?v=card2');
     html = html.replace(/habilidades-catalog\.js[^"]*/g, 'habilidades-catalog.js?v=livro1');
     if (extras) html = html.replace('</body>', extras + '</body>');
@@ -91,11 +92,6 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
       bindAllTabs();
       setTimeout(bindAllTabs, 500);
       setTimeout(bindAllTabs, 1500);
-
-      /* mascara code kept minimal in this restore - loaded from previous working patterns via interval if present */
-      if (typeof window.__mskBoot !== 'function') {
-        /* full mask UI remains in prior long inject if needed - res fix is priority */
-      }
     }, 600);
   })
   .catch(function () {
