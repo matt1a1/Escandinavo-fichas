@@ -1,7 +1,7 @@
 /* combat-stats-fix.js
  * Cálculos oficiais:
  * - Defesa Passiva = 10 + AGI + armadura (+ bônus passivos, ex: Patrulha +2)
- *   mínimo 15 na ficha
+ *   mínimo 15 na ficha (exceto ficha customizada)
  * - Esquiva (precisa Reflexos treinado) = Defesa Passiva + bônus Reflexos
  * - Bloqueio (precisa Fortitude treinada): na ficha marca-se Defesa + Fortitude;
  *   efeito mecânico = RD igual ao bônus de Fortitude
@@ -52,6 +52,7 @@
   }
 
   function floor15(v) {
+    if (typeof window.__skipDefesaFloor === 'function' && window.__skipDefesaFloor()) return v;
     return Math.max(15, v);
   }
 
