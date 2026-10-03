@@ -75,6 +75,7 @@
       window.calcularRecursos.__cOverride = true;
     }
 
+    // Rebind atributos sem teto 5 / sem pool (uma vez; botões não são recriados)
     if (!window.__customAttrRebound) {
       document.querySelectorAll('.attr-item').forEach(function (el) {
         var key = el.dataset.attr;
@@ -112,6 +113,50 @@
         });
       });
       window.__customAttrRebound = true;
+    }
+
+    // Perícias: na custom, qualquer rank livre (rebind após cada render)
+    if (typeof renderPericias === 'function' && !renderPericias.__c) {
+      var _rp = renderPericias;
+      window.renderPericias = function () {
+        _rp.apply(this, arguments);
+        if (!custom()) return;
+        document.querySelectorAll('#pericias-list .rank-select').forEach(function (sel) {
+          var neo = sel.cloneNode(true);
+          sel.parentNode.replaceChild(neo, sel);
+          neo.addEventListener('click', function (e) { e.stopPropagation(); });
+          neo.addEventListener('change', function () {
+            var row = neo.closest('.pericia-row');
+            var idx = Array.prototype.indexOf.call(
+              document.querySelectorAll('#pericias-list .pericia-row:not(.pericia-head)'),
+              row
+            );
+            if (idx < 0 || typeof PERICIAS === 'undefined') return;
+            var p = PERICIAS[idx];
+            if (!p) return;
+            var novo = parseInt(neo.value, 10) || 0;
+            if (typeof setPericiaRank === 'function') setPericiaRank(p.id, novo);
+            if (typeof renderPericias === 'function') renderPericias();
+            if (typeof renderRecursos === 'function') renderRecursos();
+            if (typeof scheduleSave === 'function') scheduleSave();
+          });
+        });
+      };
+      window.renderPericias.__c = true;
+      try { window.renderPericias(); } catch (e) {}
+    }
+
+    // Hint de atributos custom
+    if (typeof renderAtributos === 'function' && !renderAtributos.__c) {
+      var _ra = renderAtributos;
+      window.renderAtributos = function () {
+        _ra.apply(this, arguments);
+        if (custom()) {
+          var hint = document.getElementById('attr-nex-hint');
+          if (hint) hint.textContent = ' · Ficha Customizada: sem limite de pontos nem teto de atributo (0–20)';
+        }
+      };
+      window.renderAtributos.__c = true;
     }
 
     return true;
