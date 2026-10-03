@@ -201,7 +201,7 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
           '  <p class="msk-title">Forma Suprema</p>' +
           '  <span class="msk-badge" id="msk-badge">INATIVA</span>' +
           '</div>' +
-          '<p class="msk-help">Clique em <b>Colocar M\u00e1scara</b>: +20 Vida, +10 Esfor\u00e7o, +10 Defesa, \u22122 Sanidade.<br>' +
+          '<p class="msk-help">Clique em <b>Colocar M\u00e1scara</b>: +20 Vida, +10 Esfor\u00e7o, +10 Defesa, \u22126 Sanidade.<br>' +
           '<b>Manter</b>: \u22122 Sanidade/rodada \u00b7 <b>Tirar</b>: remove os b\u00f4nus.</p>' +
           '<div class="msk-actions">' +
           '  <button type="button" id="msk-on">Colocar M\u00e1scara</button>' +
@@ -277,7 +277,7 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
             msg('M\u00e1scara j\u00e1 ativa.');
             return;
           }
-          var custo = 2;
+          var custo = 6;
           var san = state.sanAtual;
           if (san == null || san === undefined) {
             var rr = calcularRecursos();
@@ -311,7 +311,7 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
 
           setBadge(true);
           showChoice();
-          msg('ATIVA: +20 Vida \u00b7 +10 Esfor\u00e7o \u00b7 +10 Defesa \u00b7 \u22122 Sanidade');
+          msg('ATIVA: +20 Vida \u00b7 +10 Esfor\u00e7o \u00b7 +10 Defesa \u00b7 \u22126 Sanidade');
           persist();
         };
 
