@@ -15,7 +15,7 @@
   .ag-nav a{color:var(--ag-text-dim);text-decoration:none;font-size:.95rem;padding-bottom:4px;border-bottom:2px solid transparent;cursor:pointer;}
   .ag-nav a.active{color:var(--ag-text);border-bottom-color:var(--ag-accent);}
   .ag-wrap{max-width:1100px;margin:0 auto;padding:32px;}
-  .ag-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;gap:16px;flex-wrap:wrap;}
+  .ag-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;gap:16px;flex-wrap:wrap;}.ag-header-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
   .ag-header h1{font-size:1.1rem;font-weight:600;margin:0;color:var(--ag-text-dim);}
   .ag-header h1 b{color:var(--ag-text);}
   .btn-primary{background:var(--ag-accent);color:#fff;border:none;border-radius:8px;padding:10px 18px;font-weight:600;font-size:.9rem;cursor:pointer;}
@@ -24,53 +24,41 @@
   .ag-search{width:100%;padding:11px 14px;border-radius:8px;border:1px solid var(--ag-border);background:var(--ag-panel);color:var(--ag-text);margin-bottom:22px;font-size:.9rem;}
   .ag-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px;}
   .ag-card{background:var(--ag-panel);border:1px solid var(--ag-border);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;position:relative;}
-  .ag-card .avatar{width:100%;height:90px;border-radius:8px;background:var(--ag-panel-2);display:flex;align-items:center;justify-content:center;font-size:1.6rem;color:var(--ag-text-dim);}
+  .ag-card .avatar{width:100%;height:90px;border-radius:8px;background:var(--ag-panel-2);display:flex;align-items:center;justify-content:center;font-size:1.8rem;}
   .ag-card h3{margin:0;font-size:1rem;}
-  .ag-card .meta{font-size:.78rem;color:var(--ag-text-dim);}
-  .ag-card .del{position:absolute;top:10px;right:10px;background:transparent;border:none;color:var(--ag-text-dim);cursor:pointer;}
-  .ag-card .del:hover{color:var(--ag-danger);}
-  .ag-card .acessar{margin-top:auto;background:var(--ag-accent);color:#fff;text-align:center;text-decoration:none;padding:9px;border-radius:8px;font-size:.85rem;font-weight:600;}
-  .ag-empty{grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--ag-text-dim);border:1px dashed var(--ag-border);border-radius:12px;}
+  .ag-card .meta{font-size:.8rem;color:var(--ag-text-dim);}
+  .ag-card .actions{display:flex;gap:8px;margin-top:auto;}
+  .ag-card .btn-open{flex:1;background:var(--ag-accent);color:#fff;border:none;border-radius:6px;padding:8px;font-size:.85rem;cursor:pointer;font-weight:600;}
+  .ag-card .btn-del{background:transparent;border:1px solid var(--ag-border);color:var(--ag-danger);border-radius:6px;padding:8px 10px;cursor:pointer;font-size:.85rem;}
+  .ag-empty{grid-column:1/-1;text-align:center;padding:48px 16px;color:var(--ag-text-dim);font-size:.95rem;}
   .camp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;}
-  .camp-card{background:var(--ag-panel);border:1px solid var(--ag-border);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;position:relative;}
-  .camp-cover{height:120px;background:linear-gradient(135deg,#1a1a28,#2a1a3a);display:flex;align-items:flex-start;justify-content:space-between;padding:10px;background-size:cover;background-position:center;}
-  .camp-cover .badge{background:rgba(0,0,0,.55);color:#fff;font-size:.75rem;padding:3px 8px;border-radius:6px;}
-  .camp-cover .del-camp{background:rgba(0,0,0,.45);border:none;color:#f88;width:28px;height:28px;border-radius:6px;cursor:pointer;}
-  .camp-cover .del-camp:hover{background:var(--ag-danger);color:#fff;}
-  .camp-body{padding:14px;display:flex;flex-direction:column;gap:8px;flex:1;}
-  .camp-body h3{margin:0;font-size:1.05rem;}
-  .camp-body .meta{font-size:.78rem;color:var(--ag-text-dim);}
-  .camp-body .btn-acessar{margin-top:auto;align-self:flex-end;background:var(--ag-accent);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-weight:600;font-size:.85rem;cursor:pointer;}
-  .btn-outline{background:transparent;color:var(--ag-text);border:1px solid var(--ag-accent);border-radius:8px;padding:8px 14px;font-size:.82rem;cursor:pointer;font-weight:500;}
-  .btn-outline:hover{background:rgba(139,92,246,.12);}
-  .camp-detail-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px;}
-  .camp-detail-actions{display:flex;flex-wrap:wrap;gap:8px;}
+  .camp-card{background:var(--ag-panel);border:1px solid var(--ag-border);border-radius:12px;overflow:hidden;cursor:pointer;transition:border-color .15s;}
+  .camp-card:hover{border-color:var(--ag-accent);}
+  .camp-cover{height:120px;background:linear-gradient(135deg,#2a1a4a,#1a1a2e);position:relative;display:flex;align-items:flex-end;padding:12px;}
+  .camp-cover .badge{background:rgba(0,0,0,.5);color:#fff;font-size:.75rem;padding:3px 8px;border-radius:999px;}
+  .camp-cover .del-camp{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.4);border:none;color:#fff;border-radius:6px;padding:4px 8px;cursor:pointer;}
+  .camp-body{padding:14px;}
+  .camp-body h3{margin:0 0 4px;font-size:1rem;}
+  .camp-body .meta{font-size:.8rem;color:var(--ag-text-dim);}
+  .camp-detail-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+  .camp-detail-actions{display:flex;gap:8px;flex-wrap:wrap;}
+  .btn-outline{background:transparent;color:var(--ag-text);border:1px solid var(--ag-border);border-radius:8px;padding:9px 14px;font-size:.85rem;cursor:pointer;}
   .camp-detail-header{display:flex;gap:18px;align-items:center;margin-bottom:22px;}
-  .camp-detail-cover{width:120px;height:80px;border-radius:10px;background:var(--ag-panel-2);border:1px solid var(--ag-border);display:flex;align-items:center;justify-content:center;font-size:1.6rem;color:var(--ag-text-dim);background-size:cover;background-position:center;flex-shrink:0;}
+  .camp-detail-header .cover{width:80px;height:80px;border-radius:10px;background:linear-gradient(135deg,#2a1a4a,#1a1a2e);flex-shrink:0;}
   .camp-detail-header h1{margin:0 0 4px;font-size:1.5rem;}
-  .camp-detail-meta{margin:0;color:var(--ag-text-dim);font-size:.85rem;}
+  .camp-detail-header .meta{color:var(--ag-text-dim);font-size:.9rem;}
   .camp-tabs{display:flex;gap:4px;border-bottom:1px solid var(--ag-border);margin-bottom:16px;}
   .camp-tab{background:transparent;border:none;border-bottom:2px solid transparent;color:var(--ag-text-dim);padding:10px 16px;cursor:pointer;font-size:.9rem;margin-bottom:-1px;}
   .camp-tab.active{color:var(--ag-text);border-bottom-color:var(--ag-accent);font-weight:600;}
-  .camp-agentes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
-  .camp-ag-card{background:var(--ag-panel);border:1px solid var(--ag-border);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px;position:relative;}
-  .camp-ag-card h3{margin:0;font-size:.95rem;}
-  .camp-ag-card .meta{font-size:.78rem;color:var(--ag-text-dim);}
-  .camp-ag-card .btn-acessar{margin-top:auto;align-self:flex-end;background:var(--ag-accent);color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:.8rem;font-weight:600;cursor:pointer;text-decoration:none;}
-  .camp-ag-card .rm-ag{position:absolute;top:8px;right:8px;background:transparent;border:none;color:var(--ag-text-dim);cursor:pointer;}
-  .camp-ag-card .rm-ag:hover{color:var(--ag-danger);}
-  .modal-box{max-width:560px;margin:40px auto;background:var(--ag-bg);border:1px solid var(--ag-border);border-radius:12px;max-height:85vh;overflow:auto;}
-  .modal-box-body{padding:20px 24px 28px;}
-  .modal-agentes-lista{display:flex;flex-direction:column;gap:8px;max-height:360px;overflow-y:auto;}
-  .modal-ag-item{display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--ag-panel);border:1px solid var(--ag-border);border-radius:8px;cursor:pointer;}
-  .modal-ag-item:hover{border-color:var(--ag-accent);}
-  .modal-ag-item input{width:18px;height:18px;accent-color:var(--ag-accent);}
-  .modal-ag-item .info{flex:1;}
-  .modal-ag-item .info strong{display:block;font-size:.9rem;}
-  .modal-ag-item .info span{font-size:.75rem;color:var(--ag-text-dim);}
-  .wizard-overlay{position:fixed;inset:0;background:#0a0a0e;z-index:200;overflow-y:auto;}
-  .wizard-overlay[hidden]{display:none;}
-  .wizard-top{display:flex;justify-content:space-between;align-items:center;padding:18px 32px;border-bottom:1px solid var(--ag-border);}
+  .camp-agentes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;}
+  .wizard-overlay{position:fixed;inset:0;background:var(--ag-bg);z-index:100;display:flex;flex-direction:column;}
+  .wizard-overlay[hidden]{display:none!important;}
+  .wizard-top{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;border-bottom:1px solid var(--ag-border);}
+  .wizard-steps{display:flex;justify-content:center;gap:8px;padding:16px;flex-wrap:wrap;}
+  .wizard-body{flex:1;overflow:auto;padding:24px;max-width:720px;margin:0 auto;width:100%;}
+  .modal-box{background:var(--ag-panel);border:1px solid var(--ag-border);border-radius:12px;max-width:560px;margin:40px auto;width:calc(100% - 32px);max-height:calc(100vh - 80px);display:flex;flex-direction:column;}
+  .modal-box-body{padding:20px;overflow:auto;}
+  .modal-agentes-lista{display:flex;flex-direction:column;gap:8px;}
 </style>
 </head>
 <body>
@@ -78,12 +66,17 @@
   <span class="brand">◈ Escandinavo Fichas</span>
   <a data-view="agentes" class="active">Agentes</a>
   <a data-view="campanhas">Campanhas</a>
+  <a data-view="npc">NPC</a>
+  <a data-view="criaturas">Criatura/Ameaça</a>
 </nav>
 <div class="ag-wrap">
   <section id="view-agentes">
     <div class="ag-header">
       <h1>Agentes: <b id="ag-count">0</b></h1>
-      <button class="btn-primary" id="btn-novo-agente">+ Novo Agente</button>
+      <div class="ag-header-actions">
+        <button class="btn-primary" id="btn-novo-agente">+ Novo Agente</button>
+        <button class="btn-ghost" id="btn-novo-npc">+ Novo NPC</button>
+      </div>
     </div>
     <input type="text" class="ag-search" id="ag-search" placeholder="Buscar agente..." />
     <div class="ag-grid" id="ag-grid"></div>
@@ -97,21 +90,41 @@
     <div class="camp-grid" id="camp-grid"></div>
   </section>
 
+  <section id="view-npc" hidden>
+    <div class="ag-header">
+      <h1>NPCs: <b id="npc-count">0</b></h1>
+      <button class="btn-primary" id="btn-novo-npc-tab">+ Novo NPC</button>
+    </div>
+    <input type="text" class="ag-search" id="npc-search" placeholder="Buscar NPC..." />
+    <div class="ag-grid" id="npc-grid">
+      <div class="ag-empty">Nenhum NPC ainda. Em breve: ficha livre e geradores (Agente da Ordem, Panaceia, Hell Hunter).</div>
+    </div>
+  </section>
+
+  <section id="view-criaturas" hidden>
+    <div class="ag-header">
+      <h1>Criaturas / Ameaças: <b id="criatura-count">0</b></h1>
+      <button class="btn-primary" id="btn-nova-criatura">+ Nova Criatura</button>
+    </div>
+    <input type="text" class="ag-search" id="criatura-search" placeholder="Buscar criatura..." />
+    <div class="ag-grid" id="criatura-grid">
+      <div class="ag-empty">Nenhuma criatura ainda. Em breve: ficha livre e gerador de Vampiro.</div>
+    </div>
+  </section>
+
   <section id="view-camp-detail" hidden>
     <div class="camp-detail-top">
       <button type="button" class="btn-ghost" id="btn-voltar-campanhas">← Campanhas</button>
       <div class="camp-detail-actions">
-        <button type="button" class="btn-outline" id="btn-camp-capa">Foto de Capa</button>
         <button type="button" class="btn-outline" id="btn-camp-add-agentes">Adicionar Agentes</button>
         <button type="button" class="btn-outline" id="btn-camp-editar">Editar Campanha</button>
-        <input type="file" id="camp-capa-file" accept="image/*" hidden />
       </div>
     </div>
     <div class="camp-detail-header">
-      <div class="camp-detail-cover" id="camp-detail-cover">◈</div>
+      <div class="cover" id="camp-detail-cover"></div>
       <div>
         <h1 id="camp-detail-nome">Campanha</h1>
-        <p class="camp-detail-meta" id="camp-detail-meta"></p>
+        <div class="meta" id="camp-detail-meta"></div>
       </div>
     </div>
     <div class="camp-tabs">
@@ -155,8 +168,8 @@
 <script src="firebase-config.js"></script>
 <script src="auth.js?v=5"></script>
 <script src="data.js"></script>
-<script src="wizard.js?v=tut1"></script>
+<script src="wizard.js?v=nav1"></script>
 <script src="campanhas.js?v=1"></script>
-<script src="mobile-nav.js?v=2"></script>
+<script src="mobile-nav.js?v=nav1"></script>
 </body>
 </html>
