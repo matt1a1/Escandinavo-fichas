@@ -9,6 +9,27 @@ function salvarCampanhas(lista){ localStorage.setItem(CAMPANHAS_KEY, JSON.string
 
 const CLASSE_LABEL = { combatente:'Combatente', especialista:'Especialista', ocultista:'Ocultista', mundano:'Mundano' };
 
+const TIPOS_FICHA = {
+  ordem: {
+    id: 'ordem',
+    nome: 'Ficha Ordem Paranormal',
+    desc: 'Regras e limitações oficiais do sistema. Ideal para mesas fiéis ao livro.',
+    icon: '◈'
+  },
+  custom: {
+    id: 'custom',
+    nome: 'Ficha Customizada',
+    desc: 'Sem limites de atributos, vida, sanidade, esforço, defesa e perícias. Cálculos automáticos ainda funcionam e você pode sobrescrever valores.',
+    icon: '✎'
+  },
+  mascaras: {
+    id: 'mascaras',
+    nome: 'Ficha das Máscaras',
+    desc: 'Inspirada em Hexatombe. Inclui o botão “Colocar Máscara” com tema vermelho e poderes da máscara.',
+    icon: '🎭'
+  }
+};
+
 function formatarData(ts){
   const d = new Date(ts);
   return d.toLocaleDateString('pt-BR');
@@ -28,11 +49,16 @@ function renderAgentes(){
   lista.forEach(a => {
     const card = document.createElement('div');
     card.className = 'ag-card';
+    const tipoLabel = (TIPOS_FICHA[a.tipoFicha] || TIPOS_FICHA.ordem).nome.replace('Ficha ', '');
+    const tipoBadge = a.tipoFicha && a.tipoFicha !== 'ordem'
+      ? `<span class="ag-tipo-badge tipo-${a.tipoFicha}">${tipoLabel}</span>`
+      : '';
     card.innerHTML = `
       <button class="del" title="Excluir" data-id="${a.id}">✕</button>
       <div class="avatar">◈</div>
       <h3>${a.nome || 'Sem nome'}</h3>
       <div class="meta">${CLASSE_LABEL[a.classe] || a.classe || '—'} · NEX ${a.nex ?? 5}% · atualizado em ${formatarData(a.atualizadoEm)}</div>
+      ${tipoBadge}
       <a class="acessar" href="ficha.html?id=${encodeURIComponent(a.id)}">Acessar Ficha</a>
     `;
     grid.appendChild(card);
@@ -97,7 +123,6 @@ document.querySelectorAll('.ag-nav a').forEach(link => link.addEventListener('cl
   mostrarView(view);
 }));
 
-// Botão Novo NPC (header Agentes e aba NPC) — por ora só abre a aba NPC
 function irParaNovoNpc() {
   mostrarView('npc');
   const btn = document.getElementById('btn-novo-npc-tab');
@@ -110,12 +135,14 @@ function irParaNovoNpc() {
 
 const STEPS = ['Atributos', 'Origem', 'Classe', 'Toques Finais'];
 let stepAtual = 0;
-let novoAgente = { nome:'', jogador:'', origem:'', classe:'' };
+let novoAgente = { nome:'', jogador:'', origem:'', classe:'', tipoFicha:'ordem' };
 
 function abrirWizard(){
-  stepAtual = 0;
-  novoAgente = { nome:'', jogador:'', origem:'', classe:'' };
+  stepAtual = -1;
+  novoAgente = { nome:'', jogador:'', origem:'', classe:'', tipoFicha:'ordem' };
   document.getElementById('wizard').hidden = false;
+  const brand = document.querySelector('#wizard .wizard-top .brand');
+  if (brand) brand.textContent = '◈ Novo Agente';
   renderWizard();
 }
 function fecharWizard(){ document.getElementById('wizard').hidden = true; }
@@ -126,9 +153,36 @@ document.getElementById('wizard-close').addEventListener('click', () => {
 
 function renderStepsBar(){
   const bar = document.getElementById('wizard-steps');
+  if (!bar) return;
+  if (stepAtual < 0) {
+    bar.innerHTML = '<span class="step active">Tipo de Ficha</span>';
+    return;
+  }
   bar.innerHTML = STEPS.map((s,i) =>
     `<span class="step${i===stepAtual?' active':''}">${s}</span>` + (i<STEPS.length-1 ? '<span class="sep">──────</span>' : '')
   ).join('');
+}
+
+function passoTipoFicha(){
+  const cards = Object.values(TIPOS_FICHA).map(t => `
+    <button type="button" class="tipo-ficha-card${novoAgente.tipoFicha===t.id?' selected':''}" data-tipo="${t.id}">
+      <div class="tipo-ficha-icon">${t.icon}</div>
+      <div class="tipo-ficha-body">
+        <h3>${t.nome}</h3>
+        <p>${t.desc}</p>
+      </div>
+    </button>
+  `).join('');
+  return `
+    <div class="tut-text">
+      <p>Escolha o <b>tipo de ficha</b> deste agente. Isso define regras, limites e recursos especiais da ficha.</p>
+    </div>
+    <div class="tipo-ficha-grid">${cards}</div>
+    <div class="wizard-nav">
+      <div></div>
+      <button type="button" class="btn-primary" id="btn-avancar-tipo">Continuar</button>
+    </div>
+  `;
 }
 
 function origensDisponiveis(){
@@ -144,7 +198,16 @@ const CLASSE_DESCRICAO = {
 function renderWizard(){
   renderStepsBar();
   const body = document.getElementById('wizard-body');
-  if (stepAtual === 0) body.innerHTML = passoAtributos();
+  const brand = document.querySelector('#wizard .wizard-top .brand');
+  if (brand) {
+    if (stepAtual < 0) brand.textContent = '◈ Novo Agente';
+    else {
+      const t = TIPOS_FICHA[novoAgente.tipoFicha] || TIPOS_FICHA.ordem;
+      brand.textContent = '◈ ' + t.nome;
+    }
+  }
+  if (stepAtual < 0) body.innerHTML = passoTipoFicha();
+  else if (stepAtual === 0) body.innerHTML = passoAtributos();
   else if (stepAtual === 1) body.innerHTML = passoOrigem();
   else if (stepAtual === 2) body.innerHTML = passoClasse();
   else body.innerHTML = passoFinais();
@@ -177,7 +240,7 @@ function passoAtributos(){
         <div class="attr-node" style="left:10%;top:38%"><b>1</b><small>FORÇA<br>FOR</small></div>
       </div>
     </div>
-    ${navBotoes(false)}
+    ${navBotoes(true)}
   `;
 }
 
@@ -252,7 +315,7 @@ function passoFinais(){
       </div>
     </div>
     <div class="resumo-box">
-      <b>Resumo:</b> ${novoAgente.nome || 'Sem nome'} · Origem: ${origNome} · Classe: ${clsNome}
+      <b>Resumo:</b> ${novoAgente.nome || 'Sem nome'} · ${(TIPOS_FICHA[novoAgente.tipoFicha]||TIPOS_FICHA.ordem).nome} · Origem: ${origNome} · Classe: ${clsNome}
     </div>
     ${navBotoes(true, true)}
   `;
@@ -268,8 +331,24 @@ function navBotoes(mostrarVoltar, finalizar){
 }
 
 function ligarEventosPasso(){
+  document.querySelectorAll('.tipo-ficha-card').forEach(btn => {
+    btn.addEventListener('click', () => {
+      novoAgente.tipoFicha = btn.dataset.tipo || 'ordem';
+      renderWizard();
+    });
+  });
+  const avancarTipo = document.getElementById('btn-avancar-tipo');
+  if (avancarTipo) avancarTipo.addEventListener('click', () => {
+    if (!novoAgente.tipoFicha) novoAgente.tipoFicha = 'ordem';
+    stepAtual = 0;
+    renderWizard();
+  });
+
   const voltar = document.getElementById('btn-voltar');
-  if (voltar) voltar.addEventListener('click', () => { stepAtual--; renderWizard(); });
+  if (voltar) voltar.addEventListener('click', () => {
+    stepAtual--;
+    renderWizard();
+  });
   const avancar = document.getElementById('btn-avancar');
   if (avancar) avancar.addEventListener('click', () => {
     if (stepAtual === 2 && !novoAgente.classe) {
@@ -312,19 +391,32 @@ function criarAgente(){
   const id = 'ag_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
   const classeValida = (novoAgente.classe && novoAgente.classe !== 'mundano') ? novoAgente.classe : 'ocultista';
   const origemValida = novoAgente.origem || 'investigador';
+  const tipoFicha = (novoAgente.tipoFicha && TIPOS_FICHA[novoAgente.tipoFicha])
+    ? novoAgente.tipoFicha
+    : 'ordem';
   const ficha = {
     nome: novoAgente.nome || '', jogador: novoAgente.jogador || '',
     origem: origemValida, classe: classeValida, nex: 5, patente: 'Recruta',
+    tipoFicha: tipoFicha,
     atributos: { for: 1, agi: 1, int: 1, pre: 1, vig: 1 }, pericias: {},
     vidaAtual: null, sanAtual: null, peAtual: null,
     aparencia: '', personalidade: '', historico: '', objetivo: '', anotacoes: '',
     habilidades: [], rituais: [], itens: [], ataques: [], pp: 0, credito: 'Baixo',
     itensLimite: { I: 2, II: 0, III: 0, IV: 0 },
     _mundano: novoAgente.classe === 'mundano' || false,
+    mascaraAtiva: false,
   };
   localStorage.setItem('escandinavo-ficha-' + id, JSON.stringify(ficha));
   const registro = lerAgentes();
-  registro.push({ id, nome: ficha.nome || 'Sem nome', classe: novoAgente.classe || classeValida, origem: origemValida, nex: 5, atualizadoEm: Date.now() });
+  registro.push({
+    id,
+    nome: ficha.nome || 'Sem nome',
+    classe: novoAgente.classe || classeValida,
+    origem: origemValida,
+    nex: 5,
+    tipoFicha: tipoFicha,
+    atualizadoEm: Date.now()
+  });
   salvarAgentes(registro);
   window.location.href = 'ficha.html?id=' + encodeURIComponent(id);
 }
