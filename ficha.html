@@ -27,7 +27,7 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
     html = html.replace(/habilidades-catalog\.js[^"]*/g, 'habilidades-catalog.js?v=livro1');
     html = html.replace(/data\.js[^"]*/g, 'data.js?v=hell1');
     html = html.replace(/origens-poderes\.js[^"]*/g, 'origens-poderes.js?v=hell1');
-    html = html.replace(/app\.js[^"]*/g, 'app.js?v=custom5');
+    html = html.replace(/app\.js[^"]*/g, 'app.js?v=custom6');
     html = html.replace(/catalog-ui\.js[^"]*/g, 'catalog-ui.js?v=ritui2');
     html = html.replace(/<textarea/g, '<textarea spellcheck="true" lang="pt-BR"');
     var extras = '';
@@ -60,6 +60,7 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
     if (html.indexOf('ficha-custom-limits.js') === -1) extras += '<script src="ficha-custom-limits.js?v=3"><\/script>\n';
     if (html.indexOf('ficha-mascaras.js') === -1) extras += '<script src="ficha-mascaras.js?v=1"><\/script>\n';
     if (html.indexOf('app-hotfix.js') === -1) extras += '<script src="app-hotfix.js?v=1"><\/script>\n';
+    if (html.indexOf('tabs-fix.js') === -1) extras += '<script src="tabs-fix.js?v=1"><\/script>\n';
     html = html.replace(/habilidades-ui\.js[^"]*/g, 'habilidades-ui.js?v=card2');
     html = html.replace(/habilidades-catalog\.js[^"]*/g, 'habilidades-catalog.js?v=livro1');
     if (extras) html = html.replace('</body>', extras + '</body>');
