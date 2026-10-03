@@ -27,7 +27,7 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
     html = html.replace(/habilidades-catalog\.js[^"]*/g, 'habilidades-catalog.js?v=livro1');
     html = html.replace(/data\.js[^"]*/g, 'data.js?v=hell1');
     html = html.replace(/origens-poderes\.js[^"]*/g, 'origens-poderes.js?v=hell1');
-    html = html.replace(/app\.js[^"]*/g, 'app.js?v=custom4');
+    html = html.replace(/app\.js[^"]*/g, 'app.js?v=custom5');
     html = html.replace(/catalog-ui\.js[^"]*/g, 'catalog-ui.js?v=ritui2');
     html = html.replace(/<textarea/g, '<textarea spellcheck="true" lang="pt-BR"');
     var extras = '';
@@ -53,7 +53,7 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
       extras += '<script src="arquivos-secretos-hellhunters.js?v=2"><\/script>\n';
       extras += '<script src="arquivos-secretos-ui.js?v=trilha1"><\/script>\n';
     }
-    if (html.indexOf('habilidades-bridge.js') === -1) extras += '<script src="habilidades-bridge.js?v=8"><\/script>\n';
+    if (html.indexOf('habilidades-bridge.js') === -1) extras += '<script src="habilidades-bridge.js?v=9"><\/script>\n';
     if (html.indexOf('origem-classe-reset.js') === -1) extras += '<script src="origem-classe-reset.js?v=2"><\/script>\n';
     if (html.indexOf('combat-stats-fix.js') === -1) extras += '<script src="combat-stats-fix.js?v=4"><\/script>\n';
     if (html.indexOf('ficha-custom.js') === -1) extras += '<script src="ficha-custom.js?v=4"><\/script>\n';
