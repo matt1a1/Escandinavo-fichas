@@ -23,6 +23,8 @@
       '<div class="mob-drawer-brand">◈ Escandinavo</div>' +
       '<button type="button" class="mob-drawer-link active" data-view="agentes">Agentes</button>' +
       '<button type="button" class="mob-drawer-link" data-view="campanhas">Campanhas</button>' +
+      '<button type="button" class="mob-drawer-link" data-view="npc">NPC</button>' +
+      '<button type="button" class="mob-drawer-link" data-view="criaturas">Criatura/Ameaça</button>' +
       '<div id="mob-auth-section" style="margin-top:auto;padding:16px 20px;border-top:1px solid #2a2a38;">' +
         '<p id="mob-auth-label" style="margin:0 0 10px;font-size:.8rem;color:#9797a8;"></p>' +
         '<button type="button" id="mob-btn-login" style="width:100%;padding:12px;border:none;border-radius:8px;background:#8b5cf6;color:#fff;font-weight:600;font-size:.9rem;cursor:pointer;margin-bottom:8px;">Entrar com Google</button>' +
@@ -46,42 +48,28 @@
     document.getElementById('mob-drawer-close').addEventListener('click', close);
     backdrop.addEventListener('click', close);
 
-    drawer.querySelectorAll('.mob-drawer-link').forEach(function (btn) {
+    drawer.querySelectorAll('.mob-drawer-link[data-view]').forEach(function (btn) {
       btn.addEventListener('click', function () {
-        var view = btn.dataset.view;
-        drawer.querySelectorAll('.mob-drawer-link').forEach(function (b) {
-          b.classList.toggle('active', b.dataset.view === view);
-        });
+        var view = btn.getAttribute('data-view');
+        close();
         var navLink = document.querySelector('.ag-nav a[data-view="' + view + '"]');
         if (navLink) navLink.click();
-        close();
+        else if (typeof window.mostrarView === 'function') window.mostrarView(view);
       });
     });
 
     document.getElementById('mob-btn-login').addEventListener('click', function () {
-      if (window.EscandinavoAuth && window.EscandinavoAuth.login) {
-        window.EscandinavoAuth.login();
-      } else {
-        alert('Login ainda carregando. Aguarde 1 segundo e tente de novo.');
-      }
+      if (window.EscandinavoAuth && window.EscandinavoAuth.login) window.EscandinavoAuth.login();
     });
     document.getElementById('mob-btn-logout').addEventListener('click', function () {
-      if (window.EscandinavoAuth && window.EscandinavoAuth.logout) {
-        window.EscandinavoAuth.logout();
-        syncAuthUI();
-      }
-      close();
+      if (window.EscandinavoAuth && window.EscandinavoAuth.logout) window.EscandinavoAuth.logout();
     });
     document.getElementById('mob-btn-edit-name').addEventListener('click', function () {
-      if (window.EscandinavoAuth && window.EscandinavoAuth.editName) {
-        window.EscandinavoAuth.editName();
-      }
-      close();
+      if (window.EscandinavoAuth && window.EscandinavoAuth.editDisplayName) window.EscandinavoAuth.editDisplayName();
     });
 
     window.__mobDrawerOpen = open;
     window.__mobDrawerClose = close;
-    window.__mobSyncAuth = syncAuthUI;
   }
 
   function syncAuthUI() {
@@ -90,14 +78,12 @@
     var editBtn = document.getElementById('mob-btn-edit-name');
     var label = document.getElementById('mob-auth-label');
     if (!loginBtn) return;
-
-    var user = window.EscandinavoAuth && window.EscandinavoAuth.user ? window.EscandinavoAuth.user() : null;
-    var name = window.EscandinavoAuth && window.EscandinavoAuth.displayName ? window.EscandinavoAuth.displayName() : '';
-
+    var user = window.EscandinavoAuth && window.EscandinavoAuth.user;
     if (user) {
       loginBtn.style.display = 'none';
       logoutBtn.style.display = 'block';
       editBtn.style.display = 'block';
+      var name = (window.EscandinavoAuth.getDisplayName && window.EscandinavoAuth.getDisplayName()) || user.displayName || user.email || 'Conta';
       if (label) label.textContent = 'Logado: ' + (name || user.email || 'Conta');
     } else {
       loginBtn.style.display = 'block';
