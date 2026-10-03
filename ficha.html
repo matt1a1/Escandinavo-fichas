@@ -91,7 +91,138 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
       bindAllTabs();
       setTimeout(bindAllTabs, 500);
       setTimeout(bindAllTabs, 1500);
-      setTimeout(bindAllTabs, 3000);
+
+      function injectMascaraInline() {
+        if (typeof state === 'undefined') return false;
+        var isMask = state.tipoFicha === 'mascaras';
+        if (!isMask) {
+          try {
+            var id = (typeof AGENTE_ID !== 'undefined' && AGENTE_ID) || new URLSearchParams(location.search).get('id') || '';
+            var reg = JSON.parse(localStorage.getItem('escandinavo-agentes-registro') || '[]');
+            for (var i = 0; i < reg.length; i++) {
+              if (reg[i] && reg[i].id === id && reg[i].tipoFicha === 'mascaras') {
+                state.tipoFicha = 'mascaras';
+                isMask = true;
+                break;
+              }
+            }
+          } catch (e) {}
+        }
+        if (!isMask) return true;
+
+        if (document.getElementById('msk-box')) return true;
+
+        if (!document.getElementById('msk-css')) {
+          var st = document.createElement('style');
+          st.id = 'msk-css';
+          st.textContent = '#msk-box{margin:8px 0;padding:12px;border:2px solid #ef4444;border-radius:8px;background:rgba(127,29,29,.35);z-index:50;position:relative;}'
+            + '#msk-box button{margin:4px 6px 4px 0;padding:10px 14px;font-weight:700;border-radius:6px;cursor:pointer;font-size:14px;}'
+            + '#msk-on{background:#b91c1c;color:#fff;border:1px solid #ef4444;}'
+            + '#msk-stay{background:#dc2626;color:#fff;border:1px solid #f87171;}'
+            + '#msk-off{background:#292524;color:#e7e5e4;border:1px solid #78716c;}'
+            + '#msk-msg{font-size:12px;color:#fecaca;margin-top:6px;}'
+            + 'body.msk-red{--accent:#ef4444;} body.msk-red .brand h1{color:#fca5a5!important;}';
+          document.head.appendChild(st);
+        }
+
+        var box = document.createElement('div');
+        box.id = 'msk-box';
+        box.innerHTML = '<div style="color:#fca5a5;font-weight:700;margin-bottom:8px;">Forma Suprema — Máscara</div>'
+          + '<button type="button" id="msk-on">Colocar Máscara</button>'
+          + '<button type="button" id="msk-stay" style="display:none">Ficar com a máscara (−2 SAN)</button>'
+          + '<button type="button" id="msk-off" style="display:none">Tirar máscara</button>'
+          + '<div id="msk-msg">Clique em Colocar Máscara.</div>';
+
+        var res = document.querySelector('section.card.resources') || document.querySelector('.resources');
+        if (res && res.parentNode) {
+          res.parentNode.insertBefore(box, res);
+        } else {
+          var at = document.querySelector('section.card.attributes') || document.querySelector('.attributes') || document.querySelector('.attr-wheel');
+          if (at && at.parentNode) at.parentNode.insertBefore(box, at.nextSibling);
+          else document.body.insertBefore(box, document.body.firstChild);
+        }
+
+        function msg(t) { var e = document.getElementById('msk-msg'); if (e) e.textContent = t; }
+        function isOn() { return !!state.mascaraAtiva; }
+
+        document.getElementById('msk-on').onclick = function () {
+          document.getElementById('msk-on').style.display = 'none';
+          document.getElementById('msk-stay').style.display = '';
+          document.getElementById('msk-off').style.display = '';
+          msg('Escolha: ficar (−2 SAN) ou tirar.');
+        };
+        document.getElementById('msk-stay').onclick = function () {
+          var san = state.sanAtual != null ? Number(state.sanAtual) : 0;
+          state.sanAtual = Math.max(0, san - 2);
+          if (!isOn()) {
+            state.mascaraAtiva = true;
+            var curPv = state.vidaAtual != null ? Number(state.vidaAtual) : 0;
+            var curPe = state.peAtual != null ? Number(state.peAtual) : 0;
+            state.vidaAtual = curPv + 20;
+            state.peAtual = curPe + 10;
+            document.body.classList.add('msk-red');
+            msg('ATIVA · −2 SAN · +20 PV · +10 PE · +10 Defesa');
+            document.getElementById('msk-stay').textContent = 'Manter máscara (−2 SAN)';
+          } else {
+            msg('Mantida · −2 SAN');
+          }
+          if (typeof scheduleSave === 'function') scheduleSave();
+          if (typeof renderRecursos === 'function') renderRecursos();
+        };
+        document.getElementById('msk-off').onclick = function () {
+          if (!isOn()) { msg('Não estava ativa.'); return; }
+          if (!confirm('Tirar máscara? Perde bônus. Se PV < 20 → 0 (morrendo).')) return;
+          var curPv = state.vidaAtual != null ? Number(state.vidaAtual) : 0;
+          var curPe = state.peAtual != null ? Number(state.peAtual) : 0;
+          state.mascaraAtiva = false;
+          var npv = curPv - 20; if (npv < 0) npv = 0;
+          state.vidaAtual = npv;
+          state.peAtual = Math.max(0, curPe - 10);
+          document.body.classList.remove('msk-red');
+          document.getElementById('msk-on').style.display = '';
+          document.getElementById('msk-stay').style.display = 'none';
+          document.getElementById('msk-off').style.display = 'none';
+          document.getElementById('msk-stay').textContent = 'Ficar com a máscara (−2 SAN)';
+          if (npv === 0) alert('0 PV — morrendo.');
+          msg('Máscara removida.');
+          if (typeof scheduleSave === 'function') scheduleSave();
+          if (typeof renderRecursos === 'function') renderRecursos();
+        };
+
+        if (isOn()) {
+          document.body.classList.add('msk-red');
+          document.getElementById('msk-on').style.display = 'none';
+          document.getElementById('msk-stay').style.display = '';
+          document.getElementById('msk-off').style.display = '';
+          document.getElementById('msk-stay').textContent = 'Manter máscara (−2 SAN)';
+          msg('ATIVA · +20 PV · +10 PE · +10 Defesa');
+        }
+
+        if (typeof calcularDefesa === 'function' && !calcularDefesa.__mskInline) {
+          var _d = calcularDefesa;
+          window.calcularDefesa = function () { var v = _d.apply(this, arguments); return state.mascaraAtiva ? v + 10 : v; };
+          calcularDefesa.__mskInline = true;
+        }
+        if (typeof calcularRecursos === 'function' && !calcularRecursos.__mskInline) {
+          var _r = calcularRecursos;
+          window.calcularRecursos = function () {
+            var r = _r.apply(this, arguments);
+            if (state.mascaraAtiva) { r.pvMax = (r.pvMax||1)+20; r.peMax = (r.peMax||1)+10; }
+            return r;
+          };
+          calcularRecursos.__mskInline = true;
+        }
+        window.isFichaCustom = function () {
+          return !!(state && (state.tipoFicha === 'custom' || state.tipoFicha === 'mascaras'));
+        };
+        return true;
+      }
+
+      var tries = 0;
+      var iv = setInterval(function () {
+        tries++;
+        if (injectMascaraInline() || tries > 40) clearInterval(iv);
+      }, 200);
     }, 400);
   })
   .catch(function () {
