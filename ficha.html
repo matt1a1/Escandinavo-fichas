@@ -201,11 +201,11 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
           '  <p class="msk-title">Forma Suprema</p>' +
           '  <span class="msk-badge" id="msk-badge">INATIVA</span>' +
           '</div>' +
-          '<p class="msk-help">Ativar/manter: <b>\u22122 Sanidade</b> \u00b7 ' +
-          'B\u00f4nus: <b>+20 Vida</b> (atual e m\u00e1x) \u00b7 <b>+10 Esfor\u00e7o</b> (atual e m\u00e1x) \u00b7 <b>+10 Defesa</b></p>' +
+          '<p class="msk-help">Clique em <b>Colocar M\u00e1scara</b>: +20 Vida, +10 Esfor\u00e7o, +10 Defesa, \u22122 Sanidade.<br>' +
+          '<b>Manter</b>: \u22122 Sanidade/rodada \u00b7 <b>Tirar</b>: remove os b\u00f4nus.</p>' +
           '<div class="msk-actions">' +
           '  <button type="button" id="msk-on">Colocar M\u00e1scara</button>' +
-          '  <button type="button" id="msk-stay" style="display:none">Ficar com a m\u00e1scara (\u22122 Sanidade)</button>' +
+          '  <button type="button" id="msk-stay" style="display:none">Manter m\u00e1scara (\u22122 Sanidade)</button>' +
           '  <button type="button" id="msk-off" style="display:none">Tirar m\u00e1scara</button>' +
           '</div>' +
           '<div id="msk-msg"></div>';
@@ -230,7 +230,7 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
           document.getElementById('msk-on').style.display = 'none';
           document.getElementById('msk-stay').style.display = '';
           document.getElementById('msk-off').style.display = '';
-          document.getElementById('msk-stay').textContent = 'Ficar com a m\u00e1scara (\u22122 Sanidade)';
+          document.getElementById('msk-stay').textContent = 'Manter m\u00e1scara (\u22122 Sanidade)';
         }
         function showIdle() {
           document.getElementById('msk-on').style.display = '';
@@ -272,14 +272,12 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
         }
 
         document.getElementById('msk-on').onclick = function () {
-          showChoice();
-          msg(isOn() ? 'M\u00e1scara ativa. Mantenha (\u22122) ou tire.' : 'Confirme para ativar (\u22122 Sanidade).');
-        };
-
-        document.getElementById('msk-stay').onclick = function () {
-          var first = !isOn();
+          if (isOn()) {
+            showChoice();
+            msg('M\u00e1scara j\u00e1 ativa.');
+            return;
+          }
           var custo = 2;
-
           var san = state.sanAtual;
           if (san == null || san === undefined) {
             var rr = calcularRecursos();
@@ -289,35 +287,49 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
           if (san < custo && !confirm('Sanidade insuficiente (' + san + '). Continuar?')) return;
           state.sanAtual = Math.max(0, san - custo);
 
-          if (first) {
-            state.mascaraAtiva = false;
-            patchMascara();
-            var r0 = calcularRecursos();
-            var curPv = state.vidaAtual != null ? Number(state.vidaAtual) : (r0.pvMax || 0);
-            var curPe = state.peAtual != null ? Number(state.peAtual) : (r0.peMax || 0);
+          state.mascaraAtiva = false;
+          patchMascara();
+          var r0 = calcularRecursos();
+          var curPv = state.vidaAtual != null ? Number(state.vidaAtual) : (r0.pvMax || 0);
+          var curPe = state.peAtual != null ? Number(state.peAtual) : (r0.peMax || 0);
 
-            state.mascaraAtiva = true;
-            state.vidaAtual = curPv + 20;
-            state.peAtual = curPe + 10;
+          state.mascaraAtiva = true;
+          state.vidaAtual = curPv + 20;
+          state.peAtual = curPe + 10;
 
-            var basePv = r0.pvMax || 0;
-            var basePe = r0.peMax || 0;
-            state.pvMaxOverride = basePv + 20;
-            state.peMaxOverride = basePe + 10;
+          var basePv = r0.pvMax || 0;
+          var basePe = r0.peMax || 0;
+          state.pvMaxOverride = basePv + 20;
+          state.peMaxOverride = basePe + 10;
 
-            try {
-              if (typeof lastResourceMax !== 'undefined' && lastResourceMax) {
-                lastResourceMax.pv = basePv + 20;
-                lastResourceMax.pe = basePe + 10;
-              }
-            } catch (e) {}
+          try {
+            if (typeof lastResourceMax !== 'undefined' && lastResourceMax) {
+              lastResourceMax.pv = basePv + 20;
+              lastResourceMax.pe = basePe + 10;
+            }
+          } catch (e) {}
 
-            setBadge(true);
-            showChoice();
-            msg('ATIVA: +20 Vida \u00b7 +10 Esfor\u00e7o \u00b7 +10 Defesa \u00b7 \u22122 Sanidade');
-          } else {
-            msg('Mantida: \u22122 Sanidade');
+          setBadge(true);
+          showChoice();
+          msg('ATIVA: +20 Vida \u00b7 +10 Esfor\u00e7o \u00b7 +10 Defesa \u00b7 \u22122 Sanidade');
+          persist();
+        };
+
+        document.getElementById('msk-stay').onclick = function () {
+          if (!isOn()) {
+            document.getElementById('msk-on').click();
+            return;
           }
+          var custo = 2;
+          var san = state.sanAtual;
+          if (san == null || san === undefined) {
+            var rr = calcularRecursos();
+            san = rr.sanMax || 0;
+          }
+          san = Number(san) || 0;
+          if (san < custo && !confirm('Sanidade insuficiente (' + san + '). Continuar?')) return;
+          state.sanAtual = Math.max(0, san - custo);
+          msg('Mantida: \u22122 Sanidade');
           persist();
         };
 
