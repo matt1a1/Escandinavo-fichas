@@ -73,14 +73,40 @@ document.getElementById('btn-nova-campanha').addEventListener('click', () => {
   renderCampanhas();
 });
 
+function mostrarView(view) {
+  const views = ['agentes', 'campanhas', 'npc', 'criaturas'];
+  views.forEach(function (v) {
+    const el = document.getElementById('view-' + v);
+    if (el) el.hidden = v !== view;
+  });
+  const detail = document.getElementById('view-camp-detail');
+  if (detail && view !== 'campanhas') detail.hidden = true;
+  document.querySelectorAll('.ag-nav a').forEach(function (a) {
+    a.classList.toggle('active', a.dataset.view === view);
+  });
+  document.querySelectorAll('.mob-drawer-link[data-view]').forEach(function (a) {
+    a.classList.toggle('active', a.dataset.view === view);
+  });
+  if (view === 'campanhas' && typeof renderCampanhas === 'function') renderCampanhas();
+}
+window.mostrarView = mostrarView;
+
 document.querySelectorAll('.ag-nav a').forEach(link => link.addEventListener('click', () => {
-  document.querySelectorAll('.ag-nav a').forEach(a => a.classList.remove('active'));
-  link.classList.add('active');
   const view = link.dataset.view;
-  document.getElementById('view-agentes').hidden = view !== 'agentes';
-  document.getElementById('view-campanhas').hidden = view !== 'campanhas';
-  if (view === 'campanhas') renderCampanhas();
+  if (!view) return;
+  mostrarView(view);
 }));
+
+// Botão Novo NPC (header Agentes e aba NPC) — por ora só abre a aba NPC
+function irParaNovoNpc() {
+  mostrarView('npc');
+  const btn = document.getElementById('btn-novo-npc-tab');
+  if (btn) btn.focus();
+}
+['btn-novo-npc', 'btn-novo-npc-tab'].forEach(function (id) {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('click', irParaNovoNpc);
+});
 
 const STEPS = ['Atributos', 'Origem', 'Classe', 'Toques Finais'];
 let stepAtual = 0;
