@@ -91,6 +91,30 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
       setTimeout(bindAllTabs, 500);
       setTimeout(bindAllTabs, 1500);
 
+      function patchMascara() {
+        if (typeof calcularRecursos === 'function' && !calcularRecursos.__mskPatch) {
+          var _r = calcularRecursos;
+          window.calcularRecursos = function () {
+            var r = _r.apply(this, arguments);
+            if (window.state && state.mascaraAtiva) {
+              r.pvMax = (Number(r.pvMax) || 1) + 20;
+              r.peMax = (Number(r.peMax) || 1) + 10;
+            }
+            return r;
+          };
+          window.calcularRecursos.__mskPatch = true;
+        }
+        if (typeof calcularDefesa === 'function' && !calcularDefesa.__mskPatch) {
+          var _d = calcularDefesa;
+          window.calcularDefesa = function () {
+            var v = _d.apply(this, arguments);
+            if (window.state && state.mascaraAtiva) v = Number(v) + 10;
+            return v;
+          };
+          window.calcularDefesa.__mskPatch = true;
+        }
+      }
+
       function injectMascaraInline() {
         if (typeof state === 'undefined') return false;
         var isMask = state.tipoFicha === 'mascaras';
@@ -113,30 +137,28 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
           var st = document.createElement('style');
           st.id = 'msk-css';
           st.textContent = [
-            '#msk-box{margin:10px 0 12px;padding:14px 14px 12px;border-radius:12px;',
+            '#msk-box{margin:10px 0 12px;padding:14px;border-radius:12px;',
             'border:1px solid rgba(239,68,68,.45);background:linear-gradient(180deg,rgba(127,29,29,.28),rgba(20,10,12,.55));',
-            'box-shadow:0 0 0 1px rgba(0,0,0,.25),0 8px 24px rgba(0,0,0,.25);}',
+            'box-shadow:0 8px 24px rgba(0,0,0,.25);}',
             '#msk-box .msk-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;}',
-            '#msk-box .msk-title{margin:0;font-size:.92rem;font-weight:700;color:#fca5a5;letter-spacing:.02em;}',
+            '#msk-box .msk-title{margin:0;font-size:.92rem;font-weight:700;color:#fca5a5;}',
             '#msk-box .msk-badge{font-size:.68rem;font-weight:700;padding:3px 8px;border-radius:999px;',
             'background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.4);color:#fecaca;}',
-            '#msk-box .msk-badge.on{background:rgba(239,68,68,.35);color:#fff;border-color:#ef4444;}',
-            '#msk-box .msk-help{margin:0 0 10px;font-size:.72rem;line-height:1.4;color:#e7b0b0;opacity:.9;}',
+            '#msk-box .msk-badge.on{background:rgba(239,68,68,.4);color:#fff;border-color:#ef4444;}',
+            '#msk-box .msk-help{margin:0 0 10px;font-size:.72rem;line-height:1.4;color:#e7b0b0;}',
             '#msk-box .msk-actions{display:flex;flex-wrap:wrap;gap:8px;}',
-            '#msk-box button{border:none;border-radius:8px;padding:9px 14px;font-weight:700;font-size:.82rem;',
-            'cursor:pointer;transition:filter .15s,transform .1s;}',
-            '#msk-box button:hover{filter:brightness(1.08);}',
-            '#msk-box button:active{transform:scale(.98);}',
-            '#msk-on{background:linear-gradient(135deg,#9f1239,#e11d48);color:#fff;box-shadow:0 2px 10px rgba(225,29,72,.35);}',
+            '#msk-box button{border:none;border-radius:8px;padding:9px 14px;font-weight:700;font-size:.82rem;cursor:pointer;}',
+            '#msk-on{background:linear-gradient(135deg,#9f1239,#e11d48);color:#fff;}',
             '#msk-stay{background:linear-gradient(135deg,#b91c1c,#dc2626);color:#fff;}',
             '#msk-off{background:#1c1917;color:#e7e5e4;border:1px solid #57534e !important;}',
             '#msk-msg{margin-top:8px;font-size:.75rem;color:#fecaca;min-height:1.1em;}',
-            'body.msk-red{--accent:#ef4444;--accent-2:#b91c1c;}',
-            'body.msk-red .brand h1{color:#fca5a5 !important;}',
-            'body.msk-red .tab.active{border-bottom-color:#ef4444 !important;color:#fca5a5 !important;}'
+            'body.msk-red{--accent:#ef4444;}',
+            'body.msk-red .brand h1{color:#fca5a5 !important;}'
           ].join('');
           document.head.appendChild(st);
         }
+
+        patchMascara();
 
         var existing = document.getElementById('msk-box');
         if (existing) {
@@ -159,12 +181,11 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
           '  <p class="msk-title">Forma Suprema</p>' +
           '  <span class="msk-badge" id="msk-badge">INATIVA</span>' +
           '</div>' +
-          '<p class="msk-help">Ativar: a\u00e7\u00e3o de movimento + <b>6 SAN</b> \u00b7 Manter: <b>2 SAN</b>/rodada \u00b7 ' +
-          'B\u00f4nus: <b>+20 PV</b>, <b>+10 PE</b>, <b>+10 Defesa</b> (+5 testes, +5 DT, +2 dados \u2014 mesa). ' +
-          'Tirar: a\u00e7\u00e3o livre; se PV atuais < 20 ao perder o b\u00f4nus \u2192 0 PV (morrendo).</p>' +
+          '<p class="msk-help">Ativar: a\u00e7\u00e3o de movimento + <b>6 Sanidade</b> \u00b7 Manter: <b>2 Sanidade</b>/rodada<br>' +
+          'B\u00f4nus: <b>+20 Vida</b> (atual e m\u00e1x) \u00b7 <b>+10 Esfor\u00e7o</b> (atual e m\u00e1x) \u00b7 <b>+10 Defesa</b></p>' +
           '<div class="msk-actions">' +
           '  <button type="button" id="msk-on">Colocar M\u00e1scara</button>' +
-          '  <button type="button" id="msk-stay" style="display:none">Ficar com a m\u00e1scara (\u22126 SAN)</button>' +
+          '  <button type="button" id="msk-stay" style="display:none">Ficar com a m\u00e1scara (\u22126 Sanidade)</button>' +
           '  <button type="button" id="msk-off" style="display:none">Tirar m\u00e1scara</button>' +
           '</div>' +
           '<div id="msk-msg"></div>';
@@ -185,60 +206,100 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
           if (active) { b.textContent = 'ATIVA'; b.classList.add('on'); document.body.classList.add('msk-red'); }
           else { b.textContent = 'INATIVA'; b.classList.remove('on'); document.body.classList.remove('msk-red'); }
         }
-        function save() {
-          if (typeof scheduleSave === 'function') scheduleSave();
-          else if (typeof saveState === 'function') saveState();
-          if (typeof renderRecursos === 'function') renderRecursos();
-        }
         function showChoice(first) {
           document.getElementById('msk-on').style.display = 'none';
           var stay = document.getElementById('msk-stay');
           var off = document.getElementById('msk-off');
           stay.style.display = '';
           off.style.display = '';
-          stay.textContent = first ? 'Ficar com a m\u00e1scara (\u22126 SAN)' : 'Manter m\u00e1scara (\u22122 SAN)';
+          stay.textContent = first ? 'Ficar com a m\u00e1scara (\u22126 Sanidade)' : 'Manter m\u00e1scara (\u22122 Sanidade)';
         }
         function showIdle() {
           document.getElementById('msk-on').style.display = '';
           document.getElementById('msk-stay').style.display = 'none';
           document.getElementById('msk-off').style.display = 'none';
-          document.getElementById('msk-stay').textContent = 'Ficar com a m\u00e1scara (\u22126 SAN)';
+        }
+
+        function forceUI() {
+          var r = (typeof calcularRecursos === 'function') ? calcularRecursos() : { pvMax: 0, peMax: 0, sanMax: 0 };
+          var def = (typeof calcularDefesa === 'function') ? calcularDefesa() : 15;
+          function set(id, v) {
+            var el = document.getElementById(id);
+            if (el) el.textContent = String(v);
+          }
+          if (state.vidaAtual != null) set('vida-atual', state.vidaAtual);
+          set('vida-max', r.pvMax);
+          if (state.sanAtual != null) set('san-atual', state.sanAtual);
+          set('san-max', r.sanMax);
+          if (state.peAtual != null) set('pe-atual', state.peAtual);
+          set('pe-max', r.peMax);
+          set('defesa', def);
+          var iv = document.getElementById('vida-atual-input');
+          if (iv && state.vidaAtual != null) iv.value = state.vidaAtual;
+          var isan = document.getElementById('san-atual-input');
+          if (isan && state.sanAtual != null) isan.value = state.sanAtual;
+          var ipe = document.getElementById('pe-atual-input');
+          if (ipe && state.peAtual != null) ipe.value = state.peAtual;
+        }
+
+        function persist() {
+          try {
+            if (typeof lastResourceMax !== 'undefined' && lastResourceMax) {
+              var r = calcularRecursos();
+              lastResourceMax.pv = r.pvMax;
+              lastResourceMax.pe = r.peMax;
+              lastResourceMax.san = r.sanMax;
+            }
+          } catch (e) {}
+          if (typeof scheduleSave === 'function') scheduleSave();
+          else if (typeof saveState === 'function') saveState();
+          if (typeof renderRecursos === 'function') { try { renderRecursos(); } catch (e) {} }
+          if (typeof renderCombate === 'function') { try { renderCombate(); } catch (e) {} }
+          forceUI();
         }
 
         document.getElementById('msk-on').onclick = function () {
           showChoice(!isOn());
-          msg(isOn() ? 'M\u00e1scara j\u00e1 ativa. Mantenha (\u22122 SAN) ou tire.' : 'Confirme para ativar (\u22126 SAN).');
+          msg(isOn() ? 'M\u00e1scara ativa. Mantenha (\u22122 Sanidade) ou tire.' : 'Confirme para ativar (\u22126 Sanidade).');
         };
 
         document.getElementById('msk-stay').onclick = function () {
           var first = !isOn();
           var custo = first ? 6 : 2;
-          var san = state.sanAtual != null ? Number(state.sanAtual) : 0;
-          if (san < custo && !confirm('SAN insuficiente (' + san + '). Continuar? SAN pode ir a 0.')) return;
+          var san = state.sanAtual;
+          if (san == null || san === undefined) {
+            var rr = typeof calcularRecursos === 'function' ? calcularRecursos() : { sanMax: 0 };
+            san = rr.sanMax || 0;
+          }
+          san = Number(san) || 0;
+          if (san < custo && !confirm('Sanidade insuficiente (' + san + '). Continuar?')) return;
           state.sanAtual = Math.max(0, san - custo);
 
           if (first) {
+            var r0 = typeof calcularRecursos === 'function' ? calcularRecursos() : { pvMax: 1, peMax: 1 };
+            var curPv = state.vidaAtual != null ? Number(state.vidaAtual) : (r0.pvMax || 0);
+            var curPe = state.peAtual != null ? Number(state.peAtual) : (r0.peMax || 0);
             state.mascaraAtiva = true;
-            var curPv = state.vidaAtual != null ? Number(state.vidaAtual) : 0;
-            var curPe = state.peAtual != null ? Number(state.peAtual) : 0;
             state.vidaAtual = curPv + 20;
             state.peAtual = curPe + 10;
+            try {
+              if (typeof lastResourceMax !== 'undefined' && lastResourceMax) {
+                lastResourceMax.pv = (r0.pvMax || 0) + 20;
+                lastResourceMax.pe = (r0.peMax || 0) + 10;
+              }
+            } catch (e) {}
             setBadge(true);
             showChoice(false);
-            msg('Forma Suprema ATIVA. \u22126 SAN \u00b7 +20 PV \u00b7 +10 PE \u00b7 +10 Defesa.');
+            msg('ATIVA: +20 Vida \u00b7 +10 Esfor\u00e7o \u00b7 +10 Defesa \u00b7 \u22126 Sanidade');
           } else {
-            msg('Forma mantida. \u22122 SAN (rodada).');
+            msg('Mantida: \u22122 Sanidade');
           }
-          save();
+          persist();
         };
 
         document.getElementById('msk-off').onclick = function () {
-          if (!isOn()) {
-            showIdle();
-            msg('Ativa\u00e7\u00e3o cancelada.');
-            return;
-          }
-          if (!confirm('Tirar a m\u00e1scara? Voc\u00ea perde +20 PV / +10 PE / +10 Defesa.\nSe PV atuais < 20 ao perder o b\u00f4nus, ficam 0 (morrendo).')) return;
+          if (!isOn()) { showIdle(); msg('Cancelado.'); return; }
+          if (!confirm('Tirar a m\u00e1scara? Perde +20 Vida / +10 Esfor\u00e7o / +10 Defesa. Se Vida atual < 20, fica 0 (morrendo).')) return;
           var curPv = state.vidaAtual != null ? Number(state.vidaAtual) : 0;
           var curPe = state.peAtual != null ? Number(state.peAtual) : 0;
           state.mascaraAtiva = false;
@@ -246,47 +307,30 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
           if (npv < 0) npv = 0;
           state.vidaAtual = npv;
           state.peAtual = Math.max(0, curPe - 10);
+          try {
+            if (typeof lastResourceMax !== 'undefined' && lastResourceMax) {
+              var r1 = typeof calcularRecursos === 'function' ? calcularRecursos() : { pvMax: 0, peMax: 0 };
+              lastResourceMax.pv = r1.pvMax;
+              lastResourceMax.pe = r1.peMax;
+            }
+          } catch (e) {}
           setBadge(false);
           showIdle();
-          if (npv === 0) {
-            alert('Ao tirar a m\u00e1scara voc\u00ea ficou com 0 PV e est\u00e1 morrendo.');
-            msg('M\u00e1scara removida. 0 PV \u2014 morrendo.');
-          } else {
-            msg('M\u00e1scara removida. B\u00f4nus perdidos.');
-          }
-          save();
+          if (npv === 0) { alert('0 Vida \u2014 morrendo.'); msg('Removida. 0 Vida \u2014 morrendo.'); }
+          else msg('Removida. B\u00f4nus perdidos.');
+          persist();
         };
 
         if (isOn()) {
           setBadge(true);
           showChoice(false);
-          msg('Forma Suprema ATIVA \u00b7 +20 PV \u00b7 +10 PE \u00b7 +10 Defesa');
+          msg('ATIVA \u00b7 +20 Vida \u00b7 +10 Esfor\u00e7o \u00b7 +10 Defesa');
         } else {
           setBadge(false);
           showIdle();
           msg('');
         }
 
-        if (typeof calcularDefesa === 'function' && !calcularDefesa.__mskInline) {
-          var _d = calcularDefesa;
-          window.calcularDefesa = function () {
-            var v = _d.apply(this, arguments);
-            return state.mascaraAtiva ? v + 10 : v;
-          };
-          calcularDefesa.__mskInline = true;
-        }
-        if (typeof calcularRecursos === 'function' && !calcularRecursos.__mskInline) {
-          var _r = calcularRecursos;
-          window.calcularRecursos = function () {
-            var r = _r.apply(this, arguments);
-            if (state.mascaraAtiva) {
-              r.pvMax = (r.pvMax || 1) + 20;
-              r.peMax = (r.peMax || 1) + 10;
-            }
-            return r;
-          };
-          calcularRecursos.__mskInline = true;
-        }
         window.isFichaCustom = function () {
           return !!(state && (state.tipoFicha === 'custom' || state.tipoFicha === 'mascaras'));
         };
