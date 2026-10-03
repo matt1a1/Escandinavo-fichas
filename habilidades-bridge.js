@@ -1,7 +1,7 @@
 /* habilidades-bridge.js — garante catálogo + botões de habilidades/trilhas após o loader */
 (function () {
-  function $(sel, root) { return (root || document).querySelector(sel); }
-  function $$(sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
+  function $(sel) { return document.querySelector(sel); }
+  function $$(sel) { return Array.from(document.querySelectorAll(sel)); }
 
   function ensureCatalogGlobals() {
     if (typeof window.HABILIDADES_CATALOG === 'undefined') window.HABILIDADES_CATALOG = [];
@@ -11,17 +11,14 @@
   function mergeArquivosSecretosIntoCatalog() {
     if (typeof ARQUIVOS_SECRETOS === 'undefined' || !Array.isArray(ARQUIVOS_SECRETOS)) return;
     ensureCatalogGlobals();
-    var existing = {};
-    HABILIDADES_CATALOG.forEach(function (h) {
-      if (h && h.nome) existing[String(h.nome).toLowerCase()] = true;
-    });
     ARQUIVOS_SECRETOS.forEach(function (e) {
       if (!e || !e.nome) return;
       var tipo = String(e.tipo || '').toLowerCase();
       if (tipo !== 'poder' && tipo !== 'habilidade' && tipo !== 'trilha') return;
-      var key = String(e.nome).toLowerCase();
-      if (existing[key]) return;
-      existing[key] = true;
+      var exists = HABILIDADES_CATALOG.some(function (h) {
+        return h && String(h.nome || '').toLowerCase() === String(e.nome).toLowerCase();
+      });
+      if (exists) return;
       HABILIDADES_CATALOG.push({
         nome: e.nome,
         desc: e.desc || '',
@@ -33,14 +30,83 @@
     });
   }
 
-  function patchArquivosSecretos() {
-    /* no-op placeholder for future patches */
+  function addHabToSheet(item) {
+    if (typeof state === 'undefined') return;
+    if (!state.habilidades) state.habilidades = [];
+    var nome = item.nome || item;
+    var desc = item.desc || '';
+    var already = state.habilidades.some(function (h) {
+      return String(h.nome || '').toLowerCase() === String(nome).toLowerCase();
+    });
+    if (already) return;
+    state.habilidades.push({ nome: nome, desc: desc, nex: item.nex || '' });
+    if (typeof scheduleSave === 'function') scheduleSave();
+    if (typeof renderHabilidades === 'function') renderHabilidades();
+  }
+
+  function bindCatalogButtons() {
+    var list = $('#hab-catalog-list');
+    if (!list || list.dataset.bridgeBound) return;
+    list.dataset.bridgeBound = '1';
+    list.querySelectorAll('.btn-add-hab').forEach(function (btn) {
+      if (btn.dataset.bridgeBound) return;
+      btn.dataset.bridgeBound = '1';
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var nome = btn.getAttribute('data-nome') || '';
+        var item = (typeof HABILIDADES_CATALOG !== 'undefined' ? HABILIDADES_CATALOG : []).find(function (h) {
+          return h && String(h.nome) === nome;
+        });
+        if (item) addHabToSheet(item);
+        else addHabToSheet({ nome: nome, desc: '' });
+      });
+    });
+  }
+
+  function bindClassTabs() {
+    $$('.hab-class-tab').forEach(function (btn) {
+      if (btn.dataset.bridgeBound) return;
+      btn.dataset.bridgeBound = '1';
+      btn.addEventListener('click', function () {
+        $$('.hab-class-tab').forEach(function (b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        setTimeout(function () { bindCatalogButtons(); }, 50);
+      });
+    });
+  }
+
+  function bindPersonalizada() {
+    var btn = $('#btn-add-hab');
+    if (!btn || btn.dataset.bridgeBound) return;
+    var clone = btn.cloneNode(true);
+    btn.parentNode.replaceChild(clone, btn);
+    clone.dataset.bridgeBound = '1';
+    clone.addEventListener('click', function (e) {
+      e.preventDefault();
+      if (typeof state === 'undefined') return;
+      if (!state.habilidades) state.habilidades = [];
+      state.habilidades.push({ nome: '', desc: '' });
+      if (typeof scheduleSave === 'function') scheduleSave();
+      if (typeof renderHabilidades === 'function') renderHabilidades();
+    });
   }
 
   function tryInitHabilidadesUI() {
+    mergeArquivosSecretosIntoCatalog();
     if (typeof window.initHabilidadesUI === 'function') {
-      try { window.initHabilidadesUI(); } catch (e) {}
+      try { window.initHabilidadesUI(); } catch (err) {}
     }
+    bindCatalogButtons();
+    bindClassTabs();
+    bindPersonalizada();
+  }
+
+  function patchArquivosSecretos() {
+    window.addArquivoSecretoToSheet = function (e) {
+      if (!e) return;
+      addHabToSheet({ nome: e.nome, desc: e.desc || '', nex: e.nex || '' });
+    };
   }
 
   function renderHabilidadesPadrao() {
@@ -53,8 +119,8 @@
     }
     function esc(s) {
       return String(s == null ? '' : s)
-        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        .replace(/&/g, '&').replace(/</g, '<')
+        .replace(/>/g, '>').replace(/"/g, '"');
     }
     function autosize(ta) {
       if (!ta || ta.tagName !== 'TEXTAREA') return;
@@ -99,20 +165,20 @@
         '</div>' +
         '<textarea class="hab-mine-desc" data-field="desc" data-idx="' + i + '" placeholder="Descrição...">' + esc(desc) + '</textarea>';
       list.appendChild(card);
-
-      var head = card.querySelector('.hab-mine-head');
-      if (head) head.addEventListener('click', function (e) {
+    });
+    list.querySelectorAll('.hab-mine-head').forEach(function (head) {
+      head.addEventListener('click', function (e) {
         if (e.target.closest('input, button, a, textarea, select')) return;
-        var cardEl = head.closest('.hab-mine-card');
-        if (!cardEl) return;
-        var wasOpen = cardEl.classList.contains('open');
+        var card = head.closest('.hab-mine-card');
+        if (!card) return;
+        var wasOpen = card.classList.contains('open');
         list.querySelectorAll('.hab-mine-card.open').forEach(function (c) {
-          if (c !== cardEl) c.classList.remove('open');
+          if (c !== card) c.classList.remove('open');
         });
-        if (wasOpen) cardEl.classList.remove('open');
-        else cardEl.classList.add('open');
+        if (wasOpen) card.classList.remove('open');
+        else card.classList.add('open');
         setTimeout(function () {
-          if (cardEl.classList.contains('open')) autosize(cardEl.querySelector('.hab-mine-desc'));
+          if (card.classList.contains('open')) autosize(card.querySelector('.hab-mine-desc'));
         }, 0);
       });
     });
