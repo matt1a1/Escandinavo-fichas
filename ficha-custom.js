@@ -74,7 +74,8 @@
         } else {
           state[overrideKey] = v;
         }
-        if (typeof scheduleSave === 'function') scheduleSave();
+        if (typeof saveState === 'function') saveState();
+        else if (typeof scheduleSave === 'function') scheduleSave();
         if (typeof renderRecursos === 'function') renderRecursos();
         markEditableMaxes();
       }
