@@ -1,15 +1,20 @@
-/* ficha-mascaras.js — Forma Suprema ("As Máscaras") da Ficha das Máscaras
- * Regras (Hexatombe):
- * - Ativar: ação de movimento + 6 SAN (+2 SAN por rodada extra)
- * - Benefícios: +20 PV atuais/máx, +10 PE atuais/máx, +10 Defesa
- * - Também: +5 testes, +5 DT, +2 dados de dano (marcados na UI; mesa aplica)
- * - Desativar: ação livre; perde benefícios; se PV atuais < 20 → 0 PV (morrendo)
+/* ficha-mascaras.js — Forma Suprema (As Máscaras)
+ *
+ * Fluxo:
+ * 1) Botão "Colocar Máscara" (só em tipoFicha === 'mascaras')
+ * 2) Abre painel com:
+ *    - "Ficar com a máscara" → ativa forma (custa 2 SAN) + tema vermelho + bônus
+ *    - "Tirar máscara" → remove bônus (se PV atuais < 20 após perda → 0 PV, morrendo)
+ *
+ * Bônus ativos:
+ *  +20 PV atuais/máx · +10 PE atuais/máx · +10 Defesa
+ *  (mesa aplica: +5 testes, +5 DT, +2 dados de dano, rituais avançados sem PE)
  */
 (function () {
   var BONUS_PV = 20;
   var BONUS_PE = 10;
   var BONUS_DEF = 10;
-  var CUSTO_SAN = 6;
+  var CUSTO_FICAR_SAN = 2;
 
   function isMascaras() {
     return !!(window.state && state.tipoFicha === 'mascaras');
@@ -26,130 +31,187 @@
     s.textContent = [
       'body.mascara-ativa{--accent:#ef4444;--accent-2:#b91c1c;}',
       'body.mascara-ativa .brand h1,body.mascara-ativa .brand{color:#fca5a5 !important;}',
-      'body.mascara-ativa .panel,body.mascara-ativa .stat-box,body.mascara-ativa .card{border-color:rgba(239,68,68,.35) !important;}',
-      'body.mascara-ativa .res-bar,body.mascara-ativa .vida-bar{filter:saturate(1.2);}',
-      'body.mascara-ativa #btn-mascara.mascara-on{background:linear-gradient(135deg,#7f1d1d,#b91c1c);border-color:#ef4444;color:#fff;box-shadow:0 0 18px rgba(239,68,68,.35);}',
-      '#btn-mascara{display:none;margin-left:10px;font-weight:700;letter-spacing:.02em;}',
-      'body.ficha-mascaras #btn-mascara{display:inline-flex;align-items:center;gap:6px;}',
-      '.mascara-banner{display:none;margin:8px 0 0;padding:10px 12px;border-radius:8px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.4);color:#fecaca;font-size:0.8rem;line-height:1.45;}',
-      'body.mascara-ativa .mascara-banner{display:block;}',
-      '.mascara-banner strong{color:#fca5a5;}'
+      'body.mascara-ativa .panel,body.mascara-ativa .stat-box,body.mascara-ativa .card,body.mascara-ativa .hab-mine-card{border-color:rgba(239,68,68,.4) !important;}',
+      'body.mascara-ativa .tab.active{border-bottom-color:#ef4444 !important;color:#fca5a5 !important;}',
+      'body.mascara-ativa .attr-value{color:#fca5a5 !important;}',
+      '#mascara-wrap{display:none;margin:8px 0 12px;padding:12px;border-radius:10px;border:1px solid rgba(239,68,68,.35);background:rgba(127,29,29,.15);}',
+      'body.ficha-mascaras #mascara-wrap{display:block;}',
+      '#mascara-wrap .mascara-title{margin:0 0 8px;font-size:0.95rem;font-weight:700;color:#fca5a5;}',
+      '#mascara-wrap .mascara-help{margin:0 0 10px;font-size:0.78rem;color:#fecaca;line-height:1.4;opacity:.9;}',
+      '#mascara-wrap .mascara-actions{display:flex;flex-wrap:wrap;gap:8px;}',
+      '#btn-colocar-mascara,#btn-ficar-mascara,#btn-tirar-mascara{font-weight:700;}',
+      '#btn-colocar-mascara{background:linear-gradient(135deg,#7f1d1d,#b91c1c);border:1px solid #ef4444;color:#fff;}',
+      '#btn-colocar-mascara:hover{filter:brightness(1.1);}',
+      '#btn-ficar-mascara{background:linear-gradient(135deg,#991b1b,#dc2626);border:1px solid #f87171;color:#fff;}',
+      '#btn-tirar-mascara{background:#1c1917;border:1px solid #78716c;color:#e7e5e4;}',
+      '#btn-ficar-mascara[hidden],#btn-tirar-mascara[hidden],#btn-colocar-mascara[hidden]{display:none !important;}',
+      'body.mascara-ativa #mascara-wrap{border-color:rgba(239,68,68,.7);box-shadow:0 0 20px rgba(239,68,68,.2);}',
+      '#mascara-status{font-size:0.8rem;margin-top:8px;color:#fecaca;}',
+      'body.mascara-ativa #mascara-status{color:#fca5a5;font-weight:600;}'
     ].join('\n');
     document.head.appendChild(s);
   }
 
-  function injectButton() {
-    if (document.getElementById('btn-mascara')) return;
-    var brand = document.querySelector('.brand h1') || document.querySelector('.brand');
-    if (!brand) return;
-    var btn = document.createElement('button');
-    btn.type = 'button';
-    btn.id = 'btn-mascara';
-    btn.className = 'btn secondary';
-    btn.textContent = 'Colocar Máscara';
-    if (brand.parentElement) brand.parentElement.insertBefore(btn, brand.nextSibling);
-    else brand.appendChild(btn);
-    btn.addEventListener('click', function () {
+  function injectUI() {
+    if (document.getElementById('mascara-wrap')) return;
+
+    var wrap = document.createElement('div');
+    wrap.id = 'mascara-wrap';
+    wrap.innerHTML =
+      '<p class="mascara-title">Forma Suprema — Máscara</p>' +
+      '<p class="mascara-help">' +
+      'A máscara representa a desumanização (não precisa ser literal). ' +
+      'Ao ativar: <strong>+20 PV</strong>, <strong>+10 PE</strong>, <strong>+10 Defesa</strong> ' +
+      '(+5 testes, +5 DT e +2 dados de dano — a mesa aplica). ' +
+      'Custo ao ficar: <strong>2 SAN</strong>. Desativar é ação livre; se ficar com menos de 20 PV atuais ao tirar, vai a 0 PV (morrendo).' +
+      '</p>' +
+      '<div class="mascara-actions">' +
+      '  <button type="button" id="btn-colocar-mascara" class="btn">Colocar Máscara</button>' +
+      '  <button type="button" id="btn-ficar-mascara" class="btn" hidden>Ficar com a máscara (−2 SAN)</button>' +
+      '  <button type="button" id="btn-tirar-mascara" class="btn" hidden>Tirar máscara</button>' +
+      '</div>' +
+      '<div id="mascara-status"></div>';
+
+    var anchor =
+      document.querySelector('.resources') ||
+      document.querySelector('.stat-row') ||
+      document.getElementById('vida-max') ||
+      document.querySelector('.brand') ||
+      document.querySelector('.left-panel') ||
+      document.body;
+
+    if (anchor.id === 'vida-max' || (anchor.classList && anchor.classList.contains('stat-row'))) {
+      var panel = anchor.closest('.panel') || anchor.closest('section') || anchor.parentElement;
+      if (panel && panel.parentElement) panel.parentElement.insertBefore(wrap, panel.nextSibling);
+      else if (panel) panel.appendChild(wrap);
+      else document.body.insertBefore(wrap, document.body.firstChild);
+    } else if (anchor.parentElement) {
+      anchor.parentElement.insertBefore(wrap, anchor.nextSibling);
+    } else {
+      document.body.insertBefore(wrap, document.body.firstChild);
+    }
+
+    document.getElementById('btn-colocar-mascara').addEventListener('click', function () {
       if (!isMascaras()) return;
-      if (ativa()) desativarMascara();
-      else ativarMascara();
+      document.getElementById('btn-colocar-mascara').hidden = true;
+      document.getElementById('btn-ficar-mascara').hidden = false;
+      document.getElementById('btn-tirar-mascara').hidden = false;
+      setStatus('Escolha: ficar com a máscara (−2 SAN) ou tirar (se já estiver ativa).');
+    });
+
+    document.getElementById('btn-ficar-mascara').addEventListener('click', function () {
+      if (!isMascaras()) return;
+      ativarOuManterMascara();
+    });
+
+    document.getElementById('btn-tirar-mascara').addEventListener('click', function () {
+      if (!isMascaras()) return;
+      if (!ativa()) {
+        resetChoiceButtons();
+        setStatus('Máscara não estava ativa.');
+        return;
+      }
+      if (!confirm('Tirar a máscara? Você perde +20 PV / +10 PE / +10 Defesa. Se tiver menos de 20 PV atuais, fica com 0 PV (morrendo).')) {
+        return;
+      }
+      desativarMascara();
     });
   }
 
-  function injectBanner() {
-    if (document.getElementById('mascara-banner')) return;
-    var b = document.createElement('div');
-    b.id = 'mascara-banner';
-    b.className = 'mascara-banner';
-    b.innerHTML =
-      '<strong>Forma Suprema ativa.</strong> ' +
-      '+20 PV · +10 PE · +10 Defesa · +5 em testes · +5 na DT · +2 dados no dano. ' +
-      'Custo: 6 SAN na ativação (+2 SAN por rodada extra). ' +
-      'Desativar é ação livre — se tiver menos de 20 PV atuais, fica com 0 PV (morrendo).';
-    var anchor = document.getElementById('vida-max') || document.getElementById('attr-points');
-    if (anchor) {
-      var panel = anchor.closest('.panel') || anchor.closest('section') || anchor.parentElement;
-      if (panel && panel.parentElement) panel.parentElement.insertBefore(b, panel);
-      else document.body.insertBefore(b, document.body.firstChild);
+  function resetChoiceButtons() {
+    var colocar = document.getElementById('btn-colocar-mascara');
+    var ficar = document.getElementById('btn-ficar-mascara');
+    var tirar = document.getElementById('btn-tirar-mascara');
+    if (!colocar) return;
+    if (ativa()) {
+      colocar.hidden = true;
+      ficar.hidden = false;
+      ficar.textContent = 'Manter máscara (−2 SAN)';
+      tirar.hidden = false;
     } else {
-      document.body.insertBefore(b, document.body.firstChild);
+      colocar.hidden = false;
+      ficar.hidden = true;
+      ficar.textContent = 'Ficar com a máscara (−2 SAN)';
+      tirar.hidden = true;
     }
+  }
+
+  function setStatus(msg) {
+    var el = document.getElementById('mascara-status');
+    if (el) el.textContent = msg || '';
   }
 
   function updateUI() {
-    var on = isMascaras() && ativa();
     document.body.classList.toggle('ficha-mascaras', isMascaras());
-    document.body.classList.toggle('mascara-ativa', on);
-
-    var btn = document.getElementById('btn-mascara');
-    if (btn) {
-      btn.style.display = isMascaras() ? '' : 'none';
-      btn.textContent = on ? 'Remover Máscara' : 'Colocar Máscara';
-      btn.classList.toggle('mascara-on', on);
-      btn.title = on
-        ? 'Desativa a Forma Suprema (ação livre). Perde +20 PV / +10 PE / +10 Defesa.'
-        : 'Ativa a Forma Suprema: ação de movimento + 6 SAN. +20 PV, +10 PE, +10 Defesa.';
-    }
-
-    var badge = document.getElementById('ficha-tipo-badge');
-    if (badge && state.tipoFicha === 'mascaras') {
-      badge.style.display = '';
-      badge.className = 'ficha-tipo-badge tipo-mascaras';
-      badge.textContent = on ? 'Máscaras · ATIVA' : 'Máscaras';
+    document.body.classList.toggle('mascara-ativa', isMascaras() && ativa());
+    resetChoiceButtons();
+    if (isMascaras() && ativa()) {
+      setStatus('Forma Suprema ATIVA · +20 PV · +10 PE · +10 Defesa · tema vermelho');
+    } else if (isMascaras()) {
+      setStatus('Máscara inativa. Clique em Colocar Máscara.');
     }
   }
 
-  function ativarMascara() {
-    if (!isMascaras() || ativa()) return;
+  function getSanAtual() {
+    if (state.sanAtual != null) return Number(state.sanAtual);
+    var r = typeof calcularRecursos === 'function' ? calcularRecursos() : { sanMax: 0 };
+    return Number(r.sanMax) || 0;
+  }
 
-    var sanAtual = state.sanAtual;
-    if (sanAtual == null) {
-      var r0 = typeof calcularRecursos === 'function' ? calcularRecursos() : { sanMax: 1 };
-      sanAtual = r0.sanMax;
-    }
-    if (sanAtual < CUSTO_SAN) {
-      if (!confirm('Você tem menos de ' + CUSTO_SAN + ' SAN. Ativar a máscara mesmo assim? (custa ' + CUSTO_SAN + ' SAN)')) {
-        return;
-      }
+  function ativarOuManterMascara() {
+    var san = getSanAtual();
+    if (san < CUSTO_FICAR_SAN) {
+      if (!confirm('Você tem menos de ' + CUSTO_FICAR_SAN + ' SAN. Continuar mesmo assim? (SAN pode ir a 0)')) return;
     }
 
-    state.mascaraAtiva = true;
-    state.sanAtual = Math.max(0, (sanAtual || 0) - CUSTO_SAN);
+    state.sanAtual = Math.max(0, san - CUSTO_FICAR_SAN);
 
-    var r = typeof calcularRecursos === 'function' ? calcularRecursos() : { pvMax: 1, peMax: 1 };
-    var basePvMax = Math.max(1, (r.pvMax || 1) - BONUS_PV);
-    var basePeMax = Math.max(1, (r.peMax || 1) - BONUS_PE);
-    var curPv = state.vidaAtual == null ? basePvMax : Number(state.vidaAtual);
-    var curPe = state.peAtual == null ? basePeMax : Number(state.peAtual);
-    state.vidaAtual = curPv + BONUS_PV;
-    state.peAtual = curPe + BONUS_PE;
+    if (!ativa()) {
+      state.mascaraAtiva = true;
 
-    if (typeof saveState === 'function') saveState();
-    else if (typeof scheduleSave === 'function') scheduleSave();
-    if (typeof renderRecursos === 'function') renderRecursos();
-    if (typeof renderAll === 'function') renderAll();
-    updateUI();
+      var r = typeof calcularRecursos === 'function' ? calcularRecursos() : { pvMax: 1, peMax: 1 };
+      var curPv = state.vidaAtual == null ? Math.max(1, (r.pvMax || 1) - BONUS_PV) : Number(state.vidaAtual);
+      var curPe = state.peAtual == null ? Math.max(0, (r.peMax || 0) - BONUS_PE) : Number(state.peAtual);
+
+      state.vidaAtual = Math.max(0, curPv) + BONUS_PV;
+      state.peAtual = Math.max(0, curPe) + BONUS_PE;
+
+      setStatus('Máscara colocada. −' + CUSTO_FICAR_SAN + ' SAN. +20 PV, +10 PE, +10 Defesa.');
+    } else {
+      setStatus('Você permanece na Forma Suprema. −' + CUSTO_FICAR_SAN + ' SAN (custo da rodada).');
+    }
+
+    persistAndRefresh();
   }
 
   function desativarMascara() {
-    if (!isMascaras() || !ativa()) return;
+    if (!ativa()) {
+      resetChoiceButtons();
+      return;
+    }
 
-    var r = typeof calcularRecursos === 'function' ? calcularRecursos() : { pvMax: 1 };
+    var r = typeof calcularRecursos === 'function' ? calcularRecursos() : { pvMax: 1, peMax: 1 };
     var curPv = state.vidaAtual == null ? r.pvMax : Number(state.vidaAtual);
+    var curPe = state.peAtual == null ? r.peMax : Number(state.peAtual);
 
     state.mascaraAtiva = false;
 
     var novoPv = curPv - BONUS_PV;
     if (novoPv < 0) novoPv = 0;
     state.vidaAtual = novoPv;
-
-    var curPe = state.peAtual == null ? 0 : Number(state.peAtual);
     state.peAtual = Math.max(0, curPe - BONUS_PE);
 
     if (novoPv === 0) {
-      alert('Ao remover a máscara você ficou com 0 PV e está morrendo (regra da Forma Suprema).');
+      alert('Ao tirar a máscara você ficou com 0 PV e está morrendo (regra da Forma Suprema).');
+      setStatus('Máscara removida. 0 PV — personagem morrendo.');
+    } else {
+      setStatus('Máscara removida. Bônus perdidos.');
     }
 
+    persistAndRefresh();
+  }
+
+  function persistAndRefresh() {
     if (typeof saveState === 'function') saveState();
     else if (typeof scheduleSave === 'function') scheduleSave();
     if (typeof renderRecursos === 'function') renderRecursos();
@@ -197,8 +259,7 @@
     if (typeof state === 'undefined') return false;
     if (state.mascaraAtiva == null) state.mascaraAtiva = false;
     ensureStyles();
-    injectButton();
-    injectBanner();
+    injectUI();
     patchCalcularRecursos();
     patchCalcularDefesa();
     patchRenderRecursos();
@@ -207,7 +268,9 @@
     return true;
   }
 
-  window.ativarMascara = ativarMascara;
+  window.ativarMascara = function () {
+    if (!ativa()) ativarOuManterMascara();
+  };
   window.desativarMascara = desativarMascara;
 
   var n = 0;
