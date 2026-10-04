@@ -1,36 +1,16 @@
-/* carrega controls-fix se ainda não estiver */
-(function(){
-  if (window.__controlsFixLoaded) return;
-  window.__controlsFixLoaded = true;
-  var s = document.createElement('script');
-  s.src = 'controls-fix.js?v=1';
-  document.head.appendChild(s);
-})();
-/* app-res-fix.js — setas 1/5 sem double-bind; atual pode > max */
+/* app-res-fix.js v3 — setas de Vida/Sanidade/Esforço
+   Delegação em capture (sem clone). Atual pode passar do máximo. */
 (function () {
-  function rebind() {
-    document.querySelectorAll('.res-btn').forEach(function (btn) {
-      if (btn.dataset.resFixV2) return;
-      var neo = btn.cloneNode(true);
-      neo.dataset.resFixV2 = '1';
-      neo.dataset.resBound = '1';
-      btn.parentNode.replaceChild(neo, btn);
-      neo.addEventListener('click', function () {
-        if (typeof state === 'undefined' || typeof calcularRecursos !== 'function') return;
-        var res = neo.dataset.res;
-        var delta = Number(neo.dataset.delta || 0);
-        var r = calcularRecursos();
-        if (res === 'vida') state.vidaAtual = Math.max(0, (state.vidaAtual != null ? Number(state.vidaAtual) : r.pvMax) + delta);
-        else if (res === 'sanidade') state.sanAtual = Math.max(0, (state.sanAtual != null ? Number(state.sanAtual) : r.sanMax) + delta);
-        else if (res === 'esforco') state.peAtual = Math.max(0, (state.peAtual != null ? Number(state.peAtual) : r.peMax) + delta);
-        if (typeof renderRecursos === 'function') renderRecursos();
-        if (typeof scheduleSave === 'function') scheduleSave();
-      });
-    });
+  if (window.__appResFixV3) return;
+  window.__appResFixV3 = true;
+
+  function S() {
+    return (typeof state !== 'undefined') ? state : null;
   }
+
   function patchClamp() {
-    if (typeof window.clampRecurso !== 'function' || window.clampRecurso.__overMax) return;
-    window.clampRecurso = function (atual, max, lastMax) {
+    if (typeof window.clampRecurso === 'function' && window.clampRecurso.__overMax) return;
+    window.clampRecurso = function (atual, max) {
       if (atual == null || atual === undefined) return max;
       var v = Number(atual);
       if (isNaN(v)) return max;
@@ -38,12 +18,48 @@
     };
     window.clampRecurso.__overMax = true;
   }
+
+  function handleRes(btn) {
+    var st = S();
+    if (!st || typeof calcularRecursos !== 'function') return;
+    var res = btn.dataset.res;
+    var delta = Number(btn.dataset.delta || 0);
+    if (!delta) return;
+    var r = calcularRecursos();
+    if (res === 'vida') {
+      st.vidaAtual = Math.max(0, (st.vidaAtual != null ? Number(st.vidaAtual) : r.pvMax) + delta);
+    } else if (res === 'sanidade') {
+      st.sanAtual = Math.max(0, (st.sanAtual != null ? Number(st.sanAtual) : r.sanMax) + delta);
+    } else if (res === 'esforco') {
+      st.peAtual = Math.max(0, (st.peAtual != null ? Number(st.peAtual) : r.peMax) + delta);
+    } else {
+      return;
+    }
+    if (typeof renderRecursos === 'function') {
+      try { renderRecursos(); } catch (e) {}
+    }
+    if (typeof scheduleSave === 'function') scheduleSave();
+    else if (typeof saveState === 'function') saveState();
+  }
+
+  function onClick(e) {
+    var t = e.target;
+    if (!t || !t.closest) return;
+    var btn = t.closest('.res-btn');
+    if (!btn) return;
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+    handleRes(btn);
+  }
+
+  document.addEventListener('click', onClick, true);
+
   var n = 0;
   var t = setInterval(function () {
     n++;
-    rebind();
     patchClamp();
-    if (n > 20) clearInterval(t);
-  }, 250);
-  setInterval(patchClamp, 300);
+    if (n > 40) clearInterval(t);
+  }, 200);
+  setInterval(patchClamp, 2000);
 })();
