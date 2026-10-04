@@ -1,6 +1,6 @@
 /**
  * Login Google + sincronização (Firebase)
- * - Popup no desktop; no mobile tenta popup e cai em redirect
+ * - Desktop: popup | Mobile: redirect (popup falha no iOS)
  * - Nome de conta editável
  * - Merge local + nuvem (não apaga personagens)
  */
@@ -61,7 +61,7 @@
     const wrap = document.createElement('div');
     wrap.id = 'modal-nome-conta';
     wrap.hidden = true;
-    wrap.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:300;display:none;align-items:center;justify-content:center;padding:16px;';
+    wrap.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:500;display:none;align-items:center;justify-content:center;padding:16px;';
     wrap.innerHTML =
       '<div style="background:#16161f;border:1px solid #2a2a38;border-radius:12px;padding:22px;max-width:400px;width:100%;">' +
         '<h3 style="margin:0 0 6px;font-size:1.05rem;color:#f2f2f6;">Nome da conta</h3>' +
@@ -119,6 +119,7 @@
     customName = nome;
     try { localStorage.setItem(NOME_LOCAL_KEY, nome); } catch (e) {}
     updateAuthUI();
+    if (typeof window.__mobSyncAuth === 'function') window.__mobSyncAuth();
     fecharModalNome();
     toast('Nome atualizado');
 
@@ -239,6 +240,7 @@
           currentUser = redirectResult.user;
           updateAuthUI();
           if (typeof window.__mobSyncAuth === 'function') window.__mobSyncAuth();
+          try { sessionStorage.removeItem('escandinavo-auth-redirect'); } catch (e) {}
           toast('Login ok: ' + (redirectResult.user.displayName || redirectResult.user.email));
         }
       } catch (e) {
@@ -248,12 +250,24 @@
         }
       }
 
+      var __authToastOnce = false;
       auth.onAuthStateChanged(async function (user) {
         currentUser = user;
         updateAuthUI();
         if (typeof window.__mobSyncAuth === 'function') window.__mobSyncAuth();
         if (user) {
-          toast('Logado: ' + displayName());
+          if (!__authToastOnce) {
+            __authToastOnce = true;
+            try {
+              if (sessionStorage.getItem('escandinavo-auth-redirect')) {
+                sessionStorage.removeItem('escandinavo-auth-redirect');
+              } else {
+                toast('Logado: ' + displayName());
+              }
+            } catch (e) {
+              toast('Logado: ' + displayName());
+            }
+          }
           await pullFromCloud();
           if (typeof renderAgentes === 'function') renderAgentes();
           if (typeof renderCampanhas === 'function') renderCampanhas();
@@ -271,7 +285,7 @@
     const c = e.code || '';
     if (c === 'auth/popup-blocked') return 'Popup bloqueado. Permita popups ou tente de novo.';
     if (c === 'auth/popup-closed-by-user') return 'Janela fechada antes de concluir.';
-    if (c === 'auth/unauthorized-domain') return 'Domínio não autorizado. Adicione matt1a1.github.io no Firebase.';
+    if (c === 'auth/unauthorized-domain') return 'Domínio não autorizado. Adicione o domínio no Firebase Authentication.';
     if (c === 'auth/operation-not-allowed') return 'Login Google desativado no Firebase.';
     if (c === 'auth/network-request-failed') return 'Sem conexão com a internet.';
     if (c === 'auth/api-key-not-valid.-please-pass-a-valid-api-key' || c.indexOf('api-key') !== -1) return 'API key inválida. Atualize o firebase-config.';
@@ -293,27 +307,23 @@
       await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
     } catch (e) {}
 
-    toast('Abrindo login Google…');
-
     try {
+      // Mobile: redirect é mais confiável (iOS/Android bloqueiam popup)
       if (isMobile()) {
-        try {
-          await auth.signInWithPopup(provider);
-          if (typeof window.__mobSyncAuth === 'function') window.__mobSyncAuth();
-          return;
-        } catch (popupErr) {
-          console.warn('mobile popup', popupErr && popupErr.code, popupErr);
-          toast('Redirecionando para o Google…');
-          await auth.signInWithRedirect(provider);
-          return;
-        }
+        toast('Redirecionando para o Google…');
+        try { sessionStorage.setItem('escandinavo-auth-redirect', '1'); } catch (e) {}
+        await auth.signInWithRedirect(provider);
+        return;
       }
+      toast('Abrindo login Google…');
       await auth.signInWithPopup(provider);
+      if (typeof window.__mobSyncAuth === 'function') window.__mobSyncAuth();
     } catch (e) {
       console.error('login', e);
       if (e.code === 'auth/popup-blocked' || e.code === 'auth/cancelled-popup-request' || e.code === 'auth/popup-closed-by-user') {
         try {
           toast('Redirecionando para o Google…');
+          try { sessionStorage.setItem('escandinavo-auth-redirect', '1'); } catch (e3) {}
           await auth.signInWithRedirect(provider);
           return;
         } catch (e2) {
@@ -328,8 +338,10 @@
   async function logout() {
     try {
       await auth.signOut();
+      currentUser = null;
       toast('Você saiu da conta');
       updateAuthUI();
+      if (typeof window.__mobSyncAuth === 'function') window.__mobSyncAuth();
     } catch (e) {
       toast('Erro ao sair', true);
     }
@@ -369,7 +381,6 @@
     return Number(obj.atualizadoEm) || Number(obj.updatedAt) || Number(obj.criadoEm) || 0;
   }
 
-  /** Junta listas por id — não apaga itens locais nem da nuvem */
   function mergeById(localArr, cloudArr) {
     const map = {};
     (cloudArr || []).forEach(function (a) {
@@ -425,6 +436,7 @@
         customName = data.customName;
         try { localStorage.setItem(NOME_LOCAL_KEY, customName); } catch (e) {}
         updateAuthUI();
+        if (typeof window.__mobSyncAuth === 'function') window.__mobSyncAuth();
       }
 
       const cloudAgentes = Array.isArray(data.agentes) ? data.agentes : [];
