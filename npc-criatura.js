@@ -96,7 +96,7 @@
       nome: '',
       tipoFicha: 'custom',
       pericias: gerarPericias([], [], 3 + Math.floor(Math.random() * 3), { nex: 5 }),
-      anotacoes: 'NPC — ficha livre (sem limites). Perícias iniciais aleatórias — ajuste à vontade.'
+      anotacoes: 'NPC — ficha livre. Perícias aleatórias; PV/SAN/PE pela fórmula de NEX.'
     });
   }
 
@@ -115,17 +115,14 @@
         2 + Math.floor(Math.random() * 2),
         { nex: nex }
       ),
-      pvMaxOverride: 28,
-      sanMaxOverride: 22,
-      peMaxOverride: 12,
-      vidaAtual: 28,
-      sanAtual: 22,
-      peAtual: 12,
+      vidaAtual: null,
+      sanAtual: null,
+      peAtual: null,
       habilidades: [
         { nome: 'Patrulha', desc: '+2 na Defesa (origem/treino de campo).' },
         { nome: 'Ataque Especial', desc: 'Gasto de PE para ataque aprimorado.' }
       ],
-      anotacoes: 'Gerado: Agente da Ordem. Perícias aleatórias a cada geração.'
+      anotacoes: 'Gerado: Agente da Ordem. PV/SAN/PE calculados pelo NEX (' + nex + '%).'
     });
   }
 
@@ -144,17 +141,14 @@
         3 + Math.floor(Math.random() * 2),
         { nex: nex }
       ),
-      pvMaxOverride: 18,
-      sanMaxOverride: 30,
-      peMaxOverride: 16,
-      vidaAtual: 18,
-      sanAtual: 30,
-      peAtual: 16,
+      vidaAtual: null,
+      sanAtual: null,
+      peAtual: null,
       habilidades: [
         { nome: 'Método Científico', desc: 'Bônus em Ciências e Medicina em análises prolongadas.' },
         { nome: 'Protocolo Panaceia', desc: 'Pode estabilizar aliados com equipamentos de campo.' }
       ],
-      anotacoes: 'Gerado: Pesquisador da Panaceia. Perícias aleatórias a cada geração.'
+      anotacoes: 'Gerado: Pesquisador da Panaceia. PV/SAN/PE pelo NEX (' + nex + '%).'
     });
   }
 
@@ -173,18 +167,15 @@
         2 + Math.floor(Math.random() * 3),
         { nex: nex }
       ),
-      pvMaxOverride: 36,
-      sanMaxOverride: 18,
-      peMaxOverride: 14,
-      vidaAtual: 36,
-      sanAtual: 18,
-      peAtual: 14,
+      vidaAtual: null,
+      sanAtual: null,
+      peAtual: null,
       habilidades: [
         { nome: 'Caçador do Inferno', desc: 'Bônus contra criaturas paranormais identificadas.' },
         { nome: 'Arsenal Improvisado', desc: 'Sabe usar armas táticas e equipamentos especiais.' }
       ],
       ataques: [{ nome: 'Espingarda ritual', dano: '3d8', tipo: 'balístico' }],
-      anotacoes: 'Gerado: Hell Hunter. Perícias aleatórias a cada geração.'
+      anotacoes: 'Gerado: Hell Hunter. PV/SAN/PE pelo NEX (' + nex + '%).'
     });
   }
 
@@ -196,7 +187,7 @@
       classe: 'combatente',
       origem: 'desgarrado',
       pericias: gerarPericias(['fortitude', 'sobrevivencia'], ['luta', 'intimidacao', 'percepcao'], 2, { nex: 10 }),
-      anotacoes: 'Criatura/Ameaça — ficha livre.'
+      anotacoes: 'Criatura/Ameaça — ficha livre. Recursos pela fórmula de NEX.'
     });
   }
 
@@ -216,12 +207,9 @@
         3 + Math.floor(Math.random() * 2),
         { nex: nex }
       ),
-      pvMaxOverride: 45,
-      sanMaxOverride: 25,
-      peMaxOverride: 20,
-      vidaAtual: 45,
-      sanAtual: 25,
-      peAtual: 20,
+      vidaAtual: null,
+      sanAtual: null,
+      peAtual: null,
       habilidades: [
         { nome: 'Sede de Sangue', desc: 'Ao reduzir um alvo a 0 PV, recupera 2d6+2 PV.' },
         { nome: 'Forma Noturna', desc: 'Na escuridão, +2 em Furtividade e ataque.' },
@@ -234,7 +222,7 @@
         { nome: 'Garras', dano: '2d6+3', tipo: 'cortante' },
         { nome: 'Mordida', dano: '1d8+2', tipo: 'perfurante' }
       ],
-      anotacoes: 'Gerado: Vampiro. Perícias aleatórias a cada geração.'
+      anotacoes: 'Gerado: Vampiro. PV/SAN/PE pelo NEX (' + nex + '%).'
     });
   }
 
