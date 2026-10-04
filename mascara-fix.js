@@ -2,8 +2,8 @@
    Única fonte da lógica de máscara. ficha-mascaras.js é no-op.
    Bônus: +20 PV, +10 PE, +10 Defesa. Custos: −6 SAN ao colocar, −2 ao manter. */
 (function () {
-  if (window.__mascaraFixV5) return;
-  window.__mascaraFixV5 = true;
+  if (window.__mascaraFixV8) return;
+  window.__mascaraFixV8 = true;
 
   var PV = 20, PE = 10, DEF = 10;
   var locked = false;
@@ -72,11 +72,13 @@
       'border:1px solid rgba(239,68,68,.4);color:#fca5a5;background:rgba(239,68,68,.12);}',
       '#msk-box .msk-badge.on{background:rgba(239,68,68,.35);color:#fff;}',
       '#msk-box .msk-help{margin:0 0 10px;font-size:.78rem;color:#e7e5e4;line-height:1.4;}',
-      '#msk-box .msk-actions{display:flex;flex-wrap:wrap;gap:8px;}',
+      '#msk-box .msk-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}',
       '#msk-on,#msk-stay,#msk-off{cursor:pointer;border-radius:8px;padding:10px 14px;font-weight:700;font-size:.85rem;border:none;}',
       '#msk-on{background:linear-gradient(135deg,#9f1239,#e11d48);color:#fff;}',
       '#msk-stay{background:linear-gradient(135deg,#b91c1c,#dc2626);color:#fff;}',
       '#msk-off{background:#1c1917;color:#e7e5e4;border:1px solid #57534e!important;}',
+      '#msk-box .msk-hidden{display:none!important;}',
+      '#msk-box button:not(.msk-hidden){display:inline-flex!important;align-items:center;}',
       '#msk-msg{margin-top:8px;font-size:.75rem;color:#fecaca;min-height:1.1em;}',
       'body.msk-red{--accent:#ef4444;--accent-2:#b91c1c;}',
       'body.msk-red .brand h1{color:#fca5a5!important;}',
@@ -141,22 +143,28 @@
     }
   }
 
+  function hideBtn(el) {
+    if (!el) return;
+    el.classList.add('msk-hidden');
+    el.style.display = 'none';
+  }
+
+  function showBtn(el) {
+    if (!el) return;
+    el.classList.remove('msk-hidden');
+    el.style.display = 'inline-flex';
+  }
+
   function showChoice() {
-    var o = document.getElementById('msk-on');
-    var s = document.getElementById('msk-stay');
-    var f = document.getElementById('msk-off');
-    if (o) o.style.display = 'none';
-    if (s) s.style.display = '';
-    if (f) f.style.display = '';
+    hideBtn(document.getElementById('msk-on'));
+    showBtn(document.getElementById('msk-stay'));
+    showBtn(document.getElementById('msk-off'));
   }
 
   function showIdle() {
-    var o = document.getElementById('msk-on');
-    var s = document.getElementById('msk-stay');
-    var f = document.getElementById('msk-off');
-    if (o) o.style.display = '';
-    if (s) s.style.display = 'none';
-    if (f) f.style.display = 'none';
+    showBtn(document.getElementById('msk-on'));
+    hideBtn(document.getElementById('msk-stay'));
+    hideBtn(document.getElementById('msk-off'));
   }
 
   function syncUI() {
@@ -234,15 +242,20 @@
       '<span class="msk-badge" id="msk-badge">INATIVA</span>' +
       '</div>' +
       '<p class="msk-help">Clique em <b>Colocar Máscara</b>: +20 Vida, +10 Esforço, +10 Defesa, −6 Sanidade.<br>' +
-      'Depois: <b>Manter</b> (−2 SAN) ou <b>Tirar</b> (remove bônus).</p>' +
+      'Com a máscara ativa: <b>Manter</b> (−2 SAN por rodada) ou <b>Tirar</b> (remove bônus).</p>' +
       '<div class="msk-actions">' +
       '<button type="button" id="msk-on">Colocar Máscara</button>' +
-      '<button type="button" id="msk-stay" style="display:none">Manter máscara (−2 Sanidade)</button>' +
-      '<button type="button" id="msk-off" style="display:none">Tirar máscara</button>' +
+      '<button type="button" id="msk-stay" class="msk-hidden">Manter máscara (−2 Sanidade)</button>' +
+      '<button type="button" id="msk-off" class="msk-hidden">Tirar máscara</button>' +
       '</div>' +
       '<div id="msk-msg"></div>';
     placeBox(box);
     return true;
+  }
+
+  function clearBound(id) {
+    var btn = document.getElementById(id);
+    if (btn) btn.dataset.mskBound = '';
   }
 
   function rebind(id, handler) {
@@ -265,7 +278,7 @@
     rebind('msk-on', function () {
       if (isOn()) {
         syncUI();
-        msg('Máscara já ativa.');
+        msg('Máscara já ativa. Use Manter ou Tirar.');
         return;
       }
       locked = true;
@@ -280,7 +293,6 @@
         return;
       }
 
-      // Calcula base com máscara OFF
       state.mascaraAtiva = false;
       patch();
       var r0 = typeof calcularRecursos === 'function' ? calcularRecursos() : { pvMax: 0, peMax: 0 };
@@ -292,15 +304,25 @@
       state.vidaAtual = curPv + PV;
       state.peAtual = curPe + PE;
 
+      setBadge(true);
+      showChoice();
       msg('ATIVA: +20 Vida · +10 Esforço · +10 Defesa · −6 Sanidade');
+
+      clearBound('msk-stay');
+      clearBound('msk-off');
+      bindButtons();
+
       persist();
-      setTimeout(function () { locked = false; }, 600);
+      setTimeout(function () {
+        syncUI();
+        locked = false;
+      }, 600);
     });
 
     rebind('msk-stay', function () {
       if (!isOn()) {
-        var b = document.getElementById('msk-on');
-        if (b) b.click();
+        syncUI();
+        msg('Coloque a máscara primeiro.');
         return;
       }
       locked = true;
@@ -317,7 +339,10 @@
       state.sanAtual = Math.max(0, san - custo);
       msg('Mantida: −2 Sanidade');
       persist();
-      setTimeout(function () { locked = false; }, 400);
+      setTimeout(function () {
+        syncUI();
+        locked = false;
+      }, 400);
     });
 
     rebind('msk-off', function () {
@@ -336,14 +361,24 @@
       state.vidaAtual = npv;
       state.peAtual = Math.max(0, curPe - PE);
 
+      setBadge(false);
+      showIdle();
+
       if (npv === 0) {
         alert('0 Vida — morrendo.');
         msg('Removida. 0 Vida — morrendo.');
       } else {
         msg('Removida. Bônus perdidos.');
       }
+
+      clearBound('msk-on');
+      bindButtons();
+
       persist();
-      setTimeout(function () { locked = false; }, 600);
+      setTimeout(function () {
+        syncUI();
+        locked = false;
+      }, 600);
     });
   }
 
@@ -359,8 +394,9 @@
 
     var created = ensureBox();
     if (created) {
-      var btn = document.getElementById('msk-on');
-      if (btn) btn.dataset.mskBound = '';
+      clearBound('msk-on');
+      clearBound('msk-stay');
+      clearBound('msk-off');
     }
     bindButtons();
 

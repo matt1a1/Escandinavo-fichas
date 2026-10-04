@@ -63,7 +63,7 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
     if (html.indexOf('tabs-fix.js') === -1) extras += '<script src="tabs-fix.js?v=4"><\/script>\n';
     extras += '<script src="controls-fix.js?v=2"><\/script>\n';
     extras += '<script src="app-res-fix.js?v=2"><\/script>\n';
-    extras += '<script src="mascara-fix.js?v=7"><\/script>\n';
+    extras += '<script src="mascara-fix.js?v=8"><\/script>\n';
     html = html.replace(/habilidades-ui\.js[^"]*/g, 'habilidades-ui.js?v=card2');
     html = html.replace(/habilidades-catalog\.js[^"]*/g, 'habilidades-catalog.js?v=livro1');
     if (extras) html = html.replace('</body>', extras + '</body>');
