@@ -1,8 +1,9 @@
-/* ficha-custom-limits.js — reforça limites liberados na ficha custom (pós app.js) */
+/* ficha-custom-limits.js — reforça limites liberados na ficha custom e máscaras (pós app.js) */
 (function () {
   function custom() {
-    return (typeof state !== 'undefined' && state.tipoFicha === 'custom')
-      || (typeof isFichaCustom === 'function' && isFichaCustom());
+    return (typeof state !== 'undefined' && (state.tipoFicha === 'custom' || state.tipoFicha === 'mascaras'))
+      || (typeof isFichaCustom === 'function' && isFichaCustom())
+      || (typeof isFichaLivre === 'function' && isFichaLivre());
   }
 
   function install() {
@@ -10,7 +11,10 @@
     if (typeof getAttr !== 'function') return false;
 
     window.isFichaCustom = function () {
-      return !!(state && state.tipoFicha === 'custom');
+      return !!(state && (state.tipoFicha === 'custom' || state.tipoFicha === 'mascaras'));
+    };
+    window.isFichaLivre = function () {
+      return !!(state && (state.tipoFicha === 'custom' || state.tipoFicha === 'mascaras'));
     };
 
     if (typeof pontosDisponiveis === 'function' && !pontosDisponiveis.__c) {
@@ -75,47 +79,12 @@
       window.calcularRecursos.__cOverride = true;
     }
 
-    // Rebind atributos sem teto 5 / sem pool (uma vez; botões não são recriados)
-    if (!window.__customAttrRebound) {
-      document.querySelectorAll('.attr-item').forEach(function (el) {
-        var key = el.dataset.attr;
-        el.querySelectorAll('.attr-btn').forEach(function (btn) {
-          var neo = btn.cloneNode(true);
-          btn.parentNode.replaceChild(neo, btn);
-          neo.addEventListener('click', function () {
-            var delta = +neo.dataset.delta;
-            var val = (state.atributos[key] || 0) + delta;
-            if (custom()) {
-              if (val < 0) val = 0;
-              if (val > 20) val = 20;
-            } else {
-              if (val < 0) val = 0;
-              if (val > 5) val = 5;
-              if (delta > 0) {
-                if (typeof pontosDisponiveis === 'function' && pontosDisponiveis() <= 0) return;
-                if (typeof pontosAcimaDe3 === 'function' && typeof nexAumentosAtributo === 'function') {
-                  var acimaDepois = pontosAcimaDe3() - Math.max(0, state.atributos[key] - 3) + Math.max(0, val - 3);
-                  if (acimaDepois > nexAumentosAtributo()) {
-                    alert('O máximo inicial de cada atributo é 3. Aumento de Atributo (NEX 20%, 50%, 80% e 95%) permite subir até 5.');
-                    return;
-                  }
-                }
-              }
-            }
-            if (val === state.atributos[key]) return;
-            state.atributos[key] = val;
-            if (typeof renderAtributos === 'function') renderAtributos();
-            if (typeof renderRecursos === 'function') renderRecursos();
-            if (typeof renderPericias === 'function') renderPericias();
-            if (typeof renderItens === 'function') renderItens();
-            if (typeof scheduleSave === 'function') scheduleSave();
-          });
-        });
-      });
+    // Rebind atributos desativado — controls-fix.js cuida (evita double-bind)
+    if (false && !window.__customAttrRebound) {
       window.__customAttrRebound = true;
     }
 
-    // Perícias: na custom, qualquer rank livre (rebind após cada render)
+    // Perícias: na custom/máscaras, qualquer rank livre
     if (typeof renderPericias === 'function' && !renderPericias.__c) {
       var _rp = renderPericias;
       window.renderPericias = function () {
@@ -138,7 +107,7 @@
             if (typeof setPericiaRank === 'function') setPericiaRank(p.id, novo);
             if (typeof renderPericias === 'function') renderPericias();
             if (typeof renderRecursos === 'function') renderRecursos();
-            if (typeof scheduleSave === 'function') scheduleSave();
+            if (typeof saveState === 'function') saveState(); else if (typeof scheduleSave === 'function') scheduleSave();
           });
         });
       };
@@ -146,14 +115,18 @@
       try { window.renderPericias(); } catch (e) {}
     }
 
-    // Hint de atributos custom
     if (typeof renderAtributos === 'function' && !renderAtributos.__c) {
       var _ra = renderAtributos;
       window.renderAtributos = function () {
         _ra.apply(this, arguments);
         if (custom()) {
           var hint = document.getElementById('attr-nex-hint');
-          if (hint) hint.textContent = ' · Ficha Customizada: sem limite de pontos nem teto de atributo (0–20)';
+          if (hint) {
+            if (state.tipoFicha === 'mascaras')
+              hint.textContent = ' · Ficha das Máscaras: sem limite de pontos nem teto de atributo (0–20)';
+            else
+              hint.textContent = ' · Ficha Customizada: sem limite de pontos nem teto de atributo (0–20)';
+          }
         }
       };
       window.renderAtributos.__c = true;
