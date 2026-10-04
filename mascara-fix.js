@@ -1,29 +1,37 @@
-/* mascara-fix.js v10 — Forma Suprema
-   Colocar some → Manter + Tirar aparecem no lugar (nunca os 3 juntos).
+/* mascara-fix.js v11 — Forma Suprema
+   BUGFIX: não usar window.state (app.js declara const state — não vai para window).
+   Colocar some → Manter + Tirar no lugar.
    Colocar: −6 SAN, +20 PV, +10 PE, +10 DEF
-   Manter: −2 SAN
-   Tirar: remove bônus */
+   Manter: −2 SAN | Tirar: remove bônus */
 (function () {
-  if (window.__mascaraFixV10) return;
-  window.__mascaraFixV10 = true;
+  if (window.__mascaraFixV11) return;
+  window.__mascaraFixV11 = true;
 
   var PV = 20, PE = 10, DEF = 10;
   var patched = false;
   var busy = false;
 
+  function S() {
+    return (typeof state !== 'undefined') ? state : null;
+  }
+
   function freeLimits() {
-    if (typeof state === 'undefined' || !state) return;
+    var st = S();
+    if (!st) return;
     window.isFichaCustom = function () {
-      return !!(state && (state.tipoFicha === 'custom' || state.tipoFicha === 'mascaras'));
+      var s = S();
+      return !!(s && (s.tipoFicha === 'custom' || s.tipoFicha === 'mascaras'));
     };
     window.isFichaLivre = function () {
-      return !!(state && (state.tipoFicha === 'custom' || state.tipoFicha === 'mascaras'));
+      var s = S();
+      return !!(s && (s.tipoFicha === 'custom' || s.tipoFicha === 'mascaras'));
     };
   }
 
   function detectMask() {
-    if (typeof state === 'undefined' || !state) return false;
-    if (state.tipoFicha === 'mascaras') return true;
+    var st = S();
+    if (!st) return false;
+    if (st.tipoFicha === 'mascaras') return true;
     var id = '';
     try {
       id = (typeof AGENTE_ID !== 'undefined' && AGENTE_ID) ||
@@ -34,7 +42,7 @@
       var reg = JSON.parse(localStorage.getItem('escandinavo-agentes-registro') || '[]');
       for (var i = 0; i < reg.length; i++) {
         if (reg[i] && reg[i].id === id && reg[i].tipoFicha === 'mascaras') {
-          state.tipoFicha = 'mascaras';
+          st.tipoFicha = 'mascaras';
           return true;
         }
       }
@@ -44,7 +52,7 @@
       if (raw) {
         var data = JSON.parse(raw);
         if (data && data.tipoFicha === 'mascaras') {
-          state.tipoFicha = 'mascaras';
+          st.tipoFicha = 'mascaras';
           return true;
         }
       }
@@ -53,7 +61,8 @@
   }
 
   function isOn() {
-    return !!(window.state && state.mascaraAtiva);
+    var st = S();
+    return !!(st && st.mascaraAtiva);
   }
 
   function css() {
@@ -92,7 +101,8 @@
       var _cr = calcularRecursos;
       window.calcularRecursos = function () {
         var r = _cr.apply(this, arguments);
-        if (window.state && state.mascaraAtiva) {
+        var st = S();
+        if (st && st.mascaraAtiva) {
           r.pvMax = (Number(r.pvMax) || 0) + PV;
           r.peMax = (Number(r.peMax) || 0) + PE;
         }
@@ -105,7 +115,8 @@
       var _cd = calcularDefesa;
       window.calcularDefesa = function () {
         var v = Number(_cd.apply(this, arguments)) || 0;
-        if (window.state && state.mascaraAtiva) v += DEF;
+        var st = S();
+        if (st && st.mascaraAtiva) v += DEF;
         return v;
       };
       window.calcularDefesa.__mskOuter = true;
@@ -160,18 +171,19 @@
   }
 
   function refreshNumbers() {
-    if (typeof calcularRecursos !== 'function') return;
+    var st = S();
+    if (!st || typeof calcularRecursos !== 'function') return;
     var r = calcularRecursos();
     var def = typeof calcularDefesa === 'function' ? calcularDefesa() : 15;
     function set(id, v) {
       var el = document.getElementById(id);
       if (el) el.textContent = String(v);
     }
-    if (state.vidaAtual != null) set('vida-atual', state.vidaAtual);
+    if (st.vidaAtual != null) set('vida-atual', st.vidaAtual);
     set('vida-max', r.pvMax);
-    if (state.sanAtual != null) set('san-atual', state.sanAtual);
+    if (st.sanAtual != null) set('san-atual', st.sanAtual);
     set('san-max', r.sanMax);
-    if (state.peAtual != null) set('pe-atual', state.peAtual);
+    if (st.peAtual != null) set('pe-atual', st.peAtual);
     set('pe-max', r.peMax);
     set('defesa', def);
   }
@@ -198,13 +210,17 @@
   }
 
   function getSan() {
-    if (state.sanAtual != null && state.sanAtual !== undefined) return Number(state.sanAtual) || 0;
+    var st = S();
+    if (!st) return 0;
+    if (st.sanAtual != null && st.sanAtual !== undefined) return Number(st.sanAtual) || 0;
     if (typeof calcularRecursos === 'function') return Number(calcularRecursos().sanMax) || 0;
     return 0;
   }
 
   function doColocar() {
     if (busy) return;
+    var st = S();
+    if (!st) return;
     if (isOn()) {
       syncButtons();
       return;
@@ -218,16 +234,16 @@
       return;
     }
 
-    state.mascaraAtiva = false;
+    st.mascaraAtiva = false;
     patch();
     var r0 = typeof calcularRecursos === 'function' ? calcularRecursos() : { pvMax: 0, peMax: 0 };
-    var curPv = state.vidaAtual != null ? Number(state.vidaAtual) : (Number(r0.pvMax) || 0);
-    var curPe = state.peAtual != null ? Number(state.peAtual) : (Number(r0.peMax) || 0);
+    var curPv = st.vidaAtual != null ? Number(st.vidaAtual) : (Number(r0.pvMax) || 0);
+    var curPe = st.peAtual != null ? Number(st.peAtual) : (Number(r0.peMax) || 0);
 
-    state.sanAtual = Math.max(0, san - custo);
-    state.mascaraAtiva = true;
-    state.vidaAtual = curPv + PV;
-    state.peAtual = curPe + PE;
+    st.sanAtual = Math.max(0, san - custo);
+    st.mascaraAtiva = true;
+    st.vidaAtual = curPv + PV;
+    st.peAtual = curPe + PE;
 
     hideEl('msk-on');
     showEl('msk-stay');
@@ -241,6 +257,8 @@
 
   function doManter() {
     if (busy) return;
+    var st = S();
+    if (!st) return;
     if (!isOn()) {
       syncButtons();
       return;
@@ -253,7 +271,7 @@
       busy = false;
       return;
     }
-    state.sanAtual = Math.max(0, san - custo);
+    st.sanAtual = Math.max(0, san - custo);
     setMsg('Mantida: −2 Sanidade');
     persist();
     busy = false;
@@ -261,6 +279,8 @@
 
   function doTirar() {
     if (busy) return;
+    var st = S();
+    if (!st) return;
     if (!isOn()) {
       syncButtons();
       return;
@@ -268,13 +288,13 @@
     if (!confirm('Tirar a máscara? Perde +20 Vida / +10 Esforço / +10 Defesa.')) return;
     busy = true;
 
-    var curPv = state.vidaAtual != null ? Number(state.vidaAtual) : 0;
-    var curPe = state.peAtual != null ? Number(state.peAtual) : 0;
+    var curPv = st.vidaAtual != null ? Number(st.vidaAtual) : 0;
+    var curPe = st.peAtual != null ? Number(st.peAtual) : 0;
 
-    state.mascaraAtiva = false;
+    st.mascaraAtiva = false;
     var npv = Math.max(0, curPv - PV);
-    state.vidaAtual = npv;
-    state.peAtual = Math.max(0, curPe - PE);
+    st.vidaAtual = npv;
+    st.peAtual = Math.max(0, curPe - PE);
 
     showEl('msk-on');
     hideEl('msk-stay');
@@ -358,8 +378,9 @@
   }
 
   function tick() {
-    if (typeof state === 'undefined') return;
-    if (state.mascaraAtiva == null) state.mascaraAtiva = false;
+    var st = S();
+    if (!st) return;
+    if (st.mascaraAtiva == null) st.mascaraAtiva = false;
     if (!detectMask()) return;
 
     freeLimits();
