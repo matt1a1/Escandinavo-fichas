@@ -1,6 +1,9 @@
-/* controls-fix.js — NEX ±5 e atributos ±1 (sem double-bind)
+/* controls-fix.js — NEX ±5 e atributos ±1 (todas as fichas)
    NEX válido: 5,10,…,95,99 — de 99 o − vai para 95 (não 94) */
 (function () {
+  if (window.__controlsFixV3) return;
+  window.__controlsFixV3 = true;
+
   function stepNex(cur, delta) {
     cur = Number(cur) || 5;
     if (delta > 0) {
@@ -12,22 +15,22 @@
     if (cur === 99) return 95;
     return Math.max(5, cur - 5);
   }
+  window.stepNex = stepNex;
 
   function rebindNex() {
     document.querySelectorAll('.nex-btn').forEach(function (btn) {
       var d = Number(btn.dataset.delta);
-      if (!d || Math.abs(d) === 10) {
-        var txt = String(btn.textContent || '');
-        btn.dataset.delta = (d < 0 || txt.indexOf('«') >= 0 || txt.indexOf('<') >= 0 || txt.indexOf('‹') >= 0) ? '-5' : '5';
-        d = Number(btn.dataset.delta);
-      }
-      if (Math.abs(d) !== 5) {
-        btn.dataset.delta = (d < 0 ? -5 : 5);
+      var txt = String(btn.textContent || '');
+      if (!d || Math.abs(d) === 10 || Math.abs(d) !== 5) {
+        btn.dataset.delta = (d < 0 || txt.indexOf('«') >= 0 || txt.indexOf('<') >= 0 || txt.indexOf('‹') >= 0 || txt.indexOf('−') >= 0 || txt.indexOf('-') >= 0) ? '-5' : '5';
       }
       var neo = btn.cloneNode(true);
       neo.dataset.ctrlFix = '1';
+      neo.dataset.delta = btn.dataset.delta;
       btn.parentNode.replaceChild(neo, btn);
-      neo.addEventListener('click', function () {
+      neo.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
         if (typeof state === 'undefined') return;
         var delta = Number(neo.dataset.delta) || 5;
         if (Math.abs(delta) !== 5) delta = delta < 0 ? -5 : 5;
@@ -39,6 +42,7 @@
         if (typeof renderRecursos === 'function') renderRecursos();
         if (typeof renderPericias === 'function') renderPericias();
         if (typeof scheduleSave === 'function') scheduleSave();
+        else if (typeof saveState === 'function') saveState();
       });
     });
   }
@@ -50,16 +54,16 @@
       el.querySelectorAll('.attr-btn').forEach(function (btn) {
         var d = Number(btn.dataset.delta);
         var txt = String(btn.textContent || '');
-        if (!d || Math.abs(d) === 2) {
+        if (!d || Math.abs(d) === 2 || Math.abs(d) !== 1) {
           btn.dataset.delta = (d < 0 || txt.indexOf('−') >= 0 || txt.indexOf('-') >= 0) ? '-1' : '1';
-        }
-        if (Math.abs(Number(btn.dataset.delta)) !== 1) {
-          btn.dataset.delta = Number(btn.dataset.delta) < 0 ? '-1' : '1';
         }
         var neo = btn.cloneNode(true);
         neo.dataset.ctrlFix = '1';
+        neo.dataset.delta = btn.dataset.delta;
         btn.parentNode.replaceChild(neo, btn);
-        neo.addEventListener('click', function () {
+        neo.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
           if (typeof state === 'undefined' || !state.atributos) return;
           var delta = Number(neo.dataset.delta) || 1;
           if (Math.abs(delta) !== 1) delta = delta < 0 ? -1 : 1;
@@ -90,25 +94,30 @@
           if (typeof renderRecursos === 'function') renderRecursos();
           if (typeof renderPericias === 'function') renderPericias();
           if (typeof scheduleSave === 'function') scheduleSave();
+          else if (typeof saveState === 'function') saveState();
         });
       });
     });
   }
 
   function run() {
+    if (typeof state === 'undefined') return false;
+    if (!document.querySelector('.nex-btn, .attr-btn')) return false;
     rebindNex();
     rebindAttr();
+    return true;
   }
 
   var n = 0;
   var t = setInterval(function () {
     n++;
-    if (typeof state !== 'undefined' && document.querySelector('.nex-btn, .attr-btn')) {
-      run();
+    if (run() || n > 50) {
       clearInterval(t);
-      setTimeout(run, 800);
-      setTimeout(run, 2000);
+      setInterval(run, 2500);
     }
-    if (n > 40) clearInterval(t);
-  }, 150);
+  }, 120);
+
+  setTimeout(run, 400);
+  setTimeout(run, 1200);
+  setTimeout(run, 3000);
 })();
