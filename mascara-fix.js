@@ -1,7 +1,7 @@
-/* mascara-fix.js — botão Máscara estilo original + detecção robusta */
+/* mascara-fix.js — Forma Suprema estável (sem reverter ao clicar) */
 (function () {
   var PV = 20, PE = 10, DEF = 10;
-  var injected = false;
+  var locked = false;
 
   function freeLimits() {
     if (typeof state === 'undefined') return;
@@ -17,13 +17,11 @@
   function detectMask() {
     if (typeof state === 'undefined' || !state) return false;
     if (state.tipoFicha === 'mascaras') return true;
-
     var id = '';
     try {
       id = (typeof AGENTE_ID !== 'undefined' && AGENTE_ID) || new URLSearchParams(location.search).get('id') || '';
     } catch (e) {}
     if (!id) return false;
-
     try {
       var reg = JSON.parse(localStorage.getItem('escandinavo-agentes-registro') || '[]');
       for (var i = 0; i < reg.length; i++) {
@@ -33,7 +31,6 @@
         }
       }
     } catch (e) {}
-
     try {
       var raw = localStorage.getItem('escandinavo-ficha-' + id);
       if (raw) {
@@ -44,11 +41,10 @@
         }
       }
     } catch (e) {}
-
     return false;
   }
 
-  function on() { return !!(window.state && state.mascaraAtiva); }
+  function isOn() { return !!(window.state && state.mascaraAtiva); }
 
   function css() {
     if (document.getElementById('msk-css')) return;
@@ -88,7 +84,7 @@
         }
         return r;
       };
-      calcularRecursos.__mskOuter = true;
+      window.calcularRecursos.__mskOuter = true;
     }
     if (typeof calcularDefesa === 'function' && !calcularDefesa.__mskOuter) {
       var _cd = calcularDefesa;
@@ -97,7 +93,7 @@
         if (window.state && state.mascaraAtiva) v = (Number(v) || 0) + DEF;
         return v;
       };
-      calcularDefesa.__mskOuter = true;
+      window.calcularDefesa.__mskOuter = true;
     }
   }
 
@@ -105,6 +101,7 @@
     var e = document.getElementById('msk-msg');
     if (e) e.textContent = t || '';
   }
+
   function setBadge(a) {
     var b = document.getElementById('msk-badge');
     if (!b) return;
@@ -118,6 +115,7 @@
       document.body.classList.remove('msk-red');
     }
   }
+
   function showChoice() {
     var o = document.getElementById('msk-on');
     var s = document.getElementById('msk-stay');
@@ -126,6 +124,7 @@
     if (s) s.style.display = '';
     if (f) f.style.display = '';
   }
+
   function showIdle() {
     var o = document.getElementById('msk-on');
     var s = document.getElementById('msk-stay');
@@ -133,6 +132,16 @@
     if (o) o.style.display = '';
     if (s) s.style.display = 'none';
     if (f) f.style.display = 'none';
+  }
+
+  function syncUI() {
+    if (isOn()) {
+      setBadge(true);
+      showChoice();
+    } else {
+      setBadge(false);
+      showIdle();
+    }
   }
 
   function forceUI() {
@@ -161,52 +170,55 @@
         lastResourceMax.san = r.sanMax;
       }
     } catch (e) {}
-    if (typeof scheduleSave === 'function') scheduleSave();
-    else if (typeof saveState === 'function') saveState();
+    if (typeof saveState === 'function') saveState();
+    else if (typeof scheduleSave === 'function') scheduleSave();
     if (typeof renderRecursos === 'function') {
       try { renderRecursos(); } catch (e) {}
     }
     forceUI();
+    syncUI();
   }
 
   function placeBox(box) {
-    var targets = [
-      document.querySelector('section.card.resources'),
-      document.querySelector('.resources'),
-      document.querySelector('#resources'),
-      document.querySelector('section.card.attributes'),
-      document.querySelector('.attributes'),
-      document.querySelector('.attr-wheel'),
-      document.querySelector('main'),
-      document.querySelector('#app'),
-      document.body
-    ];
-    for (var i = 0; i < targets.length; i++) {
-      var t = targets[i];
-      if (!t) continue;
-      if (t === document.body || t.id === 'app' || t.tagName === 'MAIN') {
-        t.insertBefore(box, t.firstChild);
-        return;
-      }
-      if (t.parentNode) {
-        if (t.classList && (t.classList.contains('resources') || t.id === 'resources')) {
-          t.parentNode.insertBefore(box, t);
-        } else {
-          t.parentNode.insertBefore(box, t.nextSibling);
-        }
-        return;
-      }
-    }
-    document.body.appendChild(box);
-  }
-
-  function bindOnce() {
-    var btnOn = document.getElementById('msk-on');
-    if (!btnOn) return;
-    if (btnOn.dataset.mskBound === '1') {
-      if (on()) { setBadge(true); showChoice(); } else { setBadge(false); showIdle(); }
+    var res = document.querySelector('section.card.resources') || document.querySelector('.resources');
+    if (res && res.parentNode) {
+      res.parentNode.insertBefore(box, res);
       return;
     }
+    var at = document.querySelector('section.card.attributes') || document.querySelector('.attributes') || document.querySelector('.attr-wheel');
+    if (at && at.parentNode) {
+      at.parentNode.insertBefore(box, at.nextSibling);
+      return;
+    }
+    var app = document.querySelector('#app') || document.body;
+    app.insertBefore(box, app.firstChild);
+  }
+
+  function ensureBox() {
+    if (document.getElementById('msk-box')) return false;
+    var box = document.createElement('div');
+    box.id = 'msk-box';
+    box.innerHTML =
+      '<div class="msk-head">' +
+      '<p class="msk-title">Forma Suprema</p>' +
+      '<span class="msk-badge" id="msk-badge">INATIVA</span>' +
+      '</div>' +
+      '<p class="msk-help">Clique em <b>Colocar Máscara</b>: +20 Vida, +10 Esforço, +10 Defesa, −6 Sanidade.<br>' +
+      'Depois: <b>Manter</b> (−2 SAN) ou <b>Tirar</b> (remove bônus).</p>' +
+      '<div class="msk-actions">' +
+      '<button type="button" id="msk-on">Colocar Máscara</button>' +
+      '<button type="button" id="msk-stay" style="display:none">Manter máscara (−2 Sanidade)</button>' +
+      '<button type="button" id="msk-off" style="display:none">Tirar máscara</button>' +
+      '</div>' +
+      '<div id="msk-msg"></div>';
+    placeBox(box);
+    return true;
+  }
+
+  function bindButtons() {
+    var btnOn = document.getElementById('msk-on');
+    if (!btnOn) return;
+    if (btnOn.dataset.mskBound === '1') return;
 
     function rebind(id, handler) {
       var btn = document.getElementById(id);
@@ -222,68 +234,77 @@
     }
 
     rebind('msk-on', function () {
-      if (on()) { showChoice(); msg('Máscara já ativa.'); return; }
+      if (isOn()) {
+        syncUI();
+        msg('Máscara já ativa.');
+        return;
+      }
+      locked = true;
       var custo = 6;
       var san = state.sanAtual;
       if (san == null || san === undefined) {
         san = (typeof calcularRecursos === 'function' ? calcularRecursos().sanMax : 0) || 0;
       }
       san = Number(san) || 0;
-      if (san < custo && !confirm('Sanidade insuficiente (' + san + '). Continuar?')) return;
-      state.sanAtual = Math.max(0, san - custo);
+      if (san < custo && !confirm('Sanidade insuficiente (' + san + '). Continuar?')) {
+        locked = false;
+        return;
+      }
 
       state.mascaraAtiva = false;
       var r0 = typeof calcularRecursos === 'function' ? calcularRecursos() : { pvMax: 0, peMax: 0 };
       var curPv = state.vidaAtual != null ? Number(state.vidaAtual) : (r0.pvMax || 0);
       var curPe = state.peAtual != null ? Number(state.peAtual) : (r0.peMax || 0);
 
+      state.sanAtual = Math.max(0, san - custo);
       state.mascaraAtiva = true;
       state.vidaAtual = curPv + PV;
       state.peAtual = curPe + PE;
-      state.pvMaxOverride = (r0.pvMax || 0) + PV;
-      state.peMaxOverride = (r0.peMax || 0) + PE;
 
-      setBadge(true);
-      showChoice();
       msg('ATIVA: +20 Vida · +10 Esforço · +10 Defesa · −6 Sanidade');
       persist();
+      setTimeout(function () { locked = false; }, 800);
     });
 
     rebind('msk-stay', function () {
-      if (!on()) {
+      if (!isOn()) {
         var b = document.getElementById('msk-on');
         if (b) b.click();
         return;
       }
+      locked = true;
       var custo = 2;
       var san = state.sanAtual;
       if (san == null || san === undefined) {
         san = (typeof calcularRecursos === 'function' ? calcularRecursos().sanMax : 0) || 0;
       }
       san = Number(san) || 0;
-      if (san < custo && !confirm('Sanidade insuficiente (' + san + '). Continuar?')) return;
+      if (san < custo && !confirm('Sanidade insuficiente (' + san + '). Continuar?')) {
+        locked = false;
+        return;
+      }
       state.sanAtual = Math.max(0, san - custo);
       msg('Mantida: −2 Sanidade');
       persist();
+      setTimeout(function () { locked = false; }, 500);
     });
 
     rebind('msk-off', function () {
-      if (!on()) { showIdle(); msg('Cancelado.'); return; }
+      if (!isOn()) {
+        syncUI();
+        msg('Cancelado.');
+        return;
+      }
       if (!confirm('Tirar a máscara? Perde +20 Vida / +10 Esforço / +10 Defesa.')) return;
+      locked = true;
       var curPv = state.vidaAtual != null ? Number(state.vidaAtual) : 0;
       var curPe = state.peAtual != null ? Number(state.peAtual) : 0;
-      if (state.pvMaxOverride != null && state.pvMaxOverride !== '') {
-        state.pvMaxOverride = Math.max(1, Number(state.pvMaxOverride) - PV);
-      }
-      if (state.peMaxOverride != null && state.peMaxOverride !== '') {
-        state.peMaxOverride = Math.max(1, Number(state.peMaxOverride) - PE);
-      }
+
       state.mascaraAtiva = false;
       var npv = Math.max(0, curPv - PV);
       state.vidaAtual = npv;
       state.peAtual = Math.max(0, curPe - PE);
-      setBadge(false);
-      showIdle();
+
       if (npv === 0) {
         alert('0 Vida — morrendo.');
         msg('Removida. 0 Vida — morrendo.');
@@ -291,71 +312,39 @@
         msg('Removida. Bônus perdidos.');
       }
       persist();
+      setTimeout(function () { locked = false; }, 800);
     });
   }
 
-  function inject() {
-    if (!detectMask()) return false;
+  function tick() {
+    if (typeof state === 'undefined') return;
+    if (state.mascaraAtiva == null) state.mascaraAtiva = false;
+    if (!detectMask()) return;
+
     freeLimits();
     document.body.classList.add('ficha-mascaras-sheet');
     css();
     patch();
 
-    if (!document.getElementById('msk-box')) {
-      var box = document.createElement('div');
-      box.id = 'msk-box';
-      box.innerHTML =
-        '<div class="msk-head">' +
-        '<p class="msk-title">Forma Suprema</p>' +
-        '<span class="msk-badge" id="msk-badge">INATIVA</span>' +
-        '</div>' +
-        '<p class="msk-help">Clique em <b>Colocar Máscara</b>: +20 Vida, +10 Esforço, +10 Defesa, −6 Sanidade.<br>' +
-        'Depois: <b>Manter</b> (−2 SAN) ou <b>Tirar</b> (remove bônus).</p>' +
-        '<div class="msk-actions">' +
-        '<button type="button" id="msk-on">Colocar Máscara</button>' +
-        '<button type="button" id="msk-stay" style="display:none">Manter máscara (−2 Sanidade)</button>' +
-        '<button type="button" id="msk-off" style="display:none">Tirar máscara</button>' +
-        '</div>' +
-        '<div id="msk-msg"></div>';
-      placeBox(box);
-      injected = true;
+    var created = ensureBox();
+    if (created) {
+      var btn = document.getElementById('msk-on');
+      if (btn) btn.dataset.mskBound = '';
     }
+    bindButtons();
 
-    bindOnce();
-    if (on()) {
-      setBadge(true);
-      showChoice();
-    } else {
-      setBadge(false);
-      showIdle();
-    }
-    return true;
+    if (!locked) syncUI();
   }
 
-  var tries = 0;
+  var n = 0;
   var timer = setInterval(function () {
-    tries++;
-    if (typeof state === 'undefined') return;
-    if (state.mascaraAtiva == null) state.mascaraAtiva = false;
-    freeLimits();
-    var ok = inject();
-    if (ok && document.getElementById('msk-box') && document.getElementById('msk-on')) {
-      if (tries > 15) {
-        clearInterval(timer);
-        setInterval(function () {
-          if (detectMask() && !document.getElementById('msk-box')) inject();
-          else if (detectMask()) {
-            freeLimits();
-            bindOnce();
-          }
-        }, 2000);
-      }
+    n++;
+    tick();
+    if (n === 80) {
+      clearInterval(timer);
+      setInterval(tick, 3000);
     }
   }, 250);
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function () { setTimeout(inject, 300); });
-  } else {
-    setTimeout(inject, 300);
-  }
+  setTimeout(tick, 400);
 })();
