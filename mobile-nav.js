@@ -1,9 +1,30 @@
 /**
  * Menu lateral estilo CRIS + login Google no celular
+ * BUGFIX: EscandinavoAuth.user / displayName / editName são funções
  */
 (function () {
   function isMobile() {
     return window.innerWidth <= 720;
+  }
+
+  function authUser() {
+    try {
+      if (!window.EscandinavoAuth || typeof window.EscandinavoAuth.user !== 'function') return null;
+      return window.EscandinavoAuth.user() || null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function authDisplayName(user) {
+    try {
+      if (window.EscandinavoAuth && typeof window.EscandinavoAuth.displayName === 'function') {
+        var n = window.EscandinavoAuth.displayName();
+        if (n) return n;
+      }
+    } catch (e) {}
+    if (user) return user.displayName || user.email || 'Conta';
+    return '';
   }
 
   function buildDrawer() {
@@ -48,24 +69,41 @@
     document.getElementById('mob-drawer-close').addEventListener('click', close);
     backdrop.addEventListener('click', close);
 
-    drawer.querySelectorAll('.mob-drawer-link[data-view]').forEach(function (btn) {
+    drawer.querySelectorAll('[data-view]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         var view = btn.getAttribute('data-view');
+        drawer.querySelectorAll('[data-view]').forEach(function (b) {
+          b.classList.toggle('active', b === btn);
+        });
         close();
-        var navLink = document.querySelector('.ag-nav a[data-view="' + view + '"]');
-        if (navLink) navLink.click();
-        else if (typeof window.mostrarView === 'function') window.mostrarView(view);
+        if (typeof window.mostrarView === 'function') window.mostrarView(view);
       });
     });
 
-    document.getElementById('mob-btn-login').addEventListener('click', function () {
-      if (window.EscandinavoAuth && window.EscandinavoAuth.login) window.EscandinavoAuth.login();
+    document.getElementById('mob-btn-login').addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (window.EscandinavoAuth && typeof window.EscandinavoAuth.login === 'function') {
+        window.EscandinavoAuth.login();
+      } else {
+        alert('Login ainda carregando. Aguarde 1 segundo e tente de novo.');
+      }
     });
-    document.getElementById('mob-btn-logout').addEventListener('click', function () {
-      if (window.EscandinavoAuth && window.EscandinavoAuth.logout) window.EscandinavoAuth.logout();
+    document.getElementById('mob-btn-logout').addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (window.EscandinavoAuth && typeof window.EscandinavoAuth.logout === 'function') {
+        window.EscandinavoAuth.logout().then(function () {
+          syncAuthUI();
+        }).catch(function () { syncAuthUI(); });
+      }
     });
-    document.getElementById('mob-btn-edit-name').addEventListener('click', function () {
-      if (window.EscandinavoAuth && window.EscandinavoAuth.editDisplayName) window.EscandinavoAuth.editDisplayName();
+    document.getElementById('mob-btn-edit-name').addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (window.EscandinavoAuth && typeof window.EscandinavoAuth.editName === 'function') {
+        window.EscandinavoAuth.editName();
+      }
     });
 
     window.__mobDrawerOpen = open;
@@ -78,20 +116,28 @@
     var editBtn = document.getElementById('mob-btn-edit-name');
     var label = document.getElementById('mob-auth-label');
     if (!loginBtn) return;
-    var user = window.EscandinavoAuth && window.EscandinavoAuth.user;
+
+    var user = authUser();
     if (user) {
       loginBtn.style.display = 'none';
-      logoutBtn.style.display = 'block';
-      editBtn.style.display = 'block';
-      var name = (window.EscandinavoAuth.getDisplayName && window.EscandinavoAuth.getDisplayName()) || user.displayName || user.email || 'Conta';
-      if (label) label.textContent = 'Logado: ' + (name || user.email || 'Conta');
+      if (logoutBtn) logoutBtn.style.display = 'block';
+      if (editBtn) editBtn.style.display = 'block';
+      if (label) label.textContent = 'Logado: ' + authDisplayName(user);
     } else {
       loginBtn.style.display = 'block';
-      logoutBtn.style.display = 'none';
-      editBtn.style.display = 'none';
-      if (label) label.textContent = 'Entre para salvar na nuvem';
+      if (logoutBtn) logoutBtn.style.display = 'none';
+      if (editBtn) editBtn.style.display = 'none';
+      if (label) {
+        if (window.EscandinavoAuth && window.EscandinavoAuth.ready && !window.EscandinavoAuth.ready()) {
+          label.textContent = 'Login indisponível (config)';
+        } else {
+          label.textContent = 'Entre para salvar na nuvem';
+        }
+      }
     }
   }
+
+  window.__mobSyncAuth = syncAuthUI;
 
   function injectHamburger() {
     var nav = document.querySelector('.ag-nav');
@@ -141,11 +187,12 @@
     injectHamburger();
     buildDrawer();
     enhanceAgentCards();
+    syncAuthUI();
     var tries = 0;
     var t = setInterval(function () {
       tries++;
       syncAuthUI();
-      if ((window.EscandinavoAuth && window.EscandinavoAuth.user) || tries > 20) clearInterval(t);
+      if (tries > 30) clearInterval(t);
     }, 400);
   }
 
@@ -159,6 +206,7 @@
     if (isMobile()) {
       injectHamburger();
       buildDrawer();
+      syncAuthUI();
     }
   });
 
