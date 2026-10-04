@@ -1,5 +1,18 @@
-/* controls-fix.js — NEX ±5 e atributos ±1 (sem double-bind) */
+/* controls-fix.js — NEX ±5 e atributos ±1 (sem double-bind)
+   NEX válido: 5,10,…,95,99 — de 99 o − vai para 95 (não 94) */
 (function () {
+  function stepNex(cur, delta) {
+    cur = Number(cur) || 5;
+    if (delta > 0) {
+      if (cur >= 99) return 99;
+      if (cur >= 95) return 99;
+      return Math.min(95, cur + 5);
+    }
+    if (cur <= 5) return 5;
+    if (cur === 99) return 95;
+    return Math.max(5, cur - 5);
+  }
+
   function rebindNex() {
     document.querySelectorAll('.nex-btn').forEach(function (btn) {
       var d = Number(btn.dataset.delta);
@@ -18,7 +31,7 @@
         if (typeof state === 'undefined') return;
         var delta = Number(neo.dataset.delta) || 5;
         if (Math.abs(delta) !== 5) delta = delta < 0 ? -5 : 5;
-        state.nex = Math.max(5, Math.min(99, (Number(state.nex) || 5) + delta));
+        state.nex = stepNex(state.nex, delta);
         var nd = document.getElementById('nex-display');
         if (nd) nd.textContent = state.nex + '%';
         if (typeof normalizarAtributosNex === 'function') normalizarAtributosNex();
