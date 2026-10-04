@@ -90,7 +90,7 @@ const HABILIDADES_CATALOG = [
   { nome: 'Perito em Explosivos', classe: 'Especialista', categoria: 'Poderes de Especialista', nex: '', pe: '—',
     desc: 'Soma Int na DT dos seus explosivos e exclui da explosão um número de alvos igual ao Int.' },
   { nome: 'Primeira Impressão', classe: 'Especialista', categoria: 'Poderes de Especialista', nex: '', pe: '—',
-    desc: ' +2 dados no primeiro teste de Diplomacia, Enganação, Intimidação ou Intuição da cena.' },
+    desc: '+2 dados no primeiro teste de Diplomacia, Enganação, Intimidação ou Intuição da cena.' },
   { nome: 'Transcender', classe: 'Especialista', categoria: 'Poderes de Especialista', nex: '', pe: '—',
     desc: 'Escolhe um poder paranormal, mas não ganha Sanidade nesse aumento de NEX. Pode repetir.' },
   { nome: 'Treinamento em Perícia', classe: 'Especialista', categoria: 'Poderes de Especialista', nex: '', pe: '—',
