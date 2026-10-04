@@ -1,6 +1,8 @@
 // Catálogo de Habilidades — Ordem Paranormal RPG 1ª Edição
-// Textos oficiais Combatente / Especialista / Ocultista + trilhas
+// Textos oficiais Combatente / Especialista / Ocultista (Habilidades de Classe + Poderes)
+// Trilhas e poderes paranormais vêm de habilidades-catalog-extra.js
 const HABILIDADES_CATALOG = [
+  // ========== COMBATENTE — Habilidades de Classe ==========
   { nome: 'Ataque Especial', classe: 'Combatente', categoria: 'Habilidades de Classe', nex: '5%', pe: '2+ PE',
     desc: 'Ao atacar, gasta 2 PE para +5 no ataque ou no dano. Ganha mais bônus de +5 por +1 PE: 3 PE/+10 (NEX 25%), 4 PE/+15 (55%) e 5 PE/+20 (85%).' },
   { nome: 'Habilidade de Trilha', classe: 'Combatente', categoria: 'Habilidades de Classe', nex: '10%', pe: '—',
@@ -10,13 +12,15 @@ const HABILIDADES_CATALOG = [
   { nome: 'Aumento de Atributo', classe: 'Combatente', categoria: 'Habilidades de Classe', nex: '20%', pe: '—',
     desc: '+1 em um atributo em NEX 20%, 50%, 80% e 95%, até o máximo de 5.' },
   { nome: 'Grau de Treinamento', classe: 'Combatente', categoria: 'Habilidades de Classe', nex: '35%', pe: '—',
-    desc: 'Em NEX 35% e 70%, sobe um grau em 2 + Intelecto perícias.' },
+    desc: 'Em NEX 35% e 70%, sobe um grau em 1 + Intelecto perícias treinadas (de treinado para veterano ou de veterano para expert).' },
   { nome: 'Versatilidade', classe: 'Combatente', categoria: 'Habilidades de Classe', nex: '50%', pe: '—',
     desc: 'Em NEX 50%, escolhe entre um poder de Combatente ou o 1º poder de outra trilha de Combatente.' },
-  { nome: 'Artista Marcial', classe: 'Combatente', categoria: 'Poderes de Combatente', nex: '', pe: '—',
-    desc: 'Desarmado causa 1d6, letal e ágil. Sobe para 1d8 em NEX 35% e 1d10 em 70%.' },
+
+  // ========== COMBATENTE — Poderes ==========
   { nome: 'Armamento Pesado', classe: 'Combatente', categoria: 'Poderes de Combatente', nex: '', pe: '—',
     desc: 'Proficiência com armas pesadas. Pré: For 2.' },
+  { nome: 'Artista Marcial', classe: 'Combatente', categoria: 'Poderes de Combatente', nex: '', pe: '—',
+    desc: 'Desarmado causa 1d6, letal e ágil. Sobe para 1d8 em NEX 35% e 1d10 em 70%.' },
   { nome: 'Ataque de Oportunidade', classe: 'Combatente', categoria: 'Poderes de Combatente', nex: '', pe: '1 PE',
     desc: 'Quando um ser sai voluntariamente de um espaço adjacente, reação + 1 PE para um ataque corpo a corpo.' },
   { nome: 'Combater com Duas Armas', classe: 'Combatente', categoria: 'Poderes de Combatente', nex: '', pe: '—',
@@ -41,6 +45,8 @@ const HABILIDADES_CATALOG = [
     desc: 'Ao acertar com arma de fogo, pode atacar de novo o mesmo alvo, pagando 2 PE por cada ataque já feito no turno. Pré: NEX 60%.' },
   { nome: 'Sentido Tático', classe: 'Combatente', categoria: 'Poderes de Combatente', nex: '', pe: '2 PE',
     desc: 'Ação de movimento + 2 PE. Recebe bônus em Defesa e resistência igual ao Intelecto até o fim da cena. Pré: Int 2, treinado em Percepção e Tática.' },
+
+  // ========== ESPECIALISTA — Habilidades de Classe ==========
   { nome: 'Eclético', classe: 'Especialista', categoria: 'Habilidades de Classe', nex: '5%', pe: '2 PE',
     desc: 'Ao testar uma perícia, 2 PE para ter os benefícios de ser treinado nela.' },
   { nome: 'Perito', classe: 'Especialista', categoria: 'Habilidades de Classe', nex: '5%', pe: '2+ PE',
@@ -52,13 +58,15 @@ const HABILIDADES_CATALOG = [
   { nome: 'Aumento de Atributo', classe: 'Especialista', categoria: 'Habilidades de Classe', nex: '20%', pe: '—',
     desc: '+1 em um atributo em NEX 20%, 50%, 80% e 95%, até o máximo de 5.' },
   { nome: 'Grau de Treinamento', classe: 'Especialista', categoria: 'Habilidades de Classe', nex: '35%', pe: '—',
-    desc: 'Em NEX 35% e 70%, sobe um grau em 5 + Intelecto perícias.' },
+    desc: 'Em NEX 35% e 70%, sobe um grau em 5 + Intelecto perícias treinadas (de treinado para veterano ou de veterano para expert).' },
   { nome: 'Engenhosidade', classe: 'Especialista', categoria: 'Habilidades de Classe', nex: '40%', pe: '—',
     desc: 'No Eclético, em NEX 40% pode gastar +2 PE para ter os benefícios de veterano. Em 75%, +4 PE para os de expert.' },
   { nome: 'Versatilidade', classe: 'Especialista', categoria: 'Habilidades de Classe', nex: '50%', pe: '—',
     desc: 'Em NEX 50%, escolhe entre um poder de Especialista ou o 1º poder de outra trilha de Especialista.' },
+
+  // ========== ESPECIALISTA — Poderes ==========
   { nome: 'Artista Marcial', classe: 'Especialista', categoria: 'Poderes de Especialista', nex: '', pe: '—',
-    desc: 'Igual ao do Combatente: desarmado 1d6 letal e ágil (1d8 em NEX 35%, 1d10 em 70%); ataques desarmados contam como armas ágeis.' },
+    desc: 'Igual ao do Combatente: desarmado causa 1d6, letal e ágil (1d8 em NEX 35%, 1d10 em 70%). Ataques desarmados contam como armas ágeis.' },
   { nome: 'Balística Avançada', classe: 'Especialista', categoria: 'Poderes de Especialista', nex: '', pe: '—',
     desc: 'Proficiência com armas táticas de fogo e +2 no dano com armas de fogo.' },
   { nome: 'Conhecimento Aplicado', classe: 'Especialista', categoria: 'Poderes de Especialista', nex: '', pe: '2 PE',
@@ -82,11 +90,13 @@ const HABILIDADES_CATALOG = [
   { nome: 'Perito em Explosivos', classe: 'Especialista', categoria: 'Poderes de Especialista', nex: '', pe: '—',
     desc: 'Soma Int na DT dos seus explosivos e exclui da explosão um número de alvos igual ao Int.' },
   { nome: 'Primeira Impressão', classe: 'Especialista', categoria: 'Poderes de Especialista', nex: '', pe: '—',
-    desc: '+2 dados no primeiro teste de Diplomacia, Enganação, Intimidação ou Intuição da cena.' },
+    desc: ' +2 dados no primeiro teste de Diplomacia, Enganação, Intimidação ou Intuição da cena.' },
   { nome: 'Transcender', classe: 'Especialista', categoria: 'Poderes de Especialista', nex: '', pe: '—',
     desc: 'Escolhe um poder paranormal, mas não ganha Sanidade nesse aumento de NEX. Pode repetir.' },
   { nome: 'Treinamento em Perícia', classe: 'Especialista', categoria: 'Poderes de Especialista', nex: '', pe: '—',
     desc: 'Treina 2 perícias. A partir de NEX 35% pode subir para veterano e, a partir de 70%, para expert. Pode repetir.' },
+
+  // ========== OCULTISTA — Habilidades de Classe ==========
   { nome: 'Escolhido pelo Outro Lado', classe: 'Ocultista', categoria: 'Habilidades de Classe', nex: '5%', pe: '—',
     desc: 'Lança rituais de 1º círculo. Ganha o 2º círculo em NEX 25%, o 3º em 55% e o 4º em 85%. Começa com três rituais de 1º círculo e, a cada avanço de NEX, aprende um de qualquer círculo que possa lançar, sem contar no limite de rituais conhecidos.' },
   { nome: 'Habilidade de Trilha', classe: 'Ocultista', categoria: 'Habilidades de Classe', nex: '10%', pe: '—',
@@ -96,9 +106,11 @@ const HABILIDADES_CATALOG = [
   { nome: 'Aumento de Atributo', classe: 'Ocultista', categoria: 'Habilidades de Classe', nex: '20%', pe: '—',
     desc: '+1 em um atributo em NEX 20%, 50%, 80% e 95%, até o máximo de 5.' },
   { nome: 'Grau de Treinamento', classe: 'Ocultista', categoria: 'Habilidades de Classe', nex: '35%', pe: '—',
-    desc: 'Em NEX 35% e 70%, sobe um grau em perícias conforme a tabela da classe.' },
+    desc: 'Em NEX 35% e 70%, sobe um grau em 3 + Intelecto perícias treinadas (de treinado para veterano ou de veterano para expert).' },
   { nome: 'Versatilidade', classe: 'Ocultista', categoria: 'Habilidades de Classe', nex: '50%', pe: '—',
     desc: 'Em NEX 50%, escolhe entre um poder de Ocultista ou o 1º poder de outra trilha de Ocultista.' },
+
+  // ========== OCULTISTA — Poderes ==========
   { nome: 'Camuflar Ocultismo', classe: 'Ocultista', categoria: 'Poderes de Ocultista', nex: '', pe: '2 PE',
     desc: 'Ação livre para esconder símbolos e sigilos, invisíveis a todos menos a você. Ao lançar ritual, +2 PE para lançar sem componentes e sem gesticular. Outros só percebem com Ocultismo (DT 25).' },
   { nome: 'Criar Selo', classe: 'Ocultista', categoria: 'Poderes de Ocultista', nex: '', pe: 'variável',
