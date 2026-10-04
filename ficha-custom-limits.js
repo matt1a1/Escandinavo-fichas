@@ -10,6 +10,7 @@
     if (typeof state === 'undefined') return false;
     if (typeof getAttr !== 'function') return false;
 
+    // Fonte única: custom E máscaras liberam limites
     window.isFichaCustom = function () {
       return !!(state && (state.tipoFicha === 'custom' || state.tipoFicha === 'mascaras'));
     };
@@ -79,11 +80,6 @@
       window.calcularRecursos.__cOverride = true;
     }
 
-    // Rebind atributos desativado — controls-fix.js cuida (evita double-bind)
-    if (false && !window.__customAttrRebound) {
-      window.__customAttrRebound = true;
-    }
-
     // Perícias: na custom/máscaras, qualquer rank livre
     if (typeof renderPericias === 'function' && !renderPericias.__c) {
       var _rp = renderPericias;
@@ -140,4 +136,17 @@
     n++;
     if (install() || n > 100) clearInterval(t);
   }, 100);
+
+  // Reaplica isFicha* periodicamente caso outro script sobrescreva
+  setInterval(function () {
+    if (typeof state === 'undefined') return;
+    if (state.tipoFicha === 'custom' || state.tipoFicha === 'mascaras') {
+      window.isFichaCustom = function () {
+        return !!(state && (state.tipoFicha === 'custom' || state.tipoFicha === 'mascaras'));
+      };
+      window.isFichaLivre = function () {
+        return !!(state && (state.tipoFicha === 'custom' || state.tipoFicha === 'mascaras'));
+      };
+    }
+  }, 2000);
 })();

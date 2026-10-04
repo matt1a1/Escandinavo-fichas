@@ -11,7 +11,7 @@ const state = {
   mascaraAtiva: false,
 };
 
-function isFichaCustom() { return !!(state && state.tipoFicha === 'custom'); }
+function isFichaCustom() { return !!(state && (state.tipoFicha === 'custom' || state.tipoFicha === 'mascaras')); }
 function isFichaLivre() { return !!(state && (state.tipoFicha === 'custom' || state.tipoFicha === 'mascaras')); }
 window.isFichaCustom = isFichaCustom;
 window.isFichaLivre = isFichaLivre;
