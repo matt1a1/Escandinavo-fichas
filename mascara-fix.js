@@ -1,4 +1,4 @@
-/* mascara-fix.js — botão Máscara SEMPRE que tipoFicha=mascaras (robusto) */
+/* mascara-fix.js — botão Máscara estilo original + detecção robusta */
 (function () {
   var PV = 20, PE = 10, DEF = 10;
   var injected = false;
@@ -56,23 +56,22 @@
     st.id = 'msk-css';
     st.textContent = [
       '#msk-box{display:block !important;visibility:visible !important;opacity:1 !important;',
-      'margin:12px 0 !important;padding:14px !important;border-radius:12px !important;',
-      'border:2px solid #ef4444 !important;background:linear-gradient(180deg,#7f1d1d,#1c1917) !important;',
-      'box-shadow:0 8px 24px rgba(0,0,0,.4) !important;z-index:50 !important;position:relative !important;}',
+      'margin:10px 0 12px;padding:14px;border-radius:12px;',
+      'border:1px solid rgba(239,68,68,.45);background:linear-gradient(180deg,rgba(127,29,29,.28),rgba(20,10,12,.55));',
+      'box-shadow:0 8px 24px rgba(0,0,0,.25);position:relative;z-index:20;}',
       '#msk-box .msk-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;}',
-      '#msk-box .msk-title{margin:0;font-size:1rem;font-weight:800;color:#fecaca;}',
-      '#msk-box .msk-badge{font-size:.7rem;font-weight:800;padding:4px 10px;border-radius:999px;',
-      'border:1px solid #f87171;color:#fecaca;background:rgba(239,68,68,.25);}',
-      '#msk-box .msk-badge.on{background:#ef4444;color:#fff;}',
-      '#msk-box .msk-help{margin:0 0 12px;font-size:.8rem;color:#f5f5f4;line-height:1.45;}',
-      '#msk-box .msk-actions{display:flex !important;flex-wrap:wrap;gap:8px;}',
-      '#msk-on,#msk-stay,#msk-off{display:inline-block !important;cursor:pointer !important;',
-      'border-radius:8px !important;padding:12px 16px !important;font-weight:800 !important;font-size:.9rem !important;',
-      'border:none !important;min-height:44px;}',
-      '#msk-on{background:#e11d48 !important;color:#fff !important;}',
-      '#msk-stay{background:#dc2626 !important;color:#fff !important;}',
-      '#msk-off{background:#292524 !important;color:#e7e5e4 !important;border:1px solid #78716c !important;}',
-      '#msk-msg{margin-top:8px;font-size:.8rem;color:#fecaca;min-height:1.2em;font-weight:600;}',
+      '#msk-box .msk-title{margin:0;font-size:.92rem;font-weight:700;color:#fca5a5;}',
+      '#msk-box .msk-badge{font-size:.68rem;font-weight:700;padding:3px 8px;border-radius:999px;',
+      'border:1px solid rgba(239,68,68,.4);color:#fca5a5;background:rgba(239,68,68,.12);}',
+      '#msk-box .msk-badge.on{background:rgba(239,68,68,.35);color:#fff;}',
+      '#msk-box .msk-help{margin:0 0 10px;font-size:.78rem;color:#e7e5e4;line-height:1.4;}',
+      '#msk-box .msk-actions{display:flex;flex-wrap:wrap;gap:8px;}',
+      '#msk-on,#msk-stay,#msk-off{cursor:pointer;border-radius:8px;padding:10px 14px;font-weight:700;font-size:.85rem;border:none;}',
+      '#msk-on{background:linear-gradient(135deg,#9f1239,#e11d48);color:#fff;}',
+      '#msk-stay{background:linear-gradient(135deg,#b91c1c,#dc2626);color:#fff;}',
+      '#msk-off{background:#1c1917;color:#e7e5e4;border:1px solid #57534e !important;}',
+      '#msk-msg{margin-top:8px;font-size:.75rem;color:#fecaca;min-height:1.1em;}',
+      'body.msk-red{--accent:#ef4444;--accent-2:#b91c1c;}',
       'body.msk-red .tab.active{border-bottom-color:#ef4444 !important;color:#fca5a5 !important;}'
     ].join('');
     document.head.appendChild(st);
@@ -124,14 +123,14 @@
     var s = document.getElementById('msk-stay');
     var f = document.getElementById('msk-off');
     if (o) o.style.display = 'none';
-    if (s) s.style.display = 'inline-block';
-    if (f) f.style.display = 'inline-block';
+    if (s) s.style.display = '';
+    if (f) f.style.display = '';
   }
   function showIdle() {
     var o = document.getElementById('msk-on');
     var s = document.getElementById('msk-stay');
     var f = document.getElementById('msk-off');
-    if (o) o.style.display = 'inline-block';
+    if (o) o.style.display = '';
     if (s) s.style.display = 'none';
     if (f) f.style.display = 'none';
   }
@@ -307,11 +306,11 @@
       box.id = 'msk-box';
       box.innerHTML =
         '<div class="msk-head">' +
-        '<p class="msk-title">Forma Suprema (Máscara)</p>' +
+        '<p class="msk-title">Forma Suprema</p>' +
         '<span class="msk-badge" id="msk-badge">INATIVA</span>' +
         '</div>' +
-        '<p class="msk-help"><b>Colocar Máscara:</b> +20 Vida, +10 Esforço, +10 Defesa, −6 Sanidade.<br>' +
-        '<b>Manter:</b> −2 Sanidade &nbsp;·&nbsp; <b>Tirar:</b> remove os bônus.</p>' +
+        '<p class="msk-help">Clique em <b>Colocar Máscara</b>: +20 Vida, +10 Esforço, +10 Defesa, −6 Sanidade.<br>' +
+        'Depois: <b>Manter</b> (−2 SAN) ou <b>Tirar</b> (remove bônus).</p>' +
         '<div class="msk-actions">' +
         '<button type="button" id="msk-on">Colocar Máscara</button>' +
         '<button type="button" id="msk-stay" style="display:none">Manter máscara (−2 Sanidade)</button>' +
