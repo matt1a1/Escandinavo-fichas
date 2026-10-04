@@ -1,3 +1,11 @@
+/* carrega controls-fix se ainda não estiver */
+(function(){
+  if (window.__controlsFixLoaded) return;
+  window.__controlsFixLoaded = true;
+  var s = document.createElement('script');
+  s.src = 'controls-fix.js?v=1';
+  document.head.appendChild(s);
+})();
 /* app-res-fix.js — setas 1/5 sem double-bind; atual pode > max */
 (function () {
   function rebind() {
