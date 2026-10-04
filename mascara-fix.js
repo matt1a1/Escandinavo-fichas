@@ -1,9 +1,11 @@
-/* mascara-fix.js — Forma Suprema (Ficha das Máscaras)
-   Delegação de eventos no container (sem rebind frágil).
-   +20 PV / +10 PE / +10 DEF · −6 SAN colocar · −2 SAN manter */
+/* mascara-fix.js v10 — Forma Suprema
+   Colocar some → Manter + Tirar aparecem no lugar (nunca os 3 juntos).
+   Colocar: −6 SAN, +20 PV, +10 PE, +10 DEF
+   Manter: −2 SAN
+   Tirar: remove bônus */
 (function () {
-  if (window.__mascaraFixV9) return;
-  window.__mascaraFixV9 = true;
+  if (window.__mascaraFixV10) return;
+  window.__mascaraFixV10 = true;
 
   var PV = 20, PE = 10, DEF = 10;
   var patched = false;
@@ -51,7 +53,7 @@
   }
 
   function isOn() {
-    return !!(window.state && state.mascaraAtiva === true);
+    return !!(window.state && state.mascaraAtiva);
   }
 
   function css() {
@@ -61,19 +63,18 @@
     st.textContent = [
       '#msk-box{display:block!important;margin:10px 0 12px;padding:14px;border-radius:12px;',
       'border:1px solid rgba(239,68,68,.45);background:linear-gradient(180deg,rgba(127,29,29,.28),rgba(20,10,12,.55));',
-      'box-shadow:0 8px 24px rgba(0,0,0,.25);position:relative;z-index:30;}',
+      'box-shadow:0 8px 24px rgba(0,0,0,.25);position:relative;z-index:50;}',
       '#msk-box .msk-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;}',
       '#msk-box .msk-title{margin:0;font-size:.92rem;font-weight:700;color:#fca5a5;}',
       '#msk-box .msk-badge{font-size:.68rem;font-weight:700;padding:3px 8px;border-radius:999px;',
       'border:1px solid rgba(239,68,68,.4);color:#fca5a5;background:rgba(239,68,68,.12);}',
-      '#msk-box .msk-badge.on{background:rgba(239,68,68,.35);color:#fff;}',
+      '#msk-box .msk-badge.on{background:rgba(239,68,68,.4);color:#fff;}',
       '#msk-box .msk-help{margin:0 0 10px;font-size:.78rem;color:#e7e5e4;line-height:1.45;}',
-      '#msk-box .msk-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}',
-      '#msk-box .msk-actions button{cursor:pointer;border-radius:8px;padding:10px 14px;font-weight:700;font-size:.85rem;border:none;}',
+      '#msk-box .msk-actions{display:flex!important;flex-wrap:wrap;gap:8px;align-items:center;min-height:42px;}',
+      '#msk-on,#msk-stay,#msk-off{cursor:pointer;border-radius:8px;padding:10px 14px;font-weight:700;font-size:.85rem;border:none;line-height:1.2;}',
       '#msk-on{background:linear-gradient(135deg,#9f1239,#e11d48);color:#fff;}',
       '#msk-stay{background:linear-gradient(135deg,#b91c1c,#dc2626);color:#fff;}',
       '#msk-off{background:#1c1917;color:#e7e5e4;border:1px solid #57534e!important;}',
-      '#msk-box .msk-hidden{display:none!important;}',
       '#msk-msg{margin-top:8px;font-size:.75rem;color:#fecaca;min-height:1.1em;}',
       'body.msk-red{--accent:#ef4444;--accent-2:#b91c1c;}',
       'body.msk-red .brand h1{color:#fca5a5!important;}',
@@ -91,7 +92,7 @@
       var _cr = calcularRecursos;
       window.calcularRecursos = function () {
         var r = _cr.apply(this, arguments);
-        if (window.state && state.mascaraAtiva === true) {
+        if (window.state && state.mascaraAtiva) {
           r.pvMax = (Number(r.pvMax) || 0) + PV;
           r.peMax = (Number(r.peMax) || 0) + PE;
         }
@@ -104,7 +105,7 @@
       var _cd = calcularDefesa;
       window.calcularDefesa = function () {
         var v = Number(_cd.apply(this, arguments)) || 0;
-        if (window.state && state.mascaraAtiva === true) v += DEF;
+        if (window.state && state.mascaraAtiva) v += DEF;
         return v;
       };
       window.calcularDefesa.__mskOuter = true;
@@ -131,19 +132,31 @@
     }
   }
 
-  function setVisible(id, visible) {
+  function showEl(id) {
     var el = document.getElementById(id);
     if (!el) return;
-    if (visible) el.classList.remove('msk-hidden');
-    else el.classList.add('msk-hidden');
+    el.style.setProperty('display', 'inline-block', 'important');
+    el.removeAttribute('hidden');
+  }
+
+  function hideEl(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.style.setProperty('display', 'none', 'important');
   }
 
   function syncButtons() {
     var on = isOn();
     setBadge(on);
-    setVisible('msk-on', !on);
-    setVisible('msk-stay', on);
-    setVisible('msk-off', on);
+    if (on) {
+      hideEl('msk-on');
+      showEl('msk-stay');
+      showEl('msk-off');
+    } else {
+      showEl('msk-on');
+      hideEl('msk-stay');
+      hideEl('msk-off');
+    }
   }
 
   function refreshNumbers() {
@@ -184,7 +197,7 @@
     syncButtons();
   }
 
-  function sanAtual() {
+  function getSan() {
     if (state.sanAtual != null && state.sanAtual !== undefined) return Number(state.sanAtual) || 0;
     if (typeof calcularRecursos === 'function') return Number(calcularRecursos().sanMax) || 0;
     return 0;
@@ -194,12 +207,12 @@
     if (busy) return;
     if (isOn()) {
       syncButtons();
-      setMsg('Máscara já ativa.');
       return;
     }
     busy = true;
+
     var custo = 6;
-    var san = sanAtual();
+    var san = getSan();
     if (san < custo && !confirm('Sanidade insuficiente (' + san + '). Continuar?')) {
       busy = false;
       return;
@@ -216,7 +229,12 @@
     state.vidaAtual = curPv + PV;
     state.peAtual = curPe + PE;
 
+    hideEl('msk-on');
+    showEl('msk-stay');
+    showEl('msk-off');
+    setBadge(true);
     setMsg('ATIVA: +20 Vida · +10 Esforço · +10 Defesa · −6 Sanidade');
+
     persist();
     busy = false;
   }
@@ -225,12 +243,12 @@
     if (busy) return;
     if (!isOn()) {
       syncButtons();
-      setMsg('Coloque a máscara primeiro.');
       return;
     }
     busy = true;
+
     var custo = 2;
-    var san = sanAtual();
+    var san = getSan();
     if (san < custo && !confirm('Sanidade insuficiente (' + san + '). Continuar?')) {
       busy = false;
       return;
@@ -245,11 +263,11 @@
     if (busy) return;
     if (!isOn()) {
       syncButtons();
-      setMsg('Máscara já inativa.');
       return;
     }
     if (!confirm('Tirar a máscara? Perde +20 Vida / +10 Esforço / +10 Defesa.')) return;
     busy = true;
+
     var curPv = state.vidaAtual != null ? Number(state.vidaAtual) : 0;
     var curPe = state.peAtual != null ? Number(state.peAtual) : 0;
 
@@ -258,18 +276,27 @@
     state.vidaAtual = npv;
     state.peAtual = Math.max(0, curPe - PE);
 
+    showEl('msk-on');
+    hideEl('msk-stay');
+    hideEl('msk-off');
+    setBadge(false);
+
     if (npv === 0) {
       alert('0 Vida — morrendo.');
       setMsg('Removida. 0 Vida — morrendo.');
     } else {
       setMsg('Removida. Bônus perdidos.');
     }
+
     persist();
     busy = false;
   }
 
   function onBoxClick(e) {
     var t = e.target;
+    while (t && t !== e.currentTarget && (!t.id || (t.id !== 'msk-on' && t.id !== 'msk-stay' && t.id !== 'msk-off'))) {
+      t = t.parentNode;
+    }
     if (!t || !t.id) return;
     if (t.id === 'msk-on') {
       e.preventDefault();
@@ -293,7 +320,7 @@
         box.dataset.mskDeleg = '1';
         box.addEventListener('click', onBoxClick);
       }
-      return false;
+      return;
     }
 
     box = document.createElement('div');
@@ -305,26 +332,29 @@
       '<span class="msk-badge" id="msk-badge">INATIVA</span>' +
       '</div>' +
       '<p class="msk-help">' +
-      '<b>Colocar Máscara</b>: +20 Vida, +10 Esforço, +10 Defesa, −6 Sanidade.<br>' +
-      'Ativa: <b>Manter</b> (−2 SAN) ou <b>Tirar</b> (remove bônus).' +
+      '<b>Colocar</b>: +20 Vida, +10 Esforço, +10 Defesa, −6 Sanidade.<br>' +
+      '<b>Manter</b>: −2 Sanidade · <b>Tirar</b>: remove os bônus.' +
       '</p>' +
       '<div class="msk-actions">' +
-      '<button type="button" id="msk-on">Colocar Máscara</button>' +
-      '<button type="button" id="msk-stay" class="msk-hidden">Manter máscara (−2 Sanidade)</button>' +
-      '<button type="button" id="msk-off" class="msk-hidden">Tirar máscara</button>' +
+      '<button type="button" id="msk-on" style="display:inline-block">Colocar Máscara</button>' +
+      '<button type="button" id="msk-stay" style="display:none">Manter máscara (−2 Sanidade)</button>' +
+      '<button type="button" id="msk-off" style="display:none">Tirar máscara</button>' +
       '</div>' +
       '<div id="msk-msg"></div>';
 
     var res = document.querySelector('section.card.resources') || document.querySelector('.resources');
-    if (res && res.parentNode) res.parentNode.insertBefore(box, res);
-    else {
+    if (res && res.parentNode) {
+      res.parentNode.insertBefore(box, res);
+    } else {
       var at = document.querySelector('section.card.attributes') || document.querySelector('.attributes');
       if (at && at.parentNode) at.parentNode.insertBefore(box, at.nextSibling);
-      else (document.querySelector('#app') || document.body).insertBefore(box, (document.querySelector('#app') || document.body).firstChild);
+      else {
+        var root = document.querySelector('#app') || document.body;
+        root.insertBefore(box, root.firstChild);
+      }
     }
 
     box.addEventListener('click', onBoxClick);
-    return true;
   }
 
   function tick() {
@@ -344,13 +374,13 @@
   var timer = setInterval(function () {
     n++;
     tick();
-    if (n >= 50) {
+    if (n >= 40) {
       clearInterval(timer);
-      setInterval(tick, 3000);
+      setInterval(function () { if (!busy) tick(); }, 2000);
     }
-  }, 200);
+  }, 150);
 
-  setTimeout(tick, 250);
-  setTimeout(tick, 1000);
-  setTimeout(tick, 2500);
+  setTimeout(tick, 200);
+  setTimeout(tick, 800);
+  setTimeout(tick, 2000);
 })();
