@@ -1,79 +1,73 @@
-/* tabs-fix.js — restaura navegação das abas da ficha e binds críticos */
+/* tabs-fix.js — garante navegação de abas e campos críticos (sem double-bind NEX/attr/res) */
 (function () {
   function bindTabs() {
-    document.querySelectorAll('.tab').forEach(function (tab) {
-      if (tab.__tabBound) return;
-      tab.__tabBound = true;
-      tab.style.cursor = 'pointer';
-      tab.style.pointerEvents = 'auto';
-      tab.addEventListener('click', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        var target = tab.getAttribute('data-tab');
-        if (!target) return;
-        document.querySelectorAll('.tab').forEach(function (t) { t.classList.remove('active'); });
-        document.querySelectorAll('.tab-content').forEach(function (c) { c.classList.remove('active'); });
-        tab.classList.add('active');
-        var panel = document.getElementById('tab-' + target);
-        if (panel) panel.classList.add('active');
-      }, true);
-    });
-  }
-
-  function bindCritical() {
-    // NEX
-    document.querySelectorAll('.nex-btn').forEach(function (btn) {
-      if (btn.dataset.tabsFixBound) return;
-      btn.dataset.tabsFixBound = '1';
+    document.querySelectorAll('[data-tab], .tab-btn, .sheet-tab, .nav-tab').forEach(function (btn) {
+      if (btn.dataset.tabsBound) return;
+      btn.dataset.tabsBound = '1';
       btn.addEventListener('click', function () {
-        if (typeof state === 'undefined') return;
-        state.nex = Math.max(5, Math.min(99, (Number(state.nex) || 5) + Number(btn.dataset.delta || 0)));
-        var nd = document.getElementById('nex-display');
-        if (nd) nd.textContent = state.nex + '%';
-        if (typeof normalizarAtributosNex === 'function') normalizarAtributosNex();
-        if (typeof renderAtributos === 'function') renderAtributos();
-        if (typeof renderRecursos === 'function') renderRecursos();
-        if (typeof renderPericias === 'function') renderPericias();
-        if (typeof scheduleSave === 'function') scheduleSave();
-      });
-    });
-    // Recursos: bind só no app.js (evita delta duplo)
-
-    // Atributos
-    document.querySelectorAll('.attr-item').forEach(function (el) {
-      var key = el.dataset.attr;
-      if (!key) return;
-      el.querySelectorAll('.attr-btn').forEach(function (btn) {
-        if (btn.dataset.tabsFixBound) return;
-        btn.dataset.tabsFixBound = '1';
-        btn.addEventListener('click', function () {
-          if (typeof state === 'undefined' || !state.atributos) return;
-          var delta = Number(btn.dataset.delta || 0);
-          var val = (Number(state.atributos[key]) || 0) + delta;
-          var custom = typeof isFichaCustom === 'function' && isFichaCustom();
-          if (custom) {
-            if (val < 0) val = 0;
-            if (val > 20) val = 20;
-          } else {
-            if (val < 0) val = 0;
-            if (val > 5) val = 5;
-            if (delta > 0 && typeof pontosDisponiveis === 'function' && pontosDisponiveis() <= 0) return;
+        var tab = btn.getAttribute('data-tab') || btn.dataset.tab;
+        if (!tab) return;
+        document.querySelectorAll('[data-tab], .tab-btn, .sheet-tab, .nav-tab').forEach(function (b) {
+          b.classList.toggle('active', b === btn);
+        });
+        document.querySelectorAll('[data-panel], .tab-panel, .sheet-panel').forEach(function (p) {
+          var id = p.getAttribute('data-panel') || p.id || '';
+          var show = id === tab || id === 'panel-' + tab || id.indexOf(tab) >= 0;
+          if (p.hasAttribute('hidden') || p.classList.contains('tab-panel') || p.classList.contains('sheet-panel')) {
+            p.hidden = !show;
+            p.classList.toggle('active', show);
           }
-          state.atributos[key] = val;
-          if (typeof renderAtributos === 'function') renderAtributos();
-          if (typeof renderRecursos === 'function') renderRecursos();
-          if (typeof renderPericias === 'function') renderPericias();
-          if (typeof scheduleSave === 'function') scheduleSave();
         });
       });
     });
   }
 
+  function bindSafe(id, evt, fn) {
+    var el = document.getElementById(id);
+    if (!el || el.dataset['tabs_' + evt]) return;
+    el.dataset['tabs_' + evt] = '1';
+    el.addEventListener(evt, fn);
+  }
+
+  function bindCritical() {
+    bindTabs();
+
+    // Classe / origem
+    bindSafe('classe', 'change', function (e) {
+      if (typeof state === 'undefined') return;
+      state.classe = e.target.value;
+      if (typeof applyClassePericias === 'function') applyClassePericias();
+      if (typeof renderAll === 'function') renderAll();
+      else {
+        if (typeof renderPericias === 'function') renderPericias();
+        if (typeof renderRecursos === 'function') renderRecursos();
+      }
+      if (typeof scheduleSave === 'function') scheduleSave();
+    });
+    bindSafe('origem', 'change', function (e) {
+      if (typeof state === 'undefined') return;
+      state.origem = e.target.value;
+      if (typeof applyOrigemPericias === 'function') applyOrigemPericias();
+      if (typeof renderPericias === 'function') renderPericias();
+      if (typeof renderRecursos === 'function') renderRecursos();
+      if (typeof scheduleSave === 'function') scheduleSave();
+    });
+    // NEX / atributos / recursos: bind único em controls-fix.js e app-res-fix.js
+  }
+
   var n = 0;
   var t = setInterval(function () {
     n++;
-    bindTabs();
     bindCritical();
-    if (n > 30) clearInterval(t);
-  }, 200);
+    if (n > 60) clearInterval(t);
+  }, 150);
+
+  if (typeof MutationObserver !== 'undefined') {
+    var obs = new MutationObserver(function () {
+      bindTabs();
+    });
+    if (document.body) {
+      obs.observe(document.body, { childList: true, subtree: true });
+    }
+  }
 })();
