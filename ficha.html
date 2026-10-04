@@ -24,7 +24,7 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
     html = html.replace(/rituais-catalog\.js[^"]*/g, 'rituais-catalog.js?v=livro1');
     html = html.replace(/rituais-extra\.js[^"]*/g, 'rituais-extra.js?v=livro1');
     html = html.replace(/itens-catalog\.js[^"]*/g, 'itens-catalog.js?v=livro1');
-    html = html.replace(/habilidades-catalog\.js[^"]*/g, 'habilidades-catalog.js?v=livro1');
+    html = html.replace(/habilidades-catalog\.js[^"]*/g, 'habilidades-catalog.js?v=livro3');
     html = html.replace(/data\.js[^"]*/g, 'data.js?v=hell1');
     html = html.replace(/origens-poderes\.js[^"]*/g, 'origens-poderes.js?v=hell1');
     html = html.replace(/app\.js[^"]*/g, 'https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@843b6316775cfe32a5b0826ee97d310dd7d0aff9/app.js');
@@ -64,9 +64,10 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
     extras += '<script src="controls-fix.js?v=5"><\/script>\n';
     extras += '<script src="app-res-fix.js?v=3"><\/script>\n';
     extras += '<script src="mascara-fix.js?v=11"><\/script>\n';
+    extras += '<script src="habilidades-catalog-extra.js?v=1"><\/script>\n';
     extras += '<script src="rituais-form.js?v=1"><\/script>\n';
     html = html.replace(/habilidades-ui\.js[^"]*/g, 'habilidades-ui.js?v=card2');
-    html = html.replace(/habilidades-catalog\.js[^"]*/g, 'habilidades-catalog.js?v=livro1');
+    html = html.replace(/habilidades-catalog\.js[^"]*/g, 'habilidades-catalog.js?v=livro3');
     if (extras) html = html.replace('</body>', extras + '</body>');
     document.open(); document.write(html); document.close();
     setTimeout(function () {
