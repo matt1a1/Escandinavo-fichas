@@ -1,10 +1,10 @@
-/* combat-stats-fix.js
- * Cálculos oficiais:
- * - Defesa Passiva = 10 + AGI + armadura (+ bônus passivos, ex: Patrulha +2)
- *   mínimo 15 na ficha (exceto ficha customizada)
- * - Esquiva (precisa Reflexos treinado) = Defesa Passiva + bônus Reflexos
- * - Bloqueio (precisa Fortitude treinada): na ficha marca-se Defesa + Fortitude;
- *   efeito mecânico = RD igual ao bônus de Fortitude
+/* combat-stats-fix.js v6
+ * Regras oficiais (Livro Básico p.36 e p.88):
+ * - Defesa = 10 + Agilidade + modificadores (armadura, escudo, habilidades, condições)
+ * - Esquiva (reação, exige Reflexos treinado): + bônus de Reflexos na Defesa contra aquele ataque
+ * - Bloqueio (reação, exige Fortitude treinada, só corpo a corpo): RD = bônus de Fortitude
+ *   (NÃO altera a Defesa)
+ * - mínimo 15 na Defesa da ficha normal (exceto ficha customizada / máscaras)
  * - Bônus de origem: Calejado, Cicatrizes Psicológicas, Dedicação
  */
 (function () {
@@ -60,10 +60,15 @@
     return typeof getPericiaRank === 'function' && getPericiaRank(id) > 0;
   }
 
+  function bonusPericia(id) {
+    return typeof getPericiaBonus === 'function' ? getPericiaBonus(id) : 0;
+  }
+
   function install() {
     if (typeof state === 'undefined') return false;
     if (typeof getAttr !== 'function') return false;
 
+    // Defesa bruta (sem floor): 10 + AGI + armadura + escudo
     window.__calcDefesaRaw = function () {
       var def = 10 + getAttr('agi');
       var prot = 0;
@@ -77,27 +82,28 @@
       return def + prot + escudo;
     };
 
+    // Defesa final (com bônus passivos de habilidades + floor 15 na ficha normal)
     window.calcularDefesa = function () {
       return floor15(window.__calcDefesaRaw() + bonusDefesaDeHabilidades());
     };
 
+    // Esquiva: se treinado em Reflexos, Defesa + bônus de Reflexos (valor potencial)
+    // Se não treinado, mostra a própria Defesa (não pode usar a reação)
     window.calcularEsquiva = function () {
       var def = calcularDefesa();
       if (!periciaTreinada('reflexos')) return def;
-      var b = typeof getPericiaBonus === 'function' ? getPericiaBonus('reflexos') : 0;
-      return floor15(def + b);
+      return def + bonusPericia('reflexos');
     };
 
+    // Bloqueio: RD = bônus de Fortitude (só se treinado). NÃO soma na Defesa.
     window.calcularBloqueio = function () {
-      var def = calcularDefesa();
-      if (!periciaTreinada('fortitude')) return def;
-      var b = typeof getPericiaBonus === 'function' ? getPericiaBonus('fortitude') : 0;
-      return floor15(def + b);
+      if (!periciaTreinada('fortitude')) return 0;
+      return bonusPericia('fortitude');
     };
 
+    // Alias explícito (mesmo valor)
     window.calcularBloqueioRD = function () {
-      if (!periciaTreinada('fortitude')) return 0;
-      return typeof getPericiaBonus === 'function' ? getPericiaBonus('fortitude') : 0;
+      return calcularBloqueio();
     };
 
     if (!window.__calcRecursosBase && typeof calcularRecursos === 'function') {
