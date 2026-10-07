@@ -1,10 +1,10 @@
-/* combat-stats-fix.js v6
+/* combat-stats-fix.js v7
  * Regras oficiais (Livro Básico p.36 e p.88):
  * - Defesa = 10 + Agilidade + modificadores (armadura, escudo, habilidades, condições)
+ *   SEM mínimo artificial de 15 — sobe/desce com a AGI
  * - Esquiva (reação, exige Reflexos treinado): + bônus de Reflexos na Defesa contra aquele ataque
  * - Bloqueio (reação, exige Fortitude treinada, só corpo a corpo): RD = bônus de Fortitude
  *   (NÃO altera a Defesa)
- * - mínimo 15 na Defesa da ficha normal (exceto ficha customizada / máscaras)
  * - Bônus de origem: Calejado, Cicatrizes Psicológicas, Dedicação
  */
 (function () {
@@ -51,11 +51,6 @@
     return bonus;
   }
 
-  function floor15(v) {
-    if (typeof window.__skipDefesaFloor === 'function' && window.__skipDefesaFloor()) return v;
-    return Math.max(15, v);
-  }
-
   function periciaTreinada(id) {
     return typeof getPericiaRank === 'function' && getPericiaRank(id) > 0;
   }
@@ -68,7 +63,7 @@
     if (typeof state === 'undefined') return false;
     if (typeof getAttr !== 'function') return false;
 
-    // Defesa bruta (sem floor): 10 + AGI + armadura + escudo
+    // Defesa: 10 + AGI + armadura + escudo (sem mínimo artificial)
     window.__calcDefesaRaw = function () {
       var def = 10 + getAttr('agi');
       var prot = 0;
@@ -82,9 +77,9 @@
       return def + prot + escudo;
     };
 
-    // Defesa final (com bônus passivos de habilidades + floor 15 na ficha normal)
+    // Defesa final = raw + bônus passivos de habilidades
     window.calcularDefesa = function () {
-      return floor15(window.__calcDefesaRaw() + bonusDefesaDeHabilidades());
+      return window.__calcDefesaRaw() + bonusDefesaDeHabilidades();
     };
 
     // Esquiva: se treinado em Reflexos, Defesa + bônus de Reflexos (valor potencial)
