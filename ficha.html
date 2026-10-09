@@ -43,7 +43,6 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
     if (html.indexOf('attrs-wheel.js') === -1) extras += '<script src="attrs-wheel.js?v=1"><\/script>\n';
     if (html.indexOf('arquivos-secretos-catalog.js') === -1) {
       extras += '<script src="arquivos-secretos-catalog.js?v=full3"><\/script>\n';
-      extras += '<script src="arquivos-secretos-catalog-b.js?v=2"><\/script>\n';
       extras += '<script src="arquivos-secretos-trilhas.js?v=2"><\/script>\n';
       extras += '<script src="arquivos-secretos-rituais.js?v=2"><\/script>\n';
       extras += '<script src="arquivos-secretos-poderes-a.js?v=2"><\/script>\n';
@@ -65,7 +64,7 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
     extras += '<script src="controls-fix.js?v=5"><\/script>\n';
     extras += '<script src="app-res-fix.js?v=3"><\/script>\n';
     extras += '<script src="mascara-fix.js?v=11"><\/script>\n';
-    extras += '<script src="habilidades-catalog-extra.js?v=4"><\/script>\n';
+    extras += '<script src="habilidades-catalog-extra.js?v=5"><\/script>\n';
     extras += '<script src="rituais-form.js?v=1"><\/script>\n';
     html = html.replace(/habilidades-ui\.js[^"]*/g, 'habilidades-ui.js?v=card2');
     html = html.replace(/habilidades-catalog\.js[^"]*/g, 'habilidades-catalog.js?v=livro4');
@@ -82,6 +81,6 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
 </script>
 </head>
 <body>
-<p style="font-family:sans-serif;padding:40px;color:#888">Carregando ficha\u2026</p>
+<p style="font-family:sans-serif;padding:40px;color:#888">Carregando ficha…</p>
 </body>
 </html>
