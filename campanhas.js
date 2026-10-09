@@ -41,7 +41,7 @@
     }
     lista.forEach(c => {
       const nAg = (c.agentes || []).length;
-      const coverStyle = c.capa ? "background-image:url('" + c.capa + "')" : '';
+      const coverStyle = c.capa ? "background-image:url('" + c.capa + "');background-size:cover;background-position:center" : '';
       const card = document.createElement('div');
       card.className = 'camp-card';
       card.innerHTML =
@@ -80,13 +80,20 @@
     const nAg = (c.agentes || []).length;
     document.getElementById('camp-detail-meta').textContent =
       'Iniciada em: ' + formatarData(c.criadaEm) + ' · ' + nAg + ' agente' + (nAg === 1 ? '' : 's');
-    const cover = document.getElementById('camp-detail-cover');
-    if (c.capa) {
-      cover.style.backgroundImage = "url('" + c.capa + "')";
-      cover.textContent = '';
-    } else {
-      cover.style.backgroundImage = '';
-      cover.textContent = '◈';
+    var cover = document.getElementById('camp-detail-cover');
+    if (cover) {
+      if (c.capa) {
+        cover.style.backgroundImage = "url('" + c.capa + "')";
+        cover.style.backgroundSize = 'cover';
+        cover.style.backgroundPosition = 'center';
+        cover.style.backgroundRepeat = 'no-repeat';
+        cover.textContent = '';
+      } else {
+        cover.style.backgroundImage = '';
+        cover.style.backgroundSize = '';
+        cover.style.backgroundPosition = '';
+        cover.textContent = '◈';
+      }
     }
     document.querySelectorAll('.camp-tab').forEach(t => t.classList.toggle('active', t.dataset.campTab === 'agentes'));
     document.getElementById('camp-tab-agentes').hidden = false;
