@@ -1,1 +1,34 @@
-SEE_FILE_TOO_LARGE_USE_ALTERNATE
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Escandinavo Fichas — Agentes</title>
+<script>
+(function () {
+  var BASE = 'https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@23a4e4d5a478';
+  fetch(BASE + '/index.html')
+    .then(function (r) { return r.text(); })
+    .then(function (html) {
+      if (html.indexOf('.rm-ag{') === -1) {
+        var css = '<style id="rm-ag-css">.camp-ag-card{position:relative;}.rm-ag{position:absolute;top:8px;right:8px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:transparent!important;border:none!important;color:#9797a8!important;font-size:1.15rem;line-height:1;cursor:pointer;border-radius:6px;padding:0;z-index:2;}.rm-ag:hover{color:#f87171!important;background:rgba(248,113,113,.12)!important;}</style>';
+        html = html.replace('</head>', css + '</head>');
+      }
+      if (html.indexOf('rm-ag-fix.js') === -1) {
+        html = html.replace('</body>', '<script src="rm-ag-fix.js?v=1"><\/script>\n</body>');
+      }
+      html = html.replace(/campanhas\.js\?v=[^"]*/g, 'campanhas.js?v=9');
+      document.open();
+      document.write(html);
+      document.close();
+    })
+    .catch(function (e) {
+      document.body.innerHTML = '<p style="font-family:sans-serif;padding:40px;color:#c00">Erro ao carregar. Tente Ctrl+F5.</p>';
+    });
+})();
+</script>
+</head>
+<body>
+<p style="font-family:sans-serif;padding:40px;color:#888">Carregando…</p>
+</body>
+</html>
