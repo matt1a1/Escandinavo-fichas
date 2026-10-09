@@ -14,10 +14,15 @@
         var css = '<style id="rm-ag-css">.camp-ag-card{position:relative;}.rm-ag{position:absolute;top:8px;right:8px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:transparent!important;border:none!important;color:#9797a8!important;font-size:1.15rem;line-height:1;cursor:pointer;border-radius:6px;padding:0;z-index:2;}.rm-ag:hover{color:#f87171!important;background:rgba(248,113,113,.12)!important;}</style>';
         html = html.replace('</head>', css + '</head>');
       }
-      if (html.indexOf('rm-ag-fix.js') === -1) {
-        html = html.replace('</body>', '<script src="rm-ag-fix.js?v=1"><\/script>\n</body>');
-      }
+      // scripts de fix no final do body
+      var fixes = '';
+      if (html.indexOf('rm-ag-fix.js') === -1) fixes += '<script src="rm-ag-fix.js?v=1"><\/script>\n';
+      if (html.indexOf('campanhas-sync-fix.js') === -1) fixes += '<script src="campanhas-sync-fix.js?v=1"><\/script>\n';
+      if (fixes) html = html.replace('</body>', fixes + '</body>');
+      // force latest local campanhas scripts
       html = html.replace(/campanhas\.js\?v=[^"]*/g, 'campanhas.js?v=9');
+      html = html.replace(/campanhas-invite\.js\?v=[^"]*/g, 'campanhas-invite.js?v=4');
+      html = html.replace(/campanhas-owner-fix\.js\?v=[^"]*/g, 'campanhas-owner-fix.js?v=3');
       document.open();
       document.write(html);
       document.close();
