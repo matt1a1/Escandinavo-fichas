@@ -1,375 +1,243 @@
-/**
- * Sincroniza personagens da campanha entre mestre e jogadores.
- * Grava agentes + agentesMeta (nome, foto, classe, NEX, owner) no Firestore.
- */
+/** agentes-sync v2: merge seguro */
 (function () {
-  var KEY = 'escandinavo-campanhas-registro';
-  var REG = 'escandinavo-agentes-registro';
-  var unsub = null;
-  var listeningId = null;
-
+  var KEY = 'escandinavo-campanhas-registro', REG = 'escandinavo-agentes-registro';
+  var unsub = null, listeningId = null, pushing = false;
   function uid() {
-    try {
-      var u = window.EscandinavoAuth && EscandinavoAuth.user && EscandinavoAuth.user();
-      if (u && u.uid) return u.uid;
-    } catch (e) {}
-    try {
-      var fu = firebase.auth().currentUser;
-      return fu && fu.uid ? fu.uid : null;
-    } catch (e) {}
+    try { var u = window.EscandinavoAuth && EscandinavoAuth.user && EscandinavoAuth.user(); if (u && u.uid) return u.uid; } catch (e) {}
+    try { var fu = firebase.auth().currentUser; return fu && fu.uid ? fu.uid : null; } catch (e) {}
     return null;
   }
-  function getDb() {
-    try {
-      if (window.firebase && firebase.apps && firebase.apps.length) return firebase.firestore();
-    } catch (e) {}
-    return null;
-  }
-  function lerCamps() {
-    try { return JSON.parse(localStorage.getItem(KEY) || '[]') || []; } catch (e) { return []; }
-  }
-  function salvarCamps(lista) {
-    try { localStorage.setItem(KEY, JSON.stringify(lista)); } catch (e) {}
-  }
-  function lerAgentes() {
-    try { return JSON.parse(localStorage.getItem(REG) || '[]') || []; } catch (e) { return []; }
-  }
+  function db() { try { if (window.firebase && firebase.apps && firebase.apps.length) return firebase.firestore(); } catch (e) {} return null; }
+  function ler() { try { return JSON.parse(localStorage.getItem(KEY) || '[]') || []; } catch (e) { return []; } }
+  function salvar(a) { try { localStorage.setItem(KEY, JSON.stringify(a)); } catch (e) {} }
+  function reg() { try { return JSON.parse(localStorage.getItem(REG) || '[]') || []; } catch (e) { return []; } }
   function getCamp(id) {
-    if (typeof window.__campGetCampanha === 'function') {
-      try {
-        var c = window.__campGetCampanha(id);
-        if (c) return c;
-      } catch (e) {}
-    }
-    return lerCamps().find(function (x) { return x && x.id === id; }) || null;
+    try { if (typeof window.__campGetCampanha === 'function') { var c = window.__campGetCampanha(id); if (c) return c; } } catch (e) {}
+    return ler().find(function (x) { return x && x.id === id; }) || null;
   }
-  function atualizar(id, patch) {
-    if (typeof window.__campAtualizar === 'function') {
-      try { window.__campAtualizar(id, patch); return; } catch (e) {}
-    }
-    var lista = lerCamps();
-    var i = lista.findIndex(function (x) { return x && x.id === id; });
+  function setLocal(id, patch) {
+    var lista = ler(), i = lista.findIndex(function (x) { return x && x.id === id; });
     if (i < 0) return;
     lista[i] = Object.assign({}, lista[i], patch || {});
-    salvarCamps(lista);
+    salvar(lista);
   }
-  function campIdAtual() {
-    if (typeof window.__campGetAtualId === 'function') {
-      try { return window.__campGetAtualId(); } catch (e) {}
-    }
+  function campId() {
+    try { if (typeof window.__campGetAtualId === 'function') { var id = window.__campGetAtualId(); if (id) return id; } } catch (e) {}
     return listeningId;
   }
-  function esc(s) {
-    return String(s == null ? '' : s)
-      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-  }
-  function avatarHtml(foto, nome) {
-    if (foto) {
-      return '<div class="camp-avatar" style="background-image:url(\'' + String(foto).replace(/'/g, '%27') + '\')"></div>';
-    }
-    return '<div class="camp-avatar camp-avatar-fallback">' + esc((nome || '?').charAt(0).toUpperCase()) + '</div>';
-  }
-
-  function buildMetaForIds(ids, prevMeta) {
-    var reg = lerAgentes();
-    var meta = Object.assign({}, prevMeta || {});
-    var u = uid();
-    (ids || []).forEach(function (id) {
-      var a = reg.find(function (x) { return x && x.id === id; });
-      if (a) {
-        meta[id] = Object.assign({}, meta[id] || {}, {
-          nome: a.nome || (meta[id] && meta[id].nome) || 'Agente',
-          foto: a.foto || (meta[id] && meta[id].foto) || '',
-          classe: a.classe || (meta[id] && meta[id].classe) || '',
-          nex: a.nex != null ? a.nex : ((meta[id] && meta[id].nex != null) ? meta[id].nex : 5),
-          ownerUid: (meta[id] && meta[id].ownerUid) || u || null
-        });
-      } else if (!meta[id]) {
-        meta[id] = { nome: 'Agente', foto: '', classe: '', nex: 5, ownerUid: null };
-      }
-    });
-    return meta;
-  }
-
-  function mergeAgentes(localIds, remoteIds) {
-    return Array.from(new Set([].concat(localIds || [], remoteIds || []).filter(Boolean)));
-  }
-  function mergeMeta(localMeta, remoteMeta) {
-    var out = Object.assign({}, remoteMeta || {});
-    var loc = localMeta || {};
+  function mergeIds(a, b) { return Array.from(new Set([].concat(a || [], b || []).filter(Boolean))); }
+  function mergeMeta(L, R) {
+    var out = Object.assign({}, R || {}), loc = L || {};
     Object.keys(loc).forEach(function (k) {
-      out[k] = Object.assign({}, out[k] || {}, loc[k] || {});
-      if (loc[k]) {
-        if (loc[k].nome) out[k].nome = loc[k].nome;
-        if (loc[k].foto) out[k].foto = loc[k].foto;
-        if (loc[k].classe) out[k].classe = loc[k].classe;
-        if (loc[k].nex != null) out[k].nex = loc[k].nex;
-        if (loc[k].ownerUid) out[k].ownerUid = loc[k].ownerUid;
-      }
+      var r = out[k] || {}, l = loc[k] || {};
+      out[k] = { nome: l.nome || r.nome || 'Agente', foto: l.foto || r.foto || '', classe: l.classe || r.classe || '',
+        nex: l.nex != null ? l.nex : (r.nex != null ? r.nex : 5), ownerUid: l.ownerUid || r.ownerUid || null };
     });
     return out;
   }
-
-  async function pushAgentes(campId) {
-    var db = getDb();
-    var c = getCamp(campId);
-    if (!db || !c) return false;
+  function metaMeus(ids, prev) {
+    var r = reg(), meta = Object.assign({}, prev || {}), u = uid();
+    (ids || []).forEach(function (id) {
+      var a = r.find(function (x) { return x && x.id === id; });
+      if (!a) return;
+      meta[id] = { nome: a.nome || 'Agente', foto: a.foto || '', classe: a.classe || '',
+        nex: a.nex != null ? a.nex : 5, ownerUid: (meta[id] && meta[id].ownerUid) || u || null };
+    });
+    return meta;
+  }
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/&/g,'&').replace(/</g,'<').replace(/>/g,'>').replace(/"/g,'"');
+  }
+  function av(foto, nome) {
+    if (foto) return '<div class="camp-avatar" style="background-image:url(\'' + String(foto).replace(/'/g,'%27') + '\')"></div>';
+    return '<div class="camp-avatar camp-avatar-fallback">' + esc((nome||'?').charAt(0).toUpperCase()) + '</div>';
+  }
+  async function mergePush(campId, extraIds, extraMeta) {
+    var fdb = db(); if (!fdb || !campId) return false;
+    if (pushing) return false;
+    pushing = true;
     try {
-      await db.collection('campanhas_shared').doc(campId).set({
-        id: c.id,
-        nome: c.nome || '',
-        agentes: c.agentes || [],
-        agentesMeta: c.agentesMeta || {},
-        updatedAt: Date.now()
-      }, { merge: true });
-      console.log('[agentes-sync] push', (c.agentes || []).length, 'agentes');
+      var local = getCamp(campId) || {};
+      var localIds = mergeIds(local.agentes, extraIds);
+      var localMeta = mergeMeta(metaMeus(localIds, local.agentesMeta), extraMeta || {});
+      var ref = fdb.collection('campanhas_shared').doc(campId);
+      await fdb.runTransaction(async function (tx) {
+        var snap = await tx.get(ref);
+        var remote = snap.exists ? (snap.data() || {}) : {};
+        var agentes = mergeIds(remote.agentes, localIds);
+        var agentesMeta = mergeMeta(mergeMeta(localMeta, remote.agentesMeta), extraMeta || {});
+        var payload = { agentes: agentes, agentesMeta: agentesMeta, updatedAt: Date.now(), __forceAgentes: true };
+        if (!snap.exists) {
+          payload.id = campId; payload.nome = local.nome || 'Campanha';
+          payload.ownerUid = local.ownerUid || uid() || null;
+          payload.members = local.members || []; payload.criadaEm = local.criadaEm || Date.now();
+        }
+        tx.set(ref, payload, { merge: true });
+        setLocal(campId, { agentes: agentes, agentesMeta: agentesMeta });
+      });
+      console.log('[agentes-sync] mergePush ok');
       return true;
     } catch (e) {
-      console.warn('[agentes-sync] push', e);
-      return false;
-    }
+      console.warn('[agentes-sync] tx', e);
+      try {
+        var ref2 = fdb.collection('campanhas_shared').doc(campId);
+        var snap2 = await ref2.get();
+        var remote2 = snap2.exists ? (snap2.data() || {}) : {};
+        var local2 = getCamp(campId) || {};
+        var agentes2 = mergeIds(mergeIds(remote2.agentes, local2.agentes), extraIds);
+        var meta2 = mergeMeta(mergeMeta(metaMeus(agentes2, local2.agentesMeta), remote2.agentesMeta), extraMeta || {});
+        await ref2.set({ agentes: agentes2, agentesMeta: meta2, updatedAt: Date.now(), __forceAgentes: true }, { merge: true });
+        setLocal(campId, { agentes: agentes2, agentesMeta: meta2 });
+        return true;
+      } catch (e2) { console.warn('[agentes-sync] fb', e2); return false; }
+    } finally { pushing = false; }
   }
-
-  async function pullAgentes(campId) {
-    var db = getDb();
-    if (!db || !campId) return null;
+  async function pull(campId) {
+    var fdb = db(); if (!fdb || !campId) return;
     try {
-      var snap = await db.collection('campanhas_shared').doc(campId).get();
-      if (!snap.exists) return null;
-      return snap.data() || {};
-    } catch (e) {
-      console.warn('[agentes-sync] pull', e);
-      return null;
-    }
+      var snap = await fdb.collection('campanhas_shared').doc(campId).get();
+      if (!snap.exists) return;
+      var remote = snap.data() || {}, local = getCamp(campId) || {};
+      setLocal(campId, {
+        agentes: mergeIds(local.agentes, remote.agentes),
+        agentesMeta: mergeMeta(metaMeus(mergeIds(local.agentes, remote.agentes), local.agentesMeta), remote.agentesMeta)
+      });
+    } catch (e) { console.warn('[agentes-sync] pull', e); }
   }
-
-  function applyRemote(campId, remote) {
-    if (!remote || !campId) return;
-    var c = getCamp(campId);
-    if (!c) return;
-    var agentes = mergeAgentes(c.agentes, remote.agentes);
-    var agentesMeta = mergeMeta(c.agentesMeta, remote.agentesMeta);
-    var patch = { agentes: agentes, agentesMeta: agentesMeta };
-    if (Array.isArray(remote.npcs) && remote.npcs.length) {
-      var nmap = {};
-      (c.npcs || []).forEach(function (n) { if (n && n.id) nmap[n.id] = n; });
-      remote.npcs.forEach(function (n) { if (n && n.id) nmap[n.id] = Object.assign({}, nmap[n.id] || {}, n); });
-      patch.npcs = Object.keys(nmap).map(function (k) { return nmap[k]; });
-    }
-    atualizar(campId, patch);
-  }
-
-  function podeEditar(c, agId) {
-    var u = uid();
-    if (!u) return false;
-    if (c.ownerUid === u) return true;
-    var meta = (c.agentesMeta || {})[agId];
-    if (meta && meta.ownerUid === u) return true;
-    try {
-      return lerAgentes().some(function (a) { return a.id === agId; });
-    } catch (e) { return false; }
-  }
-
-  function renderAgentes() {
+  function render() {
     var grid = document.getElementById('camp-agentes-grid');
-    var id = campIdAtual();
-    var c = id ? getCamp(id) : null;
+    var id = campId(), c = id ? getCamp(id) : null;
     if (!grid || !c) return;
-    var reg = lerAgentes();
-    var ids = c.agentes || [];
-    var meta = c.agentesMeta || {};
+    var r = reg(), ids = c.agentes || [], meta = c.agentesMeta || {};
     grid.innerHTML = '';
     if (!ids.length) {
       grid.innerHTML = '<div class="ag-empty">Nenhum personagem nesta campanha. Use “Adicionar Personagem”.</div>';
       return;
     }
+    var CL = { combatente: 'Combatente', especialista: 'Especialista', ocultista: 'Ocultista' };
     ids.forEach(function (agId) {
-      var a = reg.find(function (x) { return x.id === agId; }) || {};
+      var a = r.find(function (x) { return x.id === agId; }) || {};
       var m = meta[agId] || {};
-      var nome = a.nome || m.nome || 'Agente';
-      var foto = a.foto || m.foto || '';
-      var can = podeEditar(c, agId);
-      var card = document.createElement('div');
-      card.className = 'camp-ag-card' + (can ? '' : ' camp-ag-restricted');
-      card.style.position = 'relative';
-      var body = avatarHtml(foto, nome) + '<h3>' + esc(nome) + '</h3>';
-      var classe = a.classe || m.classe || '—';
+      var nome = a.nome || m.nome || 'Agente', foto = a.foto || m.foto || '', u = uid();
+      var can = (c.ownerUid === u) || (m.ownerUid === u) || r.some(function (x) { return x.id === agId; });
+      var classe = CL[a.classe || m.classe] || a.classe || m.classe || '—';
       var nex = a.nex != null ? a.nex : (m.nex != null ? m.nex : 5);
-      var CLASSE = { combatente: 'Combatente', especialista: 'Especialista', ocultista: 'Ocultista' };
-      var classeLabel = CLASSE[classe] || classe || '—';
-      if (can) {
-        body += '<div class="meta">' + esc(classeLabel) + ' · NEX ' + nex + '%</div>';
-        body += '<a class="btn-acessar" href="ficha.html?id=' + encodeURIComponent(agId) + '">Acessar Ficha</a>';
-      } else {
-        body += '<div class="meta">' + esc(classeLabel) + (nex != null ? ' · NEX ' + nex + '%' : '') + '</div>';
-        body += '<div class="meta camp-restricted-label" style="font-size:.75rem;color:#9797a8;font-style:italic">Personagem de outro jogador</div>';
-      }
-      var isOwner = (m.ownerUid && m.ownerUid === uid()) || reg.some(function (x) { return x.id === agId; });
-      var isMestre = c.ownerUid && c.ownerUid === uid();
-      if (isMestre || isOwner) {
-        body += '<button type="button" class="rm-ag" data-id="' + esc(agId) + '" title="Remover">×</button>';
-      }
+      var card = document.createElement('div');
+      card.className = 'camp-ag-card'; card.style.position = 'relative';
+      var body = av(foto, nome) + '<h3>' + esc(nome) + '</h3>';
+      body += '<div class="meta">' + esc(classe) + ' · NEX ' + nex + '%</div>';
+      if (can) body += '<a class="btn-acessar" href="ficha.html?id=' + encodeURIComponent(agId) + '">Acessar Ficha</a>';
+      else body += '<div class="meta" style="font-size:.75rem;color:#9797a8;font-style:italic">Personagem de outro jogador</div>';
+      if (can || c.ownerUid === u) body += '<button type="button" class="rm-ag" data-id="' + esc(agId) + '" title="Remover">×</button>';
       card.innerHTML = body;
       grid.appendChild(card);
     });
     grid.querySelectorAll('.rm-ag').forEach(function (btn) {
       btn.onclick = function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        var agId = btn.dataset.id;
-        var c2 = getCamp(id);
-        if (!c2) return;
+        e.preventDefault(); e.stopPropagation();
+        var agId = btn.dataset.id, c2 = getCamp(id); if (!c2) return;
         var novos = (c2.agentes || []).filter(function (x) { return x !== agId; });
-        var nm = Object.assign({}, c2.agentesMeta || {});
-        delete nm[agId];
-        atualizar(id, { agentes: novos, agentesMeta: nm });
-        pushAgentes(id).then(function () { renderAgentes(); });
-        renderAgentes();
+        var nm = Object.assign({}, c2.agentesMeta || {}); delete nm[agId];
+        setLocal(id, { agentes: novos, agentesMeta: nm });
+        var fdb = db();
+        if (fdb) {
+          fdb.collection('campanhas_shared').doc(id).get().then(function (snap) {
+            if (!snap.exists) return;
+            var d = snap.data() || {};
+            var ag = (d.agentes || []).filter(function (x) { return x !== agId; });
+            var mt = Object.assign({}, d.agentesMeta || {}); delete mt[agId];
+            return snap.ref.set({ agentes: ag, agentesMeta: mt, updatedAt: Date.now(), __forceAgentes: true }, { merge: true });
+          }).then(function () { return pull(id); }).then(function () { render(); });
+        }
+        render();
       };
     });
   }
-
-  function startListener(campId) {
-    var db = getDb();
-    if (!db || !campId) return;
-    if (unsub) {
-      try { unsub(); } catch (e) {}
-      unsub = null;
-    }
-    listeningId = campId;
+  function listen(campId) {
+    var fdb = db(); if (!fdb || !campId) return;
+    if (unsub) try { unsub(); } catch (e) {}
+    unsub = null; listeningId = campId;
     try {
-      unsub = db.collection('campanhas_shared').doc(campId).onSnapshot(function (snap) {
-        if (!snap.exists) return;
-        var remote = snap.data() || {};
-        applyRemote(campId, remote);
+      unsub = fdb.collection('campanhas_shared').doc(campId).onSnapshot(function (snap) {
+        if (!snap.exists || pushing) return;
+        var remote = snap.data() || {}, local = getCamp(campId) || {};
+        setLocal(campId, {
+          agentes: mergeIds(local.agentes, remote.agentes),
+          agentesMeta: mergeMeta(local.agentesMeta, remote.agentesMeta)
+        });
         try {
           var active = document.querySelector('.camp-tab.active');
-          var which = active && active.dataset.campTab;
-          if (!which || which === 'agentes') renderAgentes();
-          if (which === 'npcs' && typeof window.__campRenderNpcs === 'function') window.__campRenderNpcs();
+          if (!active || active.dataset.campTab === 'agentes') render();
         } catch (e) {}
-      }, function (err) {
-        console.warn('[agentes-sync] listener', err);
       });
-    } catch (e) {
-      console.warn('[agentes-sync] onSnapshot', e);
-    }
+    } catch (e) {}
   }
-
   async function onOpen(campId) {
     if (!campId) return;
     listeningId = campId;
+    await pull(campId);
+    render();
     var c = getCamp(campId);
-    if (c && (c.agentes || []).length) {
-      var meta = buildMetaForIds(c.agentes, c.agentesMeta);
-      atualizar(campId, { agentesMeta: meta });
-      await pushAgentes(campId);
+    if (c) {
+      var meus = (c.agentes || []).filter(function (id) { return reg().some(function (a) { return a.id === id; }); });
+      if (meus.length) {
+        await mergePush(campId, meus, metaMeus(meus, c.agentesMeta));
+        await pull(campId);
+        render();
+      }
     }
-    var remote = await pullAgentes(campId);
-    if (remote) applyRemote(campId, remote);
-    renderAgentes();
-    startListener(campId);
+    listen(campId);
   }
-
   function bindConfirm() {
     var btn = document.getElementById('btn-confirmar-agentes');
-    if (!btn || btn._agSyncBound) return;
-    btn._agSyncBound = true;
+    if (!btn || btn._agV2) return;
+    btn._agV2 = true;
     btn.addEventListener('click', function () {
-      setTimeout(function () {
-        var id = campIdAtual();
-        if (!id) return;
-        var c = getCamp(id);
-        if (!c) return;
-        var checks = document.querySelectorAll('#modal-agentes-lista input[type="checkbox"]');
-        var ids = (c.agentes || []).slice();
-        if (checks && checks.length) {
-          checks.forEach(function (ch) {
-            if (ch.checked && ch.value && ids.indexOf(ch.value) < 0) ids.push(ch.value);
-          });
-        }
-        var meta = buildMetaForIds(ids, c.agentesMeta);
-        atualizar(id, { agentes: ids, agentesMeta: meta });
-        pushAgentes(id).then(function () { renderAgentes(); });
-        renderAgentes();
-      }, 80);
+      var checked = [];
+      document.querySelectorAll('#modal-agentes-lista input[type="checkbox"]').forEach(function (ch) {
+        if (ch.checked && ch.value) checked.push(ch.value);
+      });
+      setTimeout(async function () {
+        var id = campId(); if (!id) return;
+        var c = getCamp(id) || {};
+        var ids = mergeIds(c.agentes, checked);
+        var extra = metaMeus(ids, c.agentesMeta);
+        setLocal(id, { agentes: ids, agentesMeta: mergeMeta(c.agentesMeta, extra) });
+        await mergePush(id, ids, extra);
+        await pull(id);
+        render();
+      }, 150);
     }, true);
   }
-
-  function hookAtualizar() {
-    if (typeof window.__campAtualizar !== 'function') return false;
-    if (window.__campAtualizar._agHooked) return true;
-    var origAtualizar = window.__campAtualizar;
-    window.__campAtualizar = function (id, patch) {
-      origAtualizar(id, patch);
-      if (patch && (patch.agentes || patch.agentesMeta || patch.npcs)) {
-        if (patch.agentes) {
-          var c = getCamp(id);
-          var meta = buildMetaForIds(patch.agentes, (c && c.agentesMeta) || patch.agentesMeta || {});
-          if (!patch.agentesMeta) {
-            origAtualizar(id, { agentesMeta: meta });
-          }
-        }
-        setTimeout(function () { pushAgentes(id); }, 50);
-      }
-    };
-    window.__campAtualizar._agHooked = true;
-    return true;
-  }
-
-  var prevEnhance = window.__campEnhanceOpen;
+  var prev = window.__campEnhanceOpen;
   window.__campEnhanceOpen = function (id) {
-    if (typeof prevEnhance === 'function') {
-      try { prevEnhance(id); } catch (e) {}
-    }
+    if (typeof prev === 'function') try { prev(id); } catch (e) {}
     onOpen(id);
   };
-
-  window.__campEnhanceAgentes = function () { renderAgentes(); };
-  window.__campRenderAgentes = renderAgentes;
-
-  function bindTabs() {
+  window.__campRenderAgentes = render;
+  window.__campEnhanceAgentes = render;
+  function start() {
+    bindConfirm();
     document.querySelectorAll('.camp-tab').forEach(function (tab) {
-      if (tab._agSyncBound) return;
-      tab._agSyncBound = true;
+      if (tab._agV2) return; tab._agV2 = true;
       tab.addEventListener('click', function () {
         if (tab.dataset.campTab === 'agentes') {
           setTimeout(function () {
-            var id = campIdAtual();
-            if (id) {
-              pullAgentes(id).then(function (remote) {
-                if (remote) applyRemote(id, remote);
-                renderAgentes();
-              });
-            } else renderAgentes();
+            var id = campId();
+            if (id) pull(id).then(function () { render(); });
+            else render();
           }, 40);
         }
       });
     });
-  }
-
-  function start() {
-    bindConfirm();
-    bindTabs();
-    hookAtualizar();
-    setInterval(function () {
-      bindConfirm();
-      hookAtualizar();
-    }, 1500);
-    if (!document.getElementById('camp-agentes-css')) {
-      var s = document.createElement('style');
-      s.id = 'camp-agentes-css';
-      s.textContent =
-        '.camp-avatar{width:56px;height:56px;border-radius:10px;background:#1d1d29 center/cover no-repeat;margin-bottom:8px;}' +
-        '.camp-avatar-fallback{display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.2rem;color:#a78bfa;background:#1d1d29;}' +
-        '.camp-ag-card{position:relative;}' +
-        '.rm-ag{position:absolute;top:8px;right:8px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:transparent;border:none;color:#9797a8;font-size:1.15rem;cursor:pointer;border-radius:6px;padding:0;z-index:2;}' +
-        '.rm-ag:hover{color:#f87171;background:rgba(248,113,113,.12);}';
-      document.head.appendChild(s);
+    var add = document.getElementById('btn-camp-add-agentes');
+    if (add && !add._agV2) {
+      add._agV2 = true;
+      add.addEventListener('click', function () { setTimeout(bindConfirm, 200); });
     }
-    console.log('[agentes-sync] ativo');
+    setInterval(bindConfirm, 1500);
+    console.log('[agentes-sync] v2 merge-safe');
   }
-
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
   else start();
 })();
