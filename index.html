@@ -23,6 +23,7 @@
       if (html.indexOf('camp-join-fix.js') === -1) inject += '<script src="camp-join-fix.js?v=1"><\/script>\n';
       if (html.indexOf('camp-render-guard.js') === -1) inject += '<script src="camp-render-guard.js?v=1"><\/script>\n';
       if (html.indexOf('camp-members-sync.js') === -1) inject += '<script src="camp-members-sync.js?v=1"><\/script>\n';
+      if (html.indexOf('camp-agentes-sync.js') === -1) inject += '<script src="camp-agentes-sync.js?v=1"><\/script>\n';
       if (inject) html = html.replace('</body>', inject + '</body>');
       document.open();
       document.write(html);
