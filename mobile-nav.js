@@ -1,6 +1,7 @@
 /**
  * Menu lateral estilo CRIS + login Google no celular
  * BUGFIX: EscandinavoAuth.user / displayName / editName são funções
+ * + fallback firebase.auth().currentUser após redirect
  */
 (function () {
   function isMobile() {
@@ -9,11 +10,19 @@
 
   function authUser() {
     try {
-      if (!window.EscandinavoAuth || typeof window.EscandinavoAuth.user !== 'function') return null;
-      return window.EscandinavoAuth.user() || null;
-    } catch (e) {
-      return null;
-    }
+      if (window.EscandinavoAuth && typeof window.EscandinavoAuth.user === 'function') {
+        var u = window.EscandinavoAuth.user();
+        if (u) return u;
+      }
+    } catch (e) {}
+    // Fallback: Firebase direto (após redirect a UI às vezes atrasa)
+    try {
+      if (window.firebase && firebase.auth) {
+        var a = firebase.auth();
+        if (a && a.currentUser) return a.currentUser;
+      }
+    } catch (e) {}
+    return null;
   }
 
   function authDisplayName(user) {
@@ -138,6 +147,10 @@
   }
 
   window.__mobSyncAuth = syncAuthUI;
+  window.addEventListener('focus', function () { setTimeout(syncAuthUI, 200); });
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden) setTimeout(syncAuthUI, 200);
+  });
 
   function injectHamburger() {
     var nav = document.querySelector('.ag-nav');
@@ -192,7 +205,7 @@
     var t = setInterval(function () {
       tries++;
       syncAuthUI();
-      if (tries > 30) clearInterval(t);
+      if (tries > 60) clearInterval(t); // ~24s — cobre redirect Google
     }, 400);
   }
 
