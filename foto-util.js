@@ -95,8 +95,8 @@
         e.stopPropagation();
         var card = av.closest('.ag-card');
         if (!card) return;
-        var del = card.querySelector('.del');
-        var id = del && del.dataset.id;
+        var idEl = card.querySelector('.ag-menu-btn') || card.querySelector('[data-act]') || card.querySelector('.del');
+        var id = idEl && idEl.dataset.id;
         if (!id) return;
         pickAndResize(function (dataUrl) {
           setRegistroFoto(registroKey, id, dataUrl);
