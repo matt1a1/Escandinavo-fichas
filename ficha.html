@@ -1,1 +1,89 @@
-SEE_FILE
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Escandinavo Fichas</title>
+<script>
+fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bfb207669552c837164b121a/index.html')
+  .then(function (r) { return r.text(); })
+  .then(function (html) {
+    if (html.indexOf('btn-voltar-agentes') === -1) {
+      html = html.replace(
+        '<button id="btn-new" class="btn secondary">Nova Ficha</button>',
+        '<button id="btn-voltar-agentes" class="btn secondary">\u2190 Agentes</button>\n        <button id="btn-new" class="btn secondary">Nova Ficha</button>'
+      );
+    }
+    html = html.replace(/href="styles\.css[^"]*"/g, 'href="styles.css?v=fix7"');
+    if (html.indexOf('styles-hab.css') === -1) html = html.replace('</head>', '  <link rel="stylesheet" href="styles-hab.css?v=habmine4" />\n</head>');
+    else html = html.replace(/styles-hab\.css\?v=[^"]*/g, 'styles-hab.css?v=habmine4');
+    if (html.indexOf('mobile.css') === -1) html = html.replace('</head>', '  <link rel="stylesheet" href="mobile.css?v=5" />\n</head>');
+    else html = html.replace(/mobile\.css\?v=[^"]*/g, 'mobile.css?v=5');
+    if (html.indexOf('compact.css') === -1) html = html.replace('</head>', '  <link rel="stylesheet" href="compact.css?v=fix7" />\n</head>');
+    else html = html.replace(/compact\.css\?v=[^"]*/g, 'compact.css?v=fix7');
+    html = html.replace(/rituais-catalog\.js[^"]*/g, 'rituais-catalog.js?v=livro1');
+    html = html.replace(/rituais-extra\.js[^"]*/g, 'rituais-extra.js?v=livro1');
+    html = html.replace(/itens-catalog\.js[^"]*/g, 'itens-catalog.js?v=livro1');
+    html = html.replace(/habilidades-catalog\.js[^"]*/g, 'habilidades-catalog.js?v=livro4');
+    html = html.replace(/data\.js[^"]*/g, 'data.js?v=hell1');
+    html = html.replace(/origens-poderes\.js[^"]*/g, 'origens-poderes.js?v=hell1');
+    html = html.replace(/app\.js[^"]*/g, 'https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@843b6316775cfe32a5b0826ee97d310dd7d0aff9/app.js');
+    html = html.replace(/catalog-ui\.js[^"]*/g, 'catalog-ui.js?v=ritui2');
+    html = html.replace(/<textarea/g, '<textarea spellcheck="true" lang="pt-BR"');
+    var extras = '';
+    if (html.indexOf('firebase-config.js') === -1) {
+      extras += '<script src="firebase-config.js"><\/script>\n';
+      extras += '<script src="auth.js?v=6"><\/script>\n';
+      extras += '<script src="ficha-share.js?v=1"><\/script>\n';
+    }
+    if (html.indexOf('origens-poderes.js') === -1) extras += '<script src="origens-poderes.js?v=hell1"><\/script>\n';
+    if (html.indexOf('habilidades-form.js') === -1) extras += '<script src="habilidades-form.js?v=hab1"><\/script>\n';
+    if (html.indexOf('text-format.js') === -1) extras += '<script src="text-format.js?v=2"><\/script>\n';
+    else html = html.replace(/text-format\.js[^"]*/g, 'text-format.js?v=2');
+    if (html.indexOf('attrs-wheel.js') === -1) extras += '<script src="attrs-wheel.js?v=1"><\/script>\n';
+    if (html.indexOf('arquivos-secretos-catalog.js') === -1) {
+      extras += '<script src="arquivos-secretos-catalog.js?v=full3"><\/script>\n';
+      extras += '<script src="arquivos-secretos-catalog-b.js?v=full3"><\/script>\n';
+      extras += '<script src="arquivos-secretos-part2.js?v=1"><\/script>\n';
+      extras += '<script src="arquivos-secretos-trilhas.js?v=1"><\/script>\n';
+      extras += '<script src="arquivos-secretos-rituais.js?v=2"><\/script>\n';
+      extras += '<script src="arquivos-secretos-poderes-a.js?v=2"><\/script>\n';
+      extras += '<script src="arquivos-secretos-poderes-b.js?v=2"><\/script>\n';
+      extras += '<script src="arquivos-secretos-poderes-c.js?v=2"><\/script>\n';
+      extras += '<script src="arquivos-secretos-poderes-d.js?v=2"><\/script>\n';
+      extras += '<script src="arquivos-secretos-hellhunters.js?v=2"><\/script>\n';
+      extras += '<script src="arquivos-secretos-ui.js?v=trilha1"><\/script>\n';
+    }
+    if (html.indexOf('habilidades-bridge.js') === -1) extras += '<script src="habilidades-bridge.js?v=9"><\/script>\n';
+    if (html.indexOf('origem-classe-reset.js') === -1) extras += '<script src="origem-classe-reset.js?v=2"><\/script>\n';
+    html = html.replace(/combat-stats-fix\.js[^"]*/g, 'combat-stats-fix.js?v=7');
+    if (html.indexOf('combat-stats-fix.js') === -1) extras += '<script src="combat-stats-fix.js?v=7"><\/script>\n';
+    if (html.indexOf('ficha-custom.js') === -1) extras += '<script src="ficha-custom.js?v=5"><\/script>\n';
+    if (html.indexOf('ficha-custom-limits.js') === -1) extras += '<script src="ficha-custom-limits.js?v=5"><\/script>\n';
+    html = html.replace(/<script[^>]*ficha-mascaras\.js[^>]*><\/script>/g, '');
+    if (html.indexOf('app-hotfix.js') === -1) extras += '<script src="app-hotfix.js?v=2"><\/script>\n';
+    if (html.indexOf('tabs-fix.js') === -1) extras += '<script src="tabs-fix.js?v=4"><\/script>\n';
+    extras += '<script src="controls-fix.js?v=5"><\/script>\n';
+    extras += '<script src="app-res-fix.js?v=3"><\/script>\n';
+    extras += '<script src="mascara-fix.js?v=11"><\/script>\n';
+    extras += '<script src="habilidades-catalog-extra.js?v=4"><\/script>\n';
+    extras += '<script src="rituais-form.js?v=1"><\/script>\n';
+    if (html.indexOf('ficha-share.js') === -1) extras += '<script src="ficha-share.js?v=1"><\/script>\n';
+    html = html.replace(/habilidades-ui\.js[^"]*/g, 'habilidades-ui.js?v=card2');
+    html = html.replace(/habilidades-catalog\.js[^"]*/g, 'habilidades-catalog.js?v=livro4');
+    if (extras) html = html.replace('</body>', extras + '</body>');
+    document.open(); document.write(html); document.close();
+    setTimeout(function () {
+      var b = document.getElementById('btn-voltar-agentes');
+      if (b) b.onclick = function () { location.href = 'index.html'; };
+    }, 600);
+  })
+  .catch(function () {
+    document.body.innerHTML = '<p style="font-family:sans-serif;padding:40px;color:#c00">N\u00e3o foi poss\u00edvel carregar a ficha. Tente Ctrl+F5.</p>';
+  });
+</script>
+</head>
+<body>
+<p style="font-family:sans-serif;padding:40px;color:#888">Carregando ficha…</p>
+</body>
+</html>
