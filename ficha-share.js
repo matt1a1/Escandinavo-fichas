@@ -54,6 +54,7 @@
   function closeMenus() {
     document.querySelectorAll('.ag-menu-drop').forEach(function (m) { m.hidden = true; });
   }
+
   document.addEventListener('click', function () { closeMenus(); });
 
   function ensureShareModal() {
@@ -101,7 +102,9 @@
       }
       toast(ok ? 'Link copiado!' : 'Copie manualmente (Ctrl+C)', !ok);
     };
-    document.getElementById('btn-gerar-share').onclick = function () { gerarShare(); };
+    document.getElementById('btn-gerar-share').onclick = function () {
+      gerarShare();
+    };
   }
 
   var _shareCtx = null;
@@ -162,7 +165,7 @@
       toast('Link gerado!');
     } catch (e) {
       console.warn(e);
-      toast('Não foi possível salvar o compartilhamento. Verifique as regras do Firestore (coleção ficha_shares).', true);
+      toast('Não foi possível salvar o compartilhamento. Verifique as regras do Firestore.', true);
     }
     btn.disabled = false;
     btn.textContent = 'Gerar link';
@@ -231,7 +234,9 @@
 
   async function loadSharedFicha() {
     var code = null;
-    try { code = new URL(location.href).searchParams.get('share'); } catch (e) {}
+    try {
+      code = new URL(location.href).searchParams.get('share');
+    } catch (e) {}
     if (!code) return false;
 
     function waitDb(ms) {
@@ -265,8 +270,11 @@
       ficha._sharePerm = data.perm || 'view';
       ficha._shareOwner = data.ownerUid || null;
       localStorage.setItem('escandinavo-ficha-' + localId, JSON.stringify(ficha));
-      if (data.perm === 'view') sessionStorage.setItem('escandinavo-share-readonly', localId);
-      else sessionStorage.removeItem('escandinavo-share-readonly');
+      if (data.perm === 'view') {
+        sessionStorage.setItem('escandinavo-share-readonly', localId);
+      } else {
+        sessionStorage.removeItem('escandinavo-share-readonly');
+      }
       if (!location.search.match(/[?&]id=/)) {
         var u = new URL(location.href);
         u.searchParams.delete('share');
@@ -293,7 +301,8 @@
     if (!ro && params.get('readonly') !== '1') return;
     document.body.classList.add('ficha-readonly');
     document.querySelectorAll('input, textarea, select, button').forEach(function (el) {
-      if (el.id === 'btn-voltar-agentes') return;
+      if (el.id === 'btn-voltar-agentes' || (el.className && String(el.className).indexOf('voltar') >= 0)) return;
+      if (el.closest && el.closest('.ag-nav')) return;
       if (el.tagName === 'BUTTON' && /voltar|agentes|fechar/i.test(el.textContent || '')) return;
       if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') {
         el.readOnly = true;
@@ -318,10 +327,12 @@
       _set(key, value);
       if (key && key.indexOf('escandinavo-ficha-share_') === 0) {
         try {
+          var code = key.replace('escandinavo-ficha-share_', '');
           var ficha = JSON.parse(value);
           if (ficha && ficha._sharePerm === 'edit' && ficha._shareCode) {
             var db = getDb();
-            if (db && uid()) {
+            var u = uid();
+            if (db && u) {
               db.collection('ficha_shares').doc(ficha._shareCode).set({
                 ficha: ficha,
                 updatedAt: Date.now()
