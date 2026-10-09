@@ -19,7 +19,8 @@
       html = html.replace(/campanhas-owner-fix\.js\?v=[^"]*/g, 'campanhas-owner-fix.js?v=2');
       var inject = '';
       if (html.indexOf('rm-ag-fix.js') === -1) inject += '<script src="rm-ag-fix.js?v=1"><\/script>\n';
-      if (html.indexOf('campanhas-sync-fix.js') === -1) inject += '<script src="campanhas-sync-fix.js?v=1"><\/script>\n';
+      if (html.indexOf('campanhas-sync-fix.js') === -1) inject += '<script src="campanhas-sync-fix.js?v=2"><\/script>\n';
+      if (html.indexOf('camp-join-fix.js') === -1) inject += '<script src="camp-join-fix.js?v=1"><\/script>\n';
       if (inject) html = html.replace('</body>', inject + '</body>');
       document.open();
       document.write(html);
