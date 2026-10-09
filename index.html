@@ -11,23 +11,21 @@
     .then(function (r) { return r.text(); })
     .then(function (html) {
       if (html.indexOf('.rm-ag{') === -1) {
-        var css = '<style id="rm-ag-css">.camp-ag-card{position:relative;}.rm-ag{position:absolute;top:8px;right:8px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:transparent!important;border:none!important;color:#9797a8!important;font-size:1.15rem;line-height:1;cursor:pointer;border-radius:6px;padding:0;z-index:2;}.rm-ag:hover{color:#f87171!important;background:rgba(248,113,113,.12)!important;}</style>';
+        var css = '<style id="rm-ag-css">.camp-ag-card{position:relative;}.rm-ag{position:absolute;top:8px;right:8px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:transparent!important;border:none!important;color:#9797a8!important;font-size:1.15rem;line-height:1;cursor:pointer;border-radius:6px;padding:0;z-index:2;}.rm-ag:hover{color:#f87171!important;background:rgba(248,113,113,.12)!important;}.camp-avatar{width:56px;height:56px;border-radius:10px;background:#1d1d29 center/cover no-repeat;margin-bottom:8px;}.camp-avatar-fallback{display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.2rem;color:#a78bfa;}.camp-role-mestre{color:#a78bfa;font-weight:600;}.camp-role-jogador{color:#9797a8;}@media(max-width:720px){.camp-detail-actions{flex-direction:column;}.camp-detail-actions .btn-outline,.camp-detail-actions button{width:100%;min-width:0;}.camp-tabs{overflow-x:auto;-webkit-overflow-scrolling:touch;}.camp-tab{padding:10px 12px;white-space:nowrap;}.camp-agentes-grid{grid-template-columns:1fr!important;}}</style>';
         html = html.replace('</head>', css + '</head>');
       }
-      // scripts de fix no final do body
-      var fixes = '';
-      if (html.indexOf('rm-ag-fix.js') === -1) fixes += '<script src="rm-ag-fix.js?v=1"><\/script>\n';
-      if (html.indexOf('campanhas-sync-fix.js') === -1) fixes += '<script src="campanhas-sync-fix.js?v=1"><\/script>\n';
-      if (fixes) html = html.replace('</body>', fixes + '</body>');
-      // force latest local campanhas scripts
-      html = html.replace(/campanhas\.js\?v=[^"]*/g, 'campanhas.js?v=9');
+      html = html.replace(/campanhas\.js\?v=[^"]*/g, 'campanhas.js?v=10');
       html = html.replace(/campanhas-invite\.js\?v=[^"]*/g, 'campanhas-invite.js?v=4');
-      html = html.replace(/campanhas-owner-fix\.js\?v=[^"]*/g, 'campanhas-owner-fix.js?v=3');
+      html = html.replace(/campanhas-owner-fix\.js\?v=[^"]*/g, 'campanhas-owner-fix.js?v=2');
+      var inject = '';
+      if (html.indexOf('rm-ag-fix.js') === -1) inject += '<script src="rm-ag-fix.js?v=1"><\/script>\n';
+      if (html.indexOf('campanhas-sync-fix.js') === -1) inject += '<script src="campanhas-sync-fix.js?v=1"><\/script>\n';
+      if (inject) html = html.replace('</body>', inject + '</body>');
       document.open();
       document.write(html);
       document.close();
     })
-    .catch(function (e) {
+    .catch(function () {
       document.body.innerHTML = '<p style="font-family:sans-serif;padding:40px;color:#c00">Erro ao carregar. Tente Ctrl+F5.</p>';
     });
 })();
