@@ -52,7 +52,7 @@
   .camp-detail-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px;}
   .camp-detail-actions{display:flex;flex-wrap:wrap;gap:8px;}
   .camp-detail-header{display:flex;gap:18px;align-items:center;margin-bottom:22px;}
-  .camp-detail-header .cover{width:80px;height:80px;border-radius:10px;background:linear-gradient(135deg,#2a1a4a,#1a1a2e);flex-shrink:0;}
+  .camp-detail-header .cover{width:80px;height:80px;min-width:80px;min-height:80px;border-radius:10px;background:linear-gradient(135deg,#2a1a4a,#1a1a2e) center/cover no-repeat;flex-shrink:0;overflow:hidden;}
   .camp-detail-header h1{margin:0 0 4px;font-size:1.5rem;}
   .camp-detail-header .meta{color:var(--ag-text-dim);font-size:.9rem;}
   .camp-tabs{display:flex;gap:4px;border-bottom:1px solid var(--ag-border);margin-bottom:16px;}
@@ -190,7 +190,7 @@
 <script src="data.js"></script>
 <script src="wizard.js?v=tipo1"></script>
 <script src="npc-criatura.js?v=3"></script>
-<script src="campanhas.js?v=3"></script>
+<script src="campanhas.js?v=4"></script>
 <script src="campanhas-invite.js?v=1"></script>
 <script src="mobile-nav.js?v=nav2"></script>
 </body>
