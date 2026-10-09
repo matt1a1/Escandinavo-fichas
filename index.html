@@ -17,6 +17,8 @@
       html = html.replace(/campanhas\.js\?v=[^"]*/g, 'campanhas.js?v=11');
       html = html.replace(/campanhas-invite\.js\?v=[^"]*/g, 'campanhas-invite.js?v=4');
       html = html.replace(/campanhas-owner-fix\.js\?v=[^"]*/g, 'campanhas-owner-fix.js?v=2');
+      html = html.replace(/foto-util\.js\?v=[^"]*/g, 'foto-util.js?v=3');
+      html = html.replace(/ficha-share\.js\?v=[^"]*/g, 'ficha-share.js?v=3');
       var inject = '';
       if (html.indexOf('rm-ag-fix.js') === -1) inject += '<script src="rm-ag-fix.js?v=1"><\/script>\n';
       if (html.indexOf('campanhas-sync-fix.js') === -1) inject += '<script src="campanhas-sync-fix.js?v=3"><\/script>\n';
@@ -25,6 +27,7 @@
       if (html.indexOf('camp-members-sync.js') === -1) inject += '<script src="camp-members-sync.js?v=1"><\/script>\n';
       if (html.indexOf('camp-no-overwrite-agentes.js') === -1) inject += '<script src="camp-no-overwrite-agentes.js?v=1"><\/script>\n';
       if (html.indexOf('camp-agentes-sync.js') === -1) inject += '<script src="camp-agentes-sync.js?v=2"><\/script>\n';
+      if (html.indexOf('card-actions-fix.js') === -1) inject += '<script src="card-actions-fix.js?v=1"><\/script>\n';
       if (inject) html = html.replace('</body>', inject + '</body>');
       document.open();
       document.write(html);
