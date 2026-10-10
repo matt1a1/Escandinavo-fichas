@@ -66,7 +66,7 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
     extras += '<script src="poderes-paranormais-oficiais.js?v=1"><\/script>\n';
     extras += '<script src="hab-full-text-fix.js?v=1"><\/script>\n';
     extras += '<script src="rituais-form.js?v=1"><\/script>\n';
-    if (html.indexOf('attrs-wheel.js') === -1) extras += '<script src="attrs-wheel.js?v=1"><\/script>\n';
+    if (html.indexOf('attrs-wheel.js') === -1) extras += '<script src="attrs-wheel.js?v=2"><\/script>\n';
     html = html.replace(/habilidades-ui\.js[^"]*/g, 'habilidades-ui.js?v=card2');
     html = html.replace(/habilidades-catalog\.js[^"]*/g, 'habilidades-catalog.js?v=livro5');
     if (extras) html = html.replace('</body>', extras + '</body>');
