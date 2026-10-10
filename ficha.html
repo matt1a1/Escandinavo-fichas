@@ -19,8 +19,8 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
     else html = html.replace(/styles-hab\.css\?v=[^"]*/g, 'styles-hab.css?v=habmine4');
     if (html.indexOf('mobile.css') === -1) html = html.replace('</head>', '  <link rel="stylesheet" href="mobile.css?v=5" />\n</head>');
     else html = html.replace(/mobile\.css\?v=[^"]*/g, 'mobile.css?v=5');
-    if (html.indexOf('compact.css') === -1) html = html.replace('</head>', '  <link rel="stylesheet" href="compact.css?v=fix7" />\n</head>');
-    else html = html.replace(/compact\.css\?v=[^"]*/g, 'compact.css?v=fix7');
+    if (html.indexOf('compact.css') === -1) html = html.replace('</head>', '  <link rel="stylesheet" href="compact.css?v=fix8" />\n</head>');
+    else html = html.replace(/compact\.css\?v=[^"]*/g, 'compact.css?v=fix8');
     html = html.replace(/rituais-catalog\.js[^"]*/g, 'rituais-catalog.js?v=livro1');
     html = html.replace(/rituais-extra\.js[^"]*/g, 'rituais-extra.js?v=livro1');
     html = html.replace(/itens-catalog\.js[^"]*/g, 'itens-catalog.js?v=livro1');
@@ -66,6 +66,7 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
     extras += '<script src="poderes-paranormais-oficiais.js?v=1"><\/script>\n';
     extras += '<script src="hab-full-text-fix.js?v=1"><\/script>\n';
     extras += '<script src="rituais-form.js?v=1"><\/script>\n';
+    if (html.indexOf('attrs-wheel.js') === -1) extras += '<script src="attrs-wheel.js?v=1"><\/script>\n';
     html = html.replace(/habilidades-ui\.js[^"]*/g, 'habilidades-ui.js?v=card2');
     html = html.replace(/habilidades-catalog\.js[^"]*/g, 'habilidades-catalog.js?v=livro5');
     if (extras) html = html.replace('</body>', extras + '</body>');
