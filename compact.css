@@ -25,49 +25,45 @@ body { font-size: var(--fs); }
 }
 .btn.small { padding: 3px 8px; font-size: 0.72rem; }
 
-/* Grid principal mais estreito nas laterais */
 .sheet {
-  grid-template-columns: 240px 1fr 300px;
   gap: 8px;
   padding: 8px;
 }
-.left-panel, .center-panel, .right-panel { gap: 8px; }
 
-.panel, .card {
+.card, .panel {
   padding: var(--pad);
   border-radius: var(--radius);
 }
-.panel-header { margin-bottom: 6px; }
-.panel-header h2, .panel-header h3 { font-size: 0.82rem; }
 
-input, select, textarea {
-  padding: 5px 8px;
-  border-radius: 5px;
-  font-size: var(--fs);
-}
-textarea { min-height: 52px; }
-
-.field { margin-bottom: 6px; }
-.field label {
-  font-size: var(--fs-xs);
-  margin-bottom: 2px;
-  letter-spacing: 0.03em;
+.card h2, .panel-header h2 {
+  font-size: 0.85rem;
+  margin: 0 0 6px;
 }
 
-/* Identidade compacta */
-.identity-row { margin-bottom: 6px; }
-.identity-grid {
+/* Recursos / NEX lado a lado mais apertado */
+.left-stack {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 6px;
   margin-bottom: 6px;
 }
 
-/* Atributos em linha densa (5 colunas) — sobrescrito pela roda CRIS */
+/* Atributos: 5 colunas que cabem no card (sem cortar) */
+.card.attributes {
+  overflow: visible !important;
+  min-width: 0;
+}
+.center-panel .card.attributes,
+.center-panel {
+  overflow: visible !important;
+}
 .attr-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 4px;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 .attr-item {
   flex-direction: column;
@@ -118,144 +114,131 @@ textarea { min-height: 52px; }
 .res-value { font-size: 0.85rem; }
 
 /* Defesa / bloqueio / esquiva */
-.stat-row { gap: 6px; margin-bottom: 6px; }
-.stat {
-  padding: 6px 4px;
-  border-radius: 6px;
+.stat-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
 }
-.stat label { font-size: var(--fs-xs); margin-bottom: 1px; }
-.stat span { font-size: 0.88rem; }
-.combat-stats .class-summary,
-.class-summary {
-  font-size: var(--fs-sm);
-  margin: 0 0 6px;
-  line-height: 1.3;
+.stat-box {
+  flex: 1;
+  min-width: 70px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  text-align: center;
 }
+.stat-box .label { font-size: var(--fs-xs); }
+.stat-box .value { font-size: 1.05rem; }
 
 /* Perícias densas */
-.pericias-info { font-size: var(--fs-sm); }
-.pericias-list { max-height: calc(100vh - 120px); }
+.pericias-list { gap: 2px; }
 .pericia-row {
-  grid-template-columns: 1.5fr 0.55fr 0.7fr 0.65fr 0.25fr;
+  padding: 3px 4px;
+  font-size: var(--fs-sm);
   gap: 4px;
-  padding: 3px 6px;
-  font-size: var(--fs-sm);
 }
-.pericia-row.pericia-head {
-  font-size: var(--fs-xs);
-  color: var(--text-dim);
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  padding: 4px 6px;
-}
+.pericia-nome { font-size: var(--fs-sm); }
 .attr-tag {
-  font-size: 0.58rem;
-  padding: 0 4px;
+  font-size: 0.55rem;
+  padding: 0 3px;
 }
-.pericia-treino select,
-.pericia-outros input {
-  padding: 2px 4px;
+.rank-select, .other-input {
   font-size: var(--fs-sm);
-  min-height: 0;
+  padding: 2px 4px;
   height: 24px;
 }
 
-/* Abas */
-.tabs { gap: 2px; margin-bottom: 8px; }
+/* Tabs */
+.tabs { gap: 2px; }
 .tab {
   padding: 6px 10px;
-  font-size: 0.75rem;
-}
-.list-header { margin-bottom: 6px; }
-.item-list { gap: 6px; }
-.item-card, .ataque-card {
-  padding: 8px;
-  border-radius: 6px;
-}
-.item-card h4, .ataque-card h4 { font-size: 0.85rem; margin: 0 0 4px; }
-.item-actions { margin-top: 6px; gap: 6px; }
-.item-tipo-tag { font-size: 0.62rem; padding: 1px 5px; margin-bottom: 4px; }
-.ataque-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 10px;
   font-size: var(--fs-sm);
-  color: var(--text-dim);
+}
+
+/* Inventário / habilidades / rituais cards */
+.item-card, .hab-card, .ritual-card {
+  padding: 6px 8px;
   margin-bottom: 4px;
+  border-radius: 8px;
 }
-.ataque-meta strong { color: var(--text); font-weight: 600; }
-
-/* Inventário */
-.inv-grid { gap: 6px; margin-bottom: 6px; }
-.inv-limits { margin-bottom: 6px; }
-.inv-limits-row { margin-bottom: 4px; gap: 6px; }
-.cat-boxes { gap: 4px; }
-.cat-head { font-size: 0.6rem; }
-.cat-boxes input,
-.cat-boxes span:not(.cat-head) { padding: 4px; font-size: var(--fs-sm); }
-.carga-hint { font-size: var(--fs-xs); margin: 2px 0 0; }
-.item-type-btns { gap: 4px; margin-bottom: 8px; }
-.item-type-btns .novo-label { font-size: var(--fs-sm); }
-.btn-type {
-  padding: 4px 8px;
-  font-size: 0.72rem;
-  border-radius: 6px;
+.item-card h4, .hab-card h4, .ritual-card h4 {
+  font-size: 0.8rem;
+  margin: 0 0 2px;
 }
-
-/* Catálogo */
-.catalog-panel { padding: 8px; margin-bottom: 6px; border-radius: 8px; }
-.catalog-header { margin-bottom: 6px; }
-.catalog-header h4 { font-size: 0.82rem; }
-.catalog-count { font-size: var(--fs-xs); padding: 1px 6px; }
-.catalog-filters { gap: 6px; margin-bottom: 6px; }
-.catalog-filters input,
-.catalog-filters select {
-  padding: 5px 8px;
+.item-card p, .hab-card p, .ritual-card p {
   font-size: var(--fs-sm);
+  margin: 0;
+  line-height: 1.35;
 }
-.catalog-list { max-height: 320px; gap: 4px; }
-.catalog-item { gap: 6px; padding: 8px; }
-.catalog-item-main h5 { font-size: 0.82rem; margin: 0 0 4px; }
-.catalog-tag { font-size: 0.62rem; padding: 2px 6px; }
-.catalog-item-desc { font-size: var(--fs-sm); line-height: 1.35; }
-.empty-msg { font-size: var(--fs); padding: 12px; }
 
-/* Modal um pouco mais compacto */
-.modal-header { padding: 10px 12px; }
-.modal-header h2 { font-size: 0.95rem; }
-.modal-body { padding: 12px; }
-.modal-footer { padding: 8px 12px; gap: 6px; }
-
-/* Toolbar de formatação de texto mais discreta */
-.tf-toolbar { padding: 4px 6px; gap: 4px; }
-.tf-btn { min-width: 26px; height: 24px; font-size: 0.75rem; }
-.tf-hint { font-size: 0.62rem; }
-.tf-editor {
-  min-height: 64px;
-  max-height: 160px;
-  padding: 8px 10px;
+/* Origem / classe selects */
+select, input[type="text"], input[type="number"], textarea {
   font-size: var(--fs);
 }
 
-/* Telas médias */
-@media (max-width: 1200px) {
-  .sheet { grid-template-columns: 240px 1fr 260px; }
+/* Cabeçalho ficha */
+.ficha-header {
+  gap: 6px;
+  margin-bottom: 6px;
 }
-@media (max-width: 1100px) {
-  .sheet { grid-template-columns: 1fr; }
-  .attr-grid { grid-template-columns: repeat(5, 1fr); }
-  .pericias-list { max-height: 360px; }
-}
-@media (max-width: 700px) {
-  .attr-grid { grid-template-columns: repeat(3, 1fr); }
-  .sheet { padding: 6px 8px; gap: 6px; }
-  .top-bar { padding: 6px 8px; }
+.ficha-header input {
+  font-size: 0.9rem;
+  padding: 4px 8px;
 }
 
-/* Esconde fórmulas/descrições longas de resumo */
-#res-formula,
-.res-formula,
-#grau-info,
+/* Modal */
+.modal-body { padding: 10px; }
+.modal h3 { font-size: 0.95rem; }
+
+/* Textareas narrativa */
+textarea {
+  min-height: 60px;
+  line-height: 1.4;
+}
+
+@media (max-width: 900px) {
+  .attr-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .left-stack { grid-template-columns: 1fr; }
+}
+@media (max-width: 720px) {
+  .attr-grid { grid-template-columns: repeat(3, 1fr); }
+  .sheet { padding: 6px; gap: 6px; }
+}
+
 .attr-nex-hint {
-  display: none !important;
+  display: block;
+  font-size: var(--fs-xs);
+  color: var(--text-dim);
+}
+
+/* garante 5 atributos visíveis sem scroll horizontal */
+.attr-item {
+  min-width: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+.attr-label {
+  font-size: 0.62rem !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+.attr-controls {
+  flex-wrap: nowrap;
+  justify-content: center;
+}
+@media (max-width: 720px) {
+  .attr-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    gap: 3px !important;
+  }
+  .attr-btn, .nex-btn, .res-btn {
+    width: 20px !important;
+    height: 20px !important;
+    font-size: 0.65rem !important;
+  }
+  .attr-value {
+    min-width: 14px !important;
+    font-size: 0.85rem !important;
+  }
 }
