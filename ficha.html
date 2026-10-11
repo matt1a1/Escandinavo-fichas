@@ -29,6 +29,7 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
     html = html.replace(/origens-poderes\.js[^"]*/g, 'origens-poderes.js?v=hell1');
     html = html.replace(/app\.js[^"]*/g, 'https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@843b6316775cfe32a5b0826ee97d310dd7d0aff9/app.js');
     html = html.replace(/catalog-ui\.js[^"]*/g, 'catalog-ui.js?v=ritui2');
+    html = html.replace(/arquivos-secretos-ui\.js\?v=[^"]*/g, 'arquivos-secretos-ui.js?v=trilha2');
     html = html.replace(/<textarea/g, '<textarea spellcheck="true" lang="pt-BR"');
     var extras = '';
     if (html.indexOf('firebase-config.js') === -1) {
@@ -48,7 +49,7 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
       extras += '<script src="arquivos-secretos-poderes-c.js?v=2"><\/script>\n';
       extras += '<script src="arquivos-secretos-poderes-d.js?v=2"><\/script>\n';
       extras += '<script src="arquivos-secretos-hellhunters.js?v=2"><\/script>\n';
-      extras += '<script src="arquivos-secretos-ui.js?v=trilha1"><\/script>\n';
+      extras += '<script src="arquivos-secretos-ui.js?v=trilha2"><\/script>\n';
     }
     if (html.indexOf('habilidades-bridge.js') === -1) extras += '<script src="habilidades-bridge.js?v=9"><\/script>\n';
     if (html.indexOf('origem-classe-reset.js') === -1) extras += '<script src="origem-classe-reset.js?v=2"><\/script>\n';
@@ -64,6 +65,8 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
     extras += '<script src="mascara-fix.js?v=11"><\/script>\n';
     extras += '<script src="habilidades-catalog-extra.js?v=7"><\/script>\n';
     extras += '<script src="poderes-paranormais-oficiais.js?v=1"><\/script>\n';
+    extras += '<script src="origens-ferido-transtornado.js?v=1"><\/script>\n';
+    extras += '<script src="arquivos-secretos-poderes-ocultista.js?v=1"><\/script>\n';
     extras += '<script src="hab-full-text-fix.js?v=1"><\/script>\n';
     extras += '<script src="rituais-form.js?v=1"><\/script>\n';
     if (html.indexOf('attrs-wheel.js') === -1) extras += '<script src="attrs-wheel.js?v=2"><\/script>\n';
