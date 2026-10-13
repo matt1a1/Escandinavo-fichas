@@ -1,6 +1,21 @@
 /* text-format.js — corretor pt-BR + negrito/itálico/sublinhado nos textos da ficha */
 (function () {
-  const RICH_IDS = ['aparencia', 'personalidade', 'historico', 'objetivo', 'anotacoes'];
+  const RICH_IDS = ['aparencia', 'personalidade', 'historico', 'objetivo', 'anotacoes', 'rit-desc', 'hab-desc', 'item-desc', 'descricao', 'notas'];
+
+  function enhanceAllDescTextareas() {
+    document.querySelectorAll('textarea').forEach(function (ta) {
+      var id = ta.id || '';
+      var ph = (ta.placeholder || '').toLowerCase();
+      var isDesc = /desc|descricao|notas|efeito|anotac/i.test(id) || /descri|efeito|nota/i.test(ph);
+      if (!isDesc || ta.dataset.tfEnhanced) return;
+      if (!id) {
+        id = 'tf-desc-' + Math.random().toString(36).slice(2, 8);
+        ta.id = id;
+      }
+      if (RICH_IDS.indexOf(id) === -1) RICH_IDS.push(id);
+      enhanceRichField(id);
+    });
+  }
 
   function applySpellcheck(root) {
     (root || document).querySelectorAll('textarea, input[type="text"], input:not([type])').forEach((el) => {
@@ -67,7 +82,7 @@
     if (!initial && window.state && state[id]) initial = state[id];
     if (initial && !/[<>]/.test(initial)) {
       ed.innerHTML = String(initial)
-        .replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>')
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
         .replace(/\n/g, '<br>');
     } else {
       ed.innerHTML = initial || '';
@@ -85,7 +100,7 @@
       set(v) {
         const s = v == null ? '' : String(v);
         if (s && !/[<>]/.test(s)) {
-          ed.innerHTML = s.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>').replace(/\n/g, '<br>');
+          ed.innerHTML = s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
         } else {
           ed.innerHTML = s;
         }
@@ -149,6 +164,7 @@
     injectStyles();
     applySpellcheck(document);
     RICH_IDS.forEach(enhanceRichField);
+    enhanceAllDescTextareas();
   }
 
   function boot() {
@@ -169,6 +185,9 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
 
+  setTimeout(function(){ try{ enhanceAllDescTextareas(); }catch(e){} }, 1000);
+  setTimeout(function(){ try{ enhanceAllDescTextareas(); }catch(e){} }, 2500);
+
   window.TF = {
     getHtml(id) {
       const el = document.getElementById(id);
@@ -177,7 +196,7 @@
     setHtml(id, html) {
       const el = document.getElementById(id);
       if (!el) return;
-      if (el.dataset && el.dataset.rich) el.value = html || '';
+      if (el.dataset && el.dataset.rich) el.innerHTML = html || '';
       else el.value = html || '';
     },
     reinit: init
