@@ -37,7 +37,7 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
     if (html.indexOf('firebase-config.js') === -1) {
       extras += '<script src="firebase-config.js"><\/script>\n';
       extras += '<script src="auth.js?v=6"><\/script>\n';
-      extras += '<script src="ficha-share.js?v=3"><\/script>\n';
+      extras += '<script src="ficha-share.js?v=4"><\/script>\n';
     }
     if (html.indexOf('text-format.js') === -1) extras += '<script src="text-format.js?v=3"><\/script>\n';
     extras += '<script src="arquivos-secretos-catalog.js?v=9"><\/script>\n';
@@ -65,9 +65,9 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
     html = html.replace(/<script[^>]*ficha-mascaras\.js[^>]*><\/script>/g, '');
     if (html.indexOf('app-hotfix.js') === -1) extras += '<script src="app-hotfix.js?v=2"><\/script>\n';
     if (html.indexOf('tabs-fix.js') === -1) extras += '<script src="tabs-fix.js?v=4"><\/script>\n';
-    extras += '<script src="controls-fix.js?v=5"><\/script>\n';
+    extras += '<script src="controls-fix.js?v=6"><\/script>\n';
     extras += '<script src="app-res-fix.js?v=3"><\/script>\n';
-    extras += '<script src="ui-dialog.js?v=2"><\/script>\n';
+    extras += '<script src="ui-dialog.js?v=3"><\/script>\n';
     extras += '<script src="mascara-fix.js?v=13"><\/script>\n';
     extras += '<script src="mascara-btn-fix.js?v=1"><\/script>\n';
     extras += '<script src="mascara-ui-dialog-patch.js?v=2"><\/script>\n';
@@ -83,7 +83,7 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
     extras += '<script src="arquivos-secretos-textos-oficiais-b.js?v=2"><\/script>\n';
     extras += '<script src="arquivos-secretos-poderes-ocultista.js?v=1"><\/script>\n';
     extras += '<script src="hab-full-text-fix.js?v=2"><\/script>\n';
-    extras += '<script src="rituais-form.js?v=2"><\/script>\n';
+    extras += '<script src="rituais-form.js?v=3"><\/script>\n';
     if (html.indexOf('attrs-wheel.js') === -1) extras += '<script src="attrs-wheel.js?v=2"><\/script>\n';
     html = html.replace(/habilidades-ui\.js[^"]*/g, 'habilidades-ui.js?v=card3');
     html = html.replace(/habilidades-catalog\.js[^"]*/g, 'habilidades-catalog.js?v=livro6');
