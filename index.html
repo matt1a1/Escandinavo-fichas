@@ -33,6 +33,7 @@
       if (html.indexOf('camp-no-overwrite-agentes.js') === -1) inject += '<script src="camp-no-overwrite-agentes.js?v=1"><\/script>\n';
       if (html.indexOf('camp-agentes-sync.js') === -1) inject += '<script src="camp-agentes-sync.js?v=2"><\/script>\n';
       inject += '<script src="ui-dialog.js?v=3"><\/script>\n';
+      inject += '<script src="wizard-ui-dialog-patch.js?v=1"><\/script>\n';
       if (html.indexOf('card-actions-fix.js') === -1) inject += '<script src="card-actions-fix.js?v=2"><\/script>\n';
       if (inject) html = html.replace('</body>', inject + '</body>');
       document.open();
