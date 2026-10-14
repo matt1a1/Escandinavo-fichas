@@ -1,3 +1,3 @@
-/* arquivos-secretos-catalog.js — inicializa; conteúdo em part1/part2 */
+/* arquivos-secretos-catalog.js — inicializa; conteúdo em q1-q4 */
 var ARQUIVOS_SECRETOS = [];
 if (typeof window !== 'undefined') window.ARQUIVOS_SECRETOS = ARQUIVOS_SECRETOS;
