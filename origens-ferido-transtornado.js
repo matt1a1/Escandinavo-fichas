@@ -1,5 +1,6 @@
 /**
  * Origens: Ferido por Ritual + Transtornado Arrependido
+ * Arquivos Secretos — pacote Sangue / Transtornados
  * Textos oficiais integrais (sem resumo).
  */
 (function () {
@@ -58,14 +59,14 @@
     {
       nome: 'Ferido por Ritual',
       tipo: 'origem',
-      livro: 'OPRPG',
+      livro: 'Sangue',
       desc:
         'Você tinha uma vida ordinária, até sofrer os efeitos paranormais de um ritual (escolha entre Sangue, Morte, Conhecimento ou Energia). A partir de então, sua existência mundana foi deturpada pelo Outro Lado. Perícias treinadas. Ocultismo e 1 perícia definida pelo elemento do ritual (Fortitude para Sangue, Vontade para Morte e Conhecimento ou Reflexos para Energia). Mácula Ritualística. A entidade marcou você com um ritual de 1º círculo a sua escolha do elemento correspondente. Você aprende a conjurar o ritual. Além disso, uma vez por cena, pode conjurá-lo sem gastar PE (mas ainda precisa gastar PE para qualquer efeito adicional, como formas avançadas). Esse ritual não conta no seu limite de rituais conhecidos. Em contrapartida, sofre –5 em testes de resistência contra efeitos (como rituais ou poderes paranormais) desse elemento.'
     },
     {
       nome: 'Transtornado Arrependido',
       tipo: 'origem',
-      livro: 'OPRPG',
+      livro: 'Sangue',
       desc:
         'Você já caminhou entre os Transtornados. Talvez tenha sido um seguidor cego, seduzido pelas promessas de transcendência por meio da carne e da dor. Talvez tenha conhecido a natureza visceral do culto desde o início e ainda assim escolheu mergulhar no delírio. Seja como for, em algum momento algo rompeu o ciclo. Você se libertou, mas ainda sente o eco dos rituais e a presença do Sangue sussurrando na própria carne. Perícias Treinadas. Luta e Ocultismo. Sofrimento de Sangue. Eles podem tentar... mas já não dói mais. Você recebe RD 2/mental. Para cada dois rituais de Sangue ou poderes paranormais de Sangue que possua, a RD aumenta em +1. Contudo, a lembrança das desgraças que você viveu causa pesadelos horríveis, que o impedem de repousar tranquilamente. Sua condição de descanso é sempre uma categoria pior (luxuosa se torna confortável, confortável se torna normal e normal se torna precária).'
     }
@@ -75,7 +76,13 @@
       return x.tipo === e.tipo && x.nome === e.nome;
     });
     if (!exists) root.ARQUIVOS_SECRETOS.push(e);
+    else {
+      // corrige livro se já existia com tag errada
+      root.ARQUIVOS_SECRETOS.forEach(function (x) {
+        if (x.tipo === e.tipo && x.nome === e.nome) x.livro = 'Sangue';
+      });
+    }
   });
 
-  console.log('[origens] Ferido por Ritual + Transtornado Arrependido');
+  console.log('[origens] Ferido por Ritual + Transtornado Arrependido (Sangue)');
 })();
