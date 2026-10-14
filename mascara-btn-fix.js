@@ -1,10 +1,43 @@
-/* mascara-btn-fix.js — botões da máscara estáveis + modal custom (sem re-click) */
+/* mascara-btn-fix.js — botões da máscara estáveis + modal custom + tema vermelho total */
 (function () {
   if (window.__mskBtnFix) return;
   window.__mskBtnFix = true;
 
   var PV = 20, PE = 10;
   var busy = false;
+
+  function ensureRedTheme() {
+    if (document.getElementById('msk-red-css')) return;
+    var st = document.createElement('style');
+    st.id = 'msk-red-css';
+    st.textContent = [
+      'body.msk-red,html.msk-red{',
+      '--bg:#12080a!important;--bg-elevated:#1a0c0e!important;--bg-panel:#1f1012!important;',
+      '--bg-card:#241214!important;--border:#4a2024!important;',
+      '--accent:#ef4444!important;--accent-2:#f87171!important;',
+      '--text:#f5e8e8!important;--text-dim:#c4a0a0!important;',
+      'background:#12080a!important;background-color:#12080a!important;}',
+      'body.msk-red #app,body.msk-red .app,body.msk-red main,body.msk-red .layout,body.msk-red .sheet,body.msk-red .container{',
+      'background:#12080a!important;background-color:#12080a!important;}',
+      'body.msk-red .card,body.msk-red section.card,body.msk-red .panel,body.msk-red .hab-panel,body.msk-red .side-panel{',
+      'background:rgba(36,14,16,.94)!important;border-color:#4a2024!important;}',
+      'body.msk-red .brand h1,body.msk-red .brand{color:#fca5a5!important;}',
+      'body.msk-red .tab.active,body.msk-red .tabs .active{border-bottom-color:#ef4444!important;color:#fca5a5!important;}',
+      'body.msk-red .btn.primary,body.msk-red button.primary,body.msk-red .hab-add,body.msk-red .btn-add{',
+      'background:linear-gradient(135deg,#9f1239,#e11d48)!important;border-color:#e11d48!important;color:#fff!important;}',
+      'body.msk-red input,body.msk-red select,body.msk-red textarea{',
+      'background:#1a0c0e!important;border-color:#4a2024!important;color:#f5e8e8!important;}',
+      'body.msk-red .pericia-row.trained,body.msk-red .pericia-row:hover{background:rgba(239,68,68,.10)!important;}',
+      'body.msk-red .sidebar,body.msk-red aside,body.msk-red .nav,body.msk-red header,body.msk-red .topbar{',
+      'background:#1a0c0e!important;border-color:#4a2024!important;}',
+      'body.msk-red a,body.msk-red .link{color:#fca5a5!important;}',
+      'body.msk-red .chip.active,body.msk-red .tag.active,body.msk-red .hab-chip.active,body.msk-red .chip.on{',
+      'background:rgba(239,68,68,.25)!important;border-color:#ef4444!important;color:#fecaca!important;}',
+      'body.msk-red ::-webkit-scrollbar-thumb{background:#7f1d1d!important;}',
+      'body.msk-red #msk-box{box-shadow:0 0 40px rgba(239,68,68,.35)!important;}'
+    ].join('');
+    document.head.appendChild(st);
+  }
 
   function S() {
     return (typeof state !== 'undefined') ? state : null;
@@ -40,11 +73,14 @@
     if (on) {
       b.textContent = 'ATIVA';
       b.classList.add('on');
+      ensureRedTheme();
       document.body.classList.add('msk-red');
+      document.documentElement.classList.add('msk-red');
     } else {
       b.textContent = 'INATIVA';
       b.classList.remove('on');
       document.body.classList.remove('msk-red');
+      document.documentElement.classList.remove('msk-red');
     }
   }
   function setMsg(t) {
