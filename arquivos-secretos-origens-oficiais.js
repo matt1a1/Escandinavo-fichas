@@ -157,4 +157,16 @@
   });
 
   console.log('[AS origens oficiais]', origens.length, 'atualizadas');
+
+  setTimeout(function () {
+    try {
+      if (typeof renderList === 'function') renderList();
+      document.dispatchEvent(new CustomEvent('arquivos-secretos-ready', {
+        detail: { total: (root.ARQUIVOS_SECRETOS || []).length, source: 'origens-oficiais' }
+      }));
+    } catch (e) {}
+  }, 300);
+  setTimeout(function () {
+    try { if (typeof renderList === 'function') renderList(); } catch (e) {}
+  }, 1200);
 })();
