@@ -6,11 +6,27 @@
       || (typeof isFichaLivre === 'function' && isFichaLivre());
   }
 
+  function hideFreeSheetLabels() {
+    var hide = custom();
+    document.querySelectorAll('.points-left, #attr-nex-hint, .attr-nex-hint').forEach(function (el) {
+      el.style.display = hide ? 'none' : '';
+      el.hidden = !!hide;
+    });
+    document.querySelectorAll('.pericias-info').forEach(function (el) {
+      el.style.display = hide ? 'none' : '';
+      el.hidden = !!hide;
+    });
+    var grau = document.getElementById('grau-info');
+    if (grau) {
+      grau.style.display = hide ? 'none' : '';
+      grau.hidden = !!hide;
+    }
+  }
+
   function install() {
     if (typeof state === 'undefined') return false;
     if (typeof getAttr !== 'function') return false;
 
-    // Fonte única: custom E máscaras liberam limites
     window.isFichaCustom = function () {
       return !!(state && (state.tipoFicha === 'custom' || state.tipoFicha === 'mascaras'));
     };
@@ -80,11 +96,11 @@
       window.calcularRecursos.__cOverride = true;
     }
 
-    // Perícias: na custom/máscaras, qualquer rank livre
     if (typeof renderPericias === 'function' && !renderPericias.__c) {
       var _rp = renderPericias;
       window.renderPericias = function () {
         _rp.apply(this, arguments);
+        hideFreeSheetLabels();
         if (!custom()) return;
         document.querySelectorAll('#pericias-list .rank-select').forEach(function (sel) {
           var neo = sel.cloneNode(true);
@@ -115,19 +131,12 @@
       var _ra = renderAtributos;
       window.renderAtributos = function () {
         _ra.apply(this, arguments);
-        if (custom()) {
-          var hint = document.getElementById('attr-nex-hint');
-          if (hint) {
-            if (state.tipoFicha === 'mascaras')
-              hint.textContent = ' · Ficha das Máscaras: sem limite de pontos nem teto de atributo (0–20)';
-            else
-              hint.textContent = ' · Ficha Customizada: sem limite de pontos nem teto de atributo (0–20)';
-          }
-        }
+        hideFreeSheetLabels();
       };
       window.renderAtributos.__c = true;
     }
 
+    hideFreeSheetLabels();
     return true;
   }
 
@@ -137,7 +146,6 @@
     if (install() || n > 100) clearInterval(t);
   }, 100);
 
-  // Reaplica isFicha* periodicamente caso outro script sobrescreva
   setInterval(function () {
     if (typeof state === 'undefined') return;
     if (state.tipoFicha === 'custom' || state.tipoFicha === 'mascaras') {
@@ -148,5 +156,6 @@
         return !!(state && (state.tipoFicha === 'custom' || state.tipoFicha === 'mascaras'));
       };
     }
-  }, 2000);
+    try { hideFreeSheetLabels(); } catch (e) {}
+  }, 1500);
 })();
