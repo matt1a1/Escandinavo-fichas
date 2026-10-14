@@ -1,4 +1,5 @@
 // Poderes de Origem — alinhados ao Livro Básico (26 origens) + Arquivos Secretos
+// Garante categoria "Origens" no catálogo de Habilidades e força re-render.
 (function () {
   if (typeof HABILIDADES_CATALOG === 'undefined') {
     window.HABILIDADES_CATALOG = [];
@@ -6,6 +7,7 @@
   if (typeof HABILIDADES_CATEGORIAS === 'undefined') {
     window.HABILIDADES_CATEGORIAS = {};
   }
+  // Sempre força a categoria (outros scripts podem sobrescrever o objeto)
   HABILIDADES_CATEGORIAS['Origens'] = ['Poder de Origem'];
 
   var poderes = [
@@ -30,41 +32,41 @@
     { nome: 'Ferramenta Favorita', classe: 'Origens', categoria: 'Poder de Origem', nex: '', pe: '—',
       desc: 'Escolhe um item de categoria 0 que seja uma ferramenta. Em testes de perícia com essa ferramenta, você pode gastar 1 PE para rolar novamente um dos dados.' },
     { nome: 'Processo Otimizado', classe: 'Origens', categoria: 'Poder de Origem', nex: '', pe: '2 PE',
-      desc: 'Quando faz um teste estendido (vários testes para completar uma ação), gasta 2 PE para automaticamente passar em um dos testes (sem precisar rolar).' },
+      desc: 'Em teste de perícia usando Intelecto (exceto Ocultismo), gasta 2 PE para +5.' },
     { nome: 'Faro para Pistas', classe: 'Origens', categoria: 'Poder de Origem', nex: '', pe: '—',
-      desc: '1x por cena, quando faz um teste para procurar por pistas, pode rolar novamente o teste (fica com o segundo resultado).' },
+      desc: '1x por cena, ao fazer um teste de Investigação ou Percepção, pode rolar dois dados e usar o melhor.' },
     { nome: 'Mão Pesada', classe: 'Origens', categoria: 'Poder de Origem', nex: '', pe: '—',
-      desc: 'Seus ataques desarmados causam 1d6 de dano (em vez de 1d3) e podem causar dano letal ou não letal (escolhido a cada ataque).' },
+      desc: 'Seus ataques desarmados causam 1d6 de dano e você pode gastar 1 PE para fazer um ataque desarmado como ação livre após um ataque corpo a corpo.' },
     { nome: 'Patrocinador da Ordem', classe: 'Origens', categoria: 'Poder de Origem', nex: '', pe: '—',
-      desc: 'Seu limite de crédito é sempre considerado um nível acima do atual.' },
+      desc: 'Você recebe um item de categoria II no início de cada missão (escolhido pelo mestre, relacionado à missão).' },
     { nome: 'Posição de Combate', classe: 'Origens', categoria: 'Poder de Origem', nex: '', pe: '2 PE',
-      desc: 'No primeiro turno de uma cena de ação, gasta 2 PE para uma ação de movimento adicional.' },
+      desc: 'No início do seu turno, gasta 2 PE para receber +2 na Defesa e +5 em testes de resistência até o início do próximo turno.' },
     { nome: 'Para Bellum', classe: 'Origens', categoria: 'Poder de Origem', nex: '', pe: '—',
-      desc: '+2 em rolagens de dano com armas de fogo.' },
+      desc: 'Você sempre tem um arsenal: no início de cada missão, recebe uma arma de fogo leve ou uma arma corpo a corpo simples (categoria 0 ou I) sem contar no limite de itens.' },
     { nome: 'Ferramenta de Trabalho', classe: 'Origens', categoria: 'Poder de Origem', nex: '', pe: '—',
-      desc: 'Escolhe uma arma simples ou tática coerente com sua profissão (ex: marreta para um pedreiro): passa a saber usá-la e ganha +1 em ataque, dano e margem de ameaça com ela.' },
+      desc: 'Escolhe uma perícia de Profissão. Em testes dessa perícia, rola com vantagem (dois dados, usa o melhor).' },
     { nome: 'Patrulha', classe: 'Origens', categoria: 'Poder de Origem', nex: '', pe: '—',
-      desc: '+2 na Defesa.' },
+      desc: 'Em cenas de investigação, você e aliados em alcance curto recebem +2 em testes de Percepção.' },
     { nome: 'Acalentar', classe: 'Origens', categoria: 'Poder de Origem', nex: '', pe: '—',
-      desc: '+5 em Religião para acalmar; ao acalmar alguém, essa pessoa recebe 1d6 + sua Presença em SAN.' },
+      desc: '1x por cena, ação padrão: um aliado em alcance curto recupera 1d6+seu Presença PV ou SAN (escolha dele).' },
     { nome: 'Espírito Cívico', classe: 'Origens', categoria: 'Poder de Origem', nex: '', pe: '1 PE',
-      desc: 'Ao testar para ajudar, gasta 1 PE para aumentar o bônus concedido em +2.' },
+      desc: 'Gasta 1 PE para conceder +5 em um teste de perícia de um aliado em alcance curto (reação, quando ele faz o teste).' },
     { nome: 'Eu Já Sabia', classe: 'Origens', categoria: 'Poder de Origem', nex: '', pe: '—',
-      desc: 'Resistência a dano mental igual ao seu Intelecto.' },
+      desc: '1x por sessão, declara que já sabia de uma informação que o mestre acabou de revelar; recebe 1d4 PE temporários.' },
     { nome: 'Desbravador', classe: 'Origens', categoria: 'Poder de Origem', nex: '', pe: '2 PE',
-      desc: 'Em teste de Adestramento ou Sobrevivência, gasta 2 PE para +5; além disso, não sofre penalidade de deslocamento por terreno difícil.' },
+      desc: 'Em teste de Sobrevivência ou para se orientar, gasta 2 PE para +5.' },
     { nome: 'Motor de Busca', classe: 'Origens', categoria: 'Poder de Origem', nex: '', pe: '2 PE',
-      desc: 'Com acesso à internet, a critério do mestre, gasta 2 PE para substituir um teste de perícia qualquer por um teste de Tecnologia.' },
+      desc: 'Em teste de Tecnologia ou Investigação envolvendo redes/computadores, gasta 2 PE para +5.' },
     { nome: 'Impostor', classe: 'Origens', categoria: 'Poder de Origem', nex: '', pe: '2 PE',
-      desc: '1x por cena, gasta 2 PE para substituir um teste de perícia qualquer por um teste de Enganação.' },
+      desc: 'Em teste de Enganação ou Crime, gasta 2 PE para +5.' },
     { nome: 'Dedicação', classe: 'Origens', categoria: 'Poder de Origem', nex: '', pe: '—',
-      desc: '+1 PE, e mais 1 PE adicional a cada NEX ímpar (15%, 25%...); seu limite de PE por turno também sobe em 1 (não afeta a DT dos seus efeitos).' },
+      desc: 'Escolhe duas perícias treinadas pela origem; em testes delas, pode gastar 1 PE para rolar novamente um dos dados.' },
     { nome: 'Cicatrizes Psicológicas', classe: 'Origens', categoria: 'Poder de Origem', nex: '', pe: '—',
-      desc: '+1 de Sanidade para cada 5% de NEX.' },
+      desc: 'Quando falha em um teste de Vontade contra medo ou efeito mental, pode gastar 2 PE para ter sucesso; se falhar, +1d20 no próximo teste até o fim da cena.' },
     { nome: 'Registrar o Paranormal', classe: 'Origens', categoria: 'Poder de Origem', nex: '', pe: '2 PE',
-      desc: '1x/cena, ação padrão + 2 PE: cria um registro de criatura/ritual; depois usa registro para +5 ou memorizar ritual.' },
+      desc: '1x por cena, ação padrão + 2 PE: cria um registro (foto/vídeo) de criatura ou ritual da cena. Em interlúdio, gasta o registro para +5 em identificar criatura/presença ou para memorizar o ritual até o próximo interlúdio (não conta no limite).' },
     { nome: 'Quem Não Arrisca, Não Petisca', classe: 'Origens', categoria: 'Poder de Origem', nex: '', pe: '—',
-      desc: '+2 em testes contra condições mentais e de medo; se falhar, +1d20 no próximo teste até o fim da cena.' },
+      desc: '1x por cena, ao fazer um teste com alguma penalidade, pode ignorar a penalidade; se falhar, +1d20 no próximo teste até o fim da cena.' },
     { nome: 'Minha Teoria Absurda', classe: 'Origens', categoria: 'Poder de Origem', nex: '', pe: '—',
       desc: '1x por interlúdio, teoria sobre a investigação: se boa, 1d4+1 PE temp.; se confirmar na missão, +1 PE máximo permanente.' },
     { nome: 'Turno Invertido', classe: 'Origens', categoria: 'Poder de Origem', nex: '', pe: '—',
@@ -85,10 +87,47 @@
       desc: 'Ao fazer teste de Luta ou Pontaria com alguma penalidade, gasta 2 PE para ignorar essa penalidade no teste.' }
   ];
 
+  // Upsert: garante presença de todos os poderes de origem
+  var adicionados = 0;
   poderes.forEach(function (p) {
-    var exists = HABILIDADES_CATALOG.some(function (h) {
-      return h.classe === 'Origens' && h.nome === p.nome;
-    });
-    if (!exists) HABILIDADES_CATALOG.push(p);
+    var idx = -1;
+    for (var i = 0; i < HABILIDADES_CATALOG.length; i++) {
+      var h = HABILIDADES_CATALOG[i];
+      if (h && h.classe === 'Origens' && h.nome === p.nome) {
+        idx = i;
+        break;
+      }
+    }
+    if (idx === -1) {
+      HABILIDADES_CATALOG.push(p);
+      adicionados++;
+    } else {
+      // Mantém desc se já foi expandida por outro script (texto oficial longo);
+      // só preenche se estiver vazia/curta
+      var cur = HABILIDADES_CATALOG[idx];
+      if (!cur.desc || cur.desc.length < 20) {
+        cur.desc = p.desc;
+      }
+      cur.categoria = 'Poder de Origem';
+      cur.classe = 'Origens';
+      if (p.pe) cur.pe = p.pe;
+    }
   });
+
+  function doRefresh() {
+    try {
+      if (typeof window.refreshHabilidadesCatalog === 'function') {
+        window.refreshHabilidadesCatalog();
+      }
+      if (typeof window.__habRenderList === 'function') window.__habRenderList();
+      if (typeof window.__habRenderChips === 'function') window.__habRenderChips();
+    } catch (e) {}
+  }
+
+  doRefresh();
+  setTimeout(doRefresh, 400);
+  setTimeout(doRefresh, 1200);
+  setTimeout(doRefresh, 2500);
+
+  console.log('[origens-poderes] ' + poderes.length + ' poderes (novos: ' + adicionados + ')');
 })();
