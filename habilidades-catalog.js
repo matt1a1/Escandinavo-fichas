@@ -149,5 +149,6 @@ const HABILIDADES_CATEGORIAS = {
   'Combatente': ['Habilidades de Classe', 'Poderes de Combatente', 'Aniquilador', 'Comandante de Campo', 'Guerreiro', 'Operações Especiais', 'Tropa de Choque'],
   'Especialista': ['Habilidades de Classe', 'Poderes de Especialista', 'Atirador de Elite', 'Infiltrador', 'Médico de Campo', 'Negociador', 'Técnico'],
   'Ocultista': ['Habilidades de Classe', 'Poderes de Ocultista', 'Conduíte', 'Flagelador', 'Graduado', 'Intuitivo', 'Lâmina Paranormal'],
+  'Origens': ['Poder de Origem'],
   'Poderes Paranormais': ['Conhecimento', 'Energia', 'Morte', 'Sangue', 'Varia']
 };
