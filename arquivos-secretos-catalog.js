@@ -1,3 +1,2 @@
-/* arquivos-secretos-catalog.js — itens, regras, origens */
-var ARQUIVOS_SECRETOS = [{"nome":"Agrupador Ritualístico","tipo":"item","livro":"Sangue","desc":"Um item pequeno — não maior que uma faca — e de aparência variada. Você pode gastar uma ação padrão para prender um componente ou um catalisador nele, e pode ter até quatro desses itens presos nele. Componentes e catalisadores presos no agrupador contam como empunhados, desde que o agrupador esteja sendo empunhado. Se você estiver empunhando o agrupador ritualístico, todos os componentes e catalisadores presos nele também contam como empunhados. Ocultistas usam este item para segurar vários componentes e catalisadores com uma só mão.","categoria":"II","espacos":"1"}];
-if (typeof window !== 'undefined') window.ARQUIVOS_SECRETOS = ARQUIVOS_SECRETOS;
+/* PLACEHOLDER - will fix */
+var ARQUIVOS_SECRETOS = [];
