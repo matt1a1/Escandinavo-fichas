@@ -4,10 +4,16 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Escandinavo Fichas</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml" />
+<link rel="icon" href="favicon.svg" sizes="any" />
+<link rel="apple-touch-icon" href="favicon.svg" />
+<meta name="theme-color" content="#12121c" />
+<link rel="manifest" href="site.webmanifest" />
 <script>
 fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bfb207669552c837164b121a/index.html')
   .then(function (r) { return r.text(); })
   .then(function (html) {
+    var fav = '<link rel="icon" href="favicon.svg" type="image/svg+xml" />\n<link rel="icon" href="favicon.svg" sizes="any" />\n<link rel="apple-touch-icon" href="favicon.svg" />\n<meta name="theme-color" content="#12121c" />\n<link rel="manifest" href="site.webmanifest" />\n'; if (html.indexOf('favicon.svg') === -1) html = html.replace('</head>', fav + '</head>');
     if (html.indexOf('btn-voltar-agentes') === -1) {
       html = html.replace(
         '<button id="btn-new" class="btn secondary">Nova Ficha</button>',

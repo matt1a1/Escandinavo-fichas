@@ -4,12 +4,19 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Escandinavo Fichas — Agentes</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml" />
+<link rel="icon" href="favicon.svg" sizes="any" />
+<link rel="apple-touch-icon" href="favicon.svg" />
+<meta name="theme-color" content="#12121c" />
+<link rel="manifest" href="site.webmanifest" />
 <script>
 (function () {
   var BASE = 'https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@23a4e4d5a478';
   fetch(BASE + '/index.html')
     .then(function (r) { return r.text(); })
     .then(function (html) {
+      var fav = '<link rel="icon" href="favicon.svg" type="image/svg+xml" />\n<link rel="icon" href="favicon.svg" sizes="any" />\n<link rel="apple-touch-icon" href="favicon.svg" />\n<meta name="theme-color" content="#12121c" />\n<link rel="manifest" href="site.webmanifest" />\n'; if (html.indexOf('favicon.svg') === -1) html = html.replace('</head>', fav + '</head>');
+
       if (html.indexOf('.rm-ag{') === -1) {
         var css = '<style id="rm-ag-css">.camp-ag-card{position:relative;}.rm-ag{position:absolute;top:8px;right:8px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:transparent!important;border:none!important;color:#9797a8!important;font-size:1.15rem;line-height:1;cursor:pointer;border-radius:6px;padding:0;z-index:2;}.rm-ag:hover{color:#f87171!important;background:rgba(248,113,113,.12)!important;}.camp-avatar{width:56px;height:56px;border-radius:10px;background:#1d1d29 center/cover no-repeat;margin-bottom:8px;}.camp-avatar-fallback{display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.2rem;color:#a78bfa;}.camp-role-mestre{color:#a78bfa;font-weight:600;}.camp-role-jogador{color:#9797a8;}@media(max-width:720px){.camp-detail-actions{flex-direction:column;}.camp-detail-actions .btn-outline,.camp-detail-actions button{width:100%;min-width:0;}.camp-tabs{overflow-x:auto;-webkit-overflow-scrolling:touch;}.camp-tab{padding:10px 12px;white-space:nowrap;}.camp-agentes-grid{grid-template-columns:1fr!important;}}</style>';
         html = html.replace('</head>', css + '</head>');
