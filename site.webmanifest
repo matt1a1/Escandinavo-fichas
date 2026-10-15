@@ -2,9 +2,13 @@
   "name": "Escandinavo Fichas",
   "short_name": "Escandinavo",
   "icons": [
+    {"src": "apple-touch-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any"},
+    {"src": "icon-app-dark.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"},
+    {"src": "logo-black.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any"},
     {"src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any"}
   ],
   "theme_color": "#12121c",
   "background_color": "#12121c",
-  "display": "standalone"
+  "display": "standalone",
+  "start_url": "./index.html"
 }
