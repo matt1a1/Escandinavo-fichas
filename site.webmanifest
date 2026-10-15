@@ -1,0 +1,10 @@
+{
+  "name": "Escandinavo Fichas",
+  "short_name": "Escandinavo",
+  "icons": [
+    {"src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any"}
+  ],
+  "theme_color": "#12121c",
+  "background_color": "#12121c",
+  "display": "standalone"
+}
