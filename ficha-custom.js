@@ -44,7 +44,7 @@
     } else if (state.tipoFicha === 'mascaras') {
       span.style.display = '';
       span.className = 'ficha-tipo-badge tipo-mascaras';
-      span.textContent = 'Máscaras';
+      span.textContent = 'Mascarado';
       document.body.classList.remove('ficha-custom');
       document.body.classList.add('ficha-mascaras-sheet');
     } else {
@@ -124,9 +124,6 @@
   var t = setInterval(function () {
     n++;
     if (install() || n > 40) {
-      if (install()) {
-        /* keep badge updated */
-      }
       if (n > 8) clearInterval(t);
     }
   }, 250);

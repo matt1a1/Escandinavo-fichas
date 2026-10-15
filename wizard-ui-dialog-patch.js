@@ -1,4 +1,4 @@
-/* wizard-ui-dialog-patch.js — troca confirm/alert do wizard + exclusões pela UI custom */
+/* wizard-ui-dialog-patch.js — modal custom + renomeia Máscaras → Mascarado */
 (function () {
   if (window.__wizUiDlgPatch) return;
   window.__wizUiDlgPatch = true;
@@ -123,16 +123,43 @@
     });
   }
 
+  function renameMascarado() {
+    try {
+      if (typeof TIPOS_FICHA !== 'undefined' && TIPOS_FICHA.mascaras) {
+        TIPOS_FICHA.mascaras.nome = 'Ficha Mascarado';
+      }
+    } catch (e) {}
+    document.querySelectorAll('.ag-tipo-badge.tipo-mascaras, .ficha-tipo-badge.tipo-mascaras').forEach(function (el) {
+      var txt = el.textContent || '';
+      if (/m[aá]scaras|das m[aá]scaras/i.test(txt)) el.textContent = 'Mascarado';
+    });
+    document.querySelectorAll('.tipo-ficha-card[data-tipo="mascaras"]').forEach(function (card) {
+      card.querySelectorAll('h3, .tipo-ficha-nome, .nome, strong, b').forEach(function (el) {
+        var t = el.textContent || '';
+        if (/m[aá]scaras/i.test(t)) {
+          el.textContent = t.replace(/Ficha das M[aá]scaras/gi, 'Ficha Mascarado').replace(/das M[aá]scaras/gi, 'Mascarado').replace(/M[aá]scaras/gi, 'Mascarado');
+        }
+      });
+    });
+  }
+
   var n = 0;
   var t = setInterval(function () {
     n++;
     rebindWizardClose();
     rebindDeletes();
+    renameMascarado();
     if (n > 60) clearInterval(t);
   }, 200);
 
+  setInterval(renameMascarado, 1000);
+
   try {
-    var obs = new MutationObserver(function () { rebindDeletes(); rebindWizardClose(); });
+    var obs = new MutationObserver(function () {
+      rebindDeletes();
+      rebindWizardClose();
+      renameMascarado();
+    });
     obs.observe(document.documentElement, { childList: true, subtree: true });
   } catch (e) {}
 })();
