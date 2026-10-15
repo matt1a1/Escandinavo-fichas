@@ -25,7 +25,8 @@
         return;
       }
       if (file.size > 15 * 1024 * 1024) {
-        alert('Imagem muito grande (máx. 15 MB).');
+        if (typeof uiAlert === 'function') uiAlert('Imagem muito grande (máx. 15 MB).', { title: 'Imagem', warn: true });
+        else alert('Imagem muito grande (máx. 15 MB).');
         try { input.remove(); } catch (e) {}
         return;
       }
@@ -46,13 +47,15 @@
           finish(dataUrl);
         };
         img.onerror = function () {
-          alert('Não foi possível ler a imagem.');
+          if (typeof uiAlert === 'function') uiAlert('Não foi possível ler a imagem.', { title: 'Erro', warn: true });
+          else alert('Não foi possível ler a imagem.');
           try { input.remove(); } catch (e) {}
         };
         img.src = reader.result;
       };
       reader.onerror = function () {
-        alert('Falha ao carregar o arquivo.');
+        if (typeof uiAlert === 'function') uiAlert('Falha ao carregar o arquivo.', { title: 'Erro', warn: true });
+        else alert('Falha ao carregar o arquivo.');
         try { input.remove(); } catch (e) {}
       };
       reader.readAsDataURL(file);
@@ -60,7 +63,8 @@
 
     setTimeout(function () {
       try { input.click(); } catch (e) {
-        alert('Não foi possível abrir o seletor de imagens.');
+        if (typeof uiAlert === 'function') uiAlert('Não foi possível abrir o seletor de imagens.', { title: 'Erro', warn: true });
+        else alert('Não foi possível abrir o seletor de imagens.');
         try { input.remove(); } catch (e2) {}
       }
     }, 10);
@@ -108,11 +112,10 @@
   }
 
   function avatarHtml(foto, fallbackIcon) {
-    var icon = fallbackIcon || '◈';
     if (foto) {
       return '<div class="avatar has-foto" style="background-image:url(\'' + String(foto).replace(/'/g, '%27') + '\');background-size:cover;background-position:center" title="Clique para trocar a foto"></div>';
     }
-    return '<div class="avatar" title="Clique para adicionar foto">' + icon + '</div>';
+    return '<div class="avatar avatar-logo" title="Clique para adicionar foto" style="background-image:url(\'' + (fallbackIcon && fallbackIcon.indexOf('.') >= 0 ? fallbackIcon : 'logo-white.svg') + '\');background-size:62% 62%;background-position:center;background-repeat:no-repeat"></div>';
   }
 
   function bindAvatarClicks(grid, registroKey, onDone) {
