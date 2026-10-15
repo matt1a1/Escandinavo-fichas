@@ -1,14 +1,20 @@
-/* logo-mark-patch.js — troca ◈ pelo logo oficial */
+/* logo-mark-patch.js — troca ◈ pelo logo oficial (HQ via logo-data.js se disponível) */
 (function () {
   if (window.__logoMarkPatch) return;
   window.__logoMarkPatch = true;
 
-  var LOGO = 'logo-white.svg';
+  function logoUrl() {
+    if (window.EscandinavoLogos && window.EscandinavoLogos.white) return window.EscandinavoLogos.white;
+    return 'logo-white.svg?v=2';
+  }
 
   function ensureCss() {
-    if (document.getElementById('logo-mark-css')) return;
+    var id = 'logo-mark-css';
+    var existing = document.getElementById(id);
+    if (existing) existing.remove();
+    var LOGO = logoUrl();
     var s = document.createElement('style');
-    s.id = 'logo-mark-css';
+    s.id = id;
     s.textContent = [
       '.avatar.avatar-logo, .ag-card .avatar:not(.has-foto){background-image:url("' + LOGO + '")!important;background-size:62% 62%!important;background-position:center!important;background-repeat:no-repeat!important;color:transparent!important;font-size:0!important;}',
       '.brand .logo, span.logo, .logo-mark{display:inline-block;width:1.15em;height:1.15em;vertical-align:-0.15em;background:url("' + LOGO + '") center/contain no-repeat;font-size:0!important;color:transparent!important;}',
@@ -50,15 +56,6 @@
         el.classList.add('avatar-logo');
       }
     });
-    document.querySelectorAll('#camp-detail-cover').forEach(function (el) {
-      if ((el.textContent || '').trim() === '\u25C8') {
-        el.textContent = '';
-        el.style.backgroundImage = 'url("' + LOGO + '")';
-        el.style.backgroundSize = '50%';
-        el.style.backgroundPosition = 'center';
-        el.style.backgroundRepeat = 'no-repeat';
-      }
-    });
   }
 
   var n = 0;
@@ -72,5 +69,5 @@
   try {
     new MutationObserver(scan).observe(document.documentElement, { childList: true, subtree: true, characterData: true });
   } catch (e) {}
-  console.log('[logo-mark] active');
+  console.log('[logo-mark] active HQ');
 })();
