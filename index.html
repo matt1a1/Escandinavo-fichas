@@ -6,7 +6,7 @@
 <title>Escandinavo Fichas — Agentes</title>
 <link rel="icon" href="favicon.svg" type="image/svg+xml" />
 <link rel="icon" href="favicon.svg" sizes="any" />
-<link rel="apple-touch-icon" href="apple-touch-icon.svg" />
+<link rel="apple-touch-icon" href="logo-white.svg" />
 <meta name="theme-color" content="#12121c" />
 <link rel="manifest" href="site.webmanifest" />
 <script>
@@ -15,7 +15,8 @@
   fetch(BASE + '/index.html')
     .then(function (r) { return r.text(); })
     .then(function (html) {
-      var fav = '<link rel="icon" href="favicon.svg" type="image/svg+xml" />\n<link rel="icon" href="favicon.svg" sizes="any" />\n<link rel="apple-touch-icon" href="apple-touch-icon.svg" />\n<meta name="theme-color" content="#12121c" />\n<link rel="manifest" href="site.webmanifest" />\n'; if (html.indexOf('favicon.svg') === -1) html = html.replace('</head>', fav + '</head>');
+      var fav = '<link rel="icon" href="favicon.svg" type="image/svg+xml" />\n<link rel="icon" href="favicon.svg" sizes="any" />\n<link rel="apple-touch-icon" href="logo-white.svg" />\n<meta name="theme-color" content="#12121c" />\n<link rel="manifest" href="site.webmanifest" />\n';
+      if (html.indexOf('favicon.svg') === -1) html = html.replace('</head>', fav + '</head>');
 
       if (html.indexOf('.rm-ag{') === -1) {
         var css = '<style id="rm-ag-css">.camp-ag-card{position:relative;}.rm-ag{position:absolute;top:8px;right:8px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:transparent!important;border:none!important;color:#9797a8!important;font-size:1.15rem;line-height:1;cursor:pointer;border-radius:6px;padding:0;z-index:2;}.rm-ag:hover{color:#f87171!important;background:rgba(248,113,113,.12)!important;}.camp-avatar{width:56px;height:56px;border-radius:10px;background:#1d1d29 center/cover no-repeat;margin-bottom:8px;}.camp-avatar-fallback{display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.2rem;color:#a78bfa;}.camp-role-mestre{color:#a78bfa;font-weight:600;}.camp-role-jogador{color:#9797a8;}@media(max-width:720px){.camp-detail-actions{flex-direction:column;}.camp-detail-actions .btn-outline,.camp-detail-actions button{width:100%;min-width:0;}.camp-tabs{overflow-x:auto;-webkit-overflow-scrolling:touch;}.camp-tab{padding:10px 12px;white-space:nowrap;}.camp-agentes-grid{grid-template-columns:1fr!important;}}</style>';
@@ -24,7 +25,7 @@
       html = html.replace(/campanhas\.js\?v=[^"]*/g, 'campanhas.js?v=11');
       html = html.replace(/campanhas-invite\.js\?v=[^"]*/g, 'campanhas-invite.js?v=4');
       html = html.replace(/campanhas-owner-fix\.js\?v=[^"]*/g, 'campanhas-owner-fix.js?v=3');
-      html = html.replace(/foto-util\.js\?v=[^"]*/g, 'foto-util.js?v=5');
+      html = html.replace(/foto-util\.js\?v=[^"]*/g, 'foto-util.js?v=7');
       html = html.replace(/wizard\.js[^"]*/g, 'wizard.js?v=uidlg1');
       html = html.replace(/npc-criatura\.js[^"]*/g, 'npc-criatura.js?v=uidlg1');
       html = html.replace(/mobile-nav\.js[^"]*/g, 'mobile-nav.js?v=uidlg1');
@@ -42,8 +43,7 @@
       inject += '<script src="ui-dialog.js?v=3"><\/script>\n';
       inject += '<script src="wizard-ui-dialog-patch.js?v=2"><\/script>\n';
       inject += '<script src="camp-ameacas.js?v=1"><\/script>\n';
-      inject += '<script src="logo-data.js?v=1"><\/script>\n';
-      inject += '<script src="logo-mark-patch.js?v=2"><\/script>\n';
+      inject += '<script src="logo-mark-patch.js?v=5"><\/script>\n';
       if (html.indexOf('card-actions-fix.js') === -1) inject += '<script src="card-actions-fix.js?v=2"><\/script>\n';
       if (inject) html = html.replace('</body>', inject + '</body>');
       document.open();
