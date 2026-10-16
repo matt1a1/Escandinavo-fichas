@@ -1,22 +1,20 @@
 /**
- * auth-mobile-fix.js v5 — login Google confiável no celular
- * - Mobile/PWA: sempre signInWithRedirect (popup falha no Chrome Android / PWA)
- * - Desktop: popup, com fallback para redirect
- * - Após voltar do Google: sincroniza UI do menu mobile
+ * auth-mobile-fix.js v6 — login Google confiável no celular
+ * - Mobile/PWA: sempre signInWithRedirect
+ * - Não faz signOut antes do redirect (evita perder sessão ao voltar)
+ * - Sincroniza btn-auth-login e mob-btn-login
  */
 (function () {
-  if (window.__authMobileFixV5) return;
-  window.__authMobileFixV5 = true;
+  if (window.__authMobileFixV6) return;
+  window.__authMobileFixV6 = true;
 
   function isIOS() {
     return /iPhone|iPad|iPod/i.test(navigator.userAgent || '') ||
       (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   }
-
   function isAndroid() {
     return /Android/i.test(navigator.userAgent || '');
   }
-
   function isStandalonePWA() {
     try {
       if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) return true;
@@ -24,7 +22,6 @@
     } catch (e) {}
     return false;
   }
-
   function isMobile() {
     if (isIOS() || isAndroid()) return true;
     if (isStandalonePWA()) return true;
@@ -45,26 +42,30 @@
   }
 
   function forceMobSync() {
-    try {
-      if (typeof window.__mobSyncAuth === 'function') window.__mobSyncAuth();
-    } catch (e) {}
+    try { if (typeof window.__authUiSyncNow === 'function') window.__authUiSyncNow(); } catch (e) {}
+    try { if (typeof window.__mobSyncAuth === 'function') window.__mobSyncAuth(); } catch (e) {}
     var n = 0;
     var iv = setInterval(function () {
       try {
+        if (typeof window.__authUiSyncNow === 'function') window.__authUiSyncNow();
         if (typeof window.__mobSyncAuth === 'function') window.__mobSyncAuth();
         var user = null;
         try {
           if (window.firebase && firebase.auth) user = firebase.auth().currentUser;
         } catch (e) {}
-        var loginBtn = document.getElementById('btn-login') || document.getElementById('mob-btn-login');
-        var logoutBtn = document.getElementById('btn-logout') || document.getElementById('mob-btn-logout');
+        var loginBtn = document.getElementById('btn-auth-login') || document.getElementById('mob-btn-login');
+        var logoutBtn = document.getElementById('btn-auth-logout') || document.getElementById('mob-btn-logout');
         if (user) {
           if (loginBtn) loginBtn.style.display = 'none';
           if (logoutBtn) logoutBtn.style.display = '';
+          var mobLogin = document.getElementById('mob-btn-login');
+          var mobLogout = document.getElementById('mob-btn-logout');
+          if (mobLogin) mobLogin.style.display = 'none';
+          if (mobLogout) mobLogout.style.display = '';
         }
       } catch (e) {}
-      if (++n > 30) clearInterval(iv);
-    }, 300);
+      if (++n > 40) clearInterval(iv);
+    }, 250);
   }
 
   function makeProvider() {
@@ -79,7 +80,6 @@
     try { sessionStorage.setItem('escandinavo-auth-redirect', '1'); } catch (e) {}
     try { localStorage.setItem('escandinavo-auth-redirect', String(Date.now())); } catch (e) {}
   }
-
   function clearRedirectFlag() {
     try { sessionStorage.removeItem('escandinavo-auth-redirect'); } catch (e) {}
     try { localStorage.removeItem('escandinavo-auth-redirect'); } catch (e) {}
@@ -90,14 +90,13 @@
     toast('Redirecionando para o Google…');
     var provider = makeProvider();
     try { await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); } catch (e) {}
-    try { if (auth.currentUser) await auth.signOut(); } catch (e) {}
+    // sem signOut prévio — select_account já mostra o seletor
     await auth.signInWithRedirect(provider);
   }
 
   async function doPopupLogin(auth) {
     var provider = makeProvider();
     try { await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); } catch (e) {}
-    try { if (auth.currentUser) await auth.signOut(); } catch (e) {}
     toast('Escolha a conta Google…');
     await auth.signInWithPopup(provider);
     forceMobSync();
@@ -105,7 +104,7 @@
 
   function patchLogin() {
     if (!window.EscandinavoAuth || typeof window.EscandinavoAuth.login !== 'function') return false;
-    if (window.EscandinavoAuth.__loginPatchedV5) return true;
+    if (window.EscandinavoAuth.__loginPatchedV6) return true;
 
     window.EscandinavoAuth.login = async function () {
       try {
@@ -144,13 +143,13 @@
         } else if (code === 'auth/network-request-failed') {
           toast('Sem conexão. Verifique a internet e tente de novo.', true);
         } else if (code === 'auth/redirect-cancelled-by-user' || code === 'auth/popup-closed-by-user') {
-          // usuário cancelou
         } else {
           toast('Falha no login: ' + msg, true);
         }
       }
     };
 
+    window.EscandinavoAuth.__loginPatchedV6 = true;
     window.EscandinavoAuth.__loginPatchedV5 = true;
     window.EscandinavoAuth.__loginPatched = true;
 
@@ -164,26 +163,12 @@
           }
         }).catch(function (e) {
           console.warn('[auth-mobile] redirectResult', e);
-          if (e && e.code && e.code !== 'auth/redirect-cancelled-by-user') {
-            try {
-              if (sessionStorage.getItem('escandinavo-auth-redirect') || localStorage.getItem('escandinavo-auth-redirect')) {
-                toast('Erro no login: ' + ((e && e.message) || e), true);
-                clearRedirectFlag();
-              }
-            } catch (e2) {}
-          }
         });
-
         auth.onAuthStateChanged(function (user) {
           forceMobSync();
           if (user) clearRedirectFlag();
         });
       }
-    } catch (e) {}
-
-    try {
-      var flag = sessionStorage.getItem('escandinavo-auth-redirect') || localStorage.getItem('escandinavo-auth-redirect');
-      if (flag) forceMobSync();
     } catch (e) {}
 
     forceMobSync();
@@ -208,5 +193,5 @@
     if (!document.hidden) setTimeout(forceMobSync, 200);
   });
 
-  console.log('[auth-mobile-fix] v5 mobile=' + isMobile() + ' pwa=' + isStandalonePWA());
+  console.log('[auth-mobile-fix] v6 mobile=' + isMobile() + ' pwa=' + isStandalonePWA());
 })();
