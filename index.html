@@ -4,9 +4,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Escandinavo Fichas — Agentes</title>
-<link rel="icon" href="favicon.svg?v=10" type="image/svg+xml" />
-<link rel="icon" href="favicon.svg?v=10" sizes="any" />
-<link rel="apple-touch-icon" href="apple-touch-icon.svg?v=10" />
+<link rel="icon" href="favicon.svg?v=11" type="image/svg+xml" />
+<link rel="icon" href="favicon.svg?v=11" sizes="any" />
+<link rel="apple-touch-icon" href="apple-touch-icon.svg?v=11" />
 <meta name="theme-color" content="#12121c" />
 <link rel="manifest" href="site.webmanifest" />
 <script>
@@ -15,7 +15,7 @@
   fetch(BASE + '/index.html')
     .then(function (r) { return r.text(); })
     .then(function (html) {
-      var fav = '<link rel="icon" href="favicon.svg?v=10" type="image/svg+xml" />\n<link rel="icon" href="favicon.svg?v=10" sizes="any" />\n<link rel="apple-touch-icon" href="apple-touch-icon.svg?v=10" />\n<meta name="theme-color" content="#12121c" />\n<link rel="manifest" href="site.webmanifest" />\n';
+      var fav = '<link rel="icon" href="favicon.svg?v=11" type="image/svg+xml" />\n<link rel="icon" href="favicon.svg?v=11" sizes="any" />\n<link rel="apple-touch-icon" href="apple-touch-icon.svg?v=11" />\n<meta name="theme-color" content="#12121c" />\n<link rel="manifest" href="site.webmanifest" />\n';
       if (html.indexOf('favicon.svg') === -1) html = html.replace('</head>', fav + '</head>');
 
       if (html.indexOf('.rm-ag{') === -1) {
@@ -43,7 +43,7 @@
       inject += '<script src="ui-dialog.js?v=3"><\/script>\n';
       inject += '<script src="wizard-ui-dialog-patch.js?v=2"><\/script>\n';
       inject += '<script src="camp-ameacas.js?v=1"><\/script>\n';
-      inject += '<script src="logo-mark-patch.js?v=10"><\/script>\n';
+      inject += '<script src="logo-mark-patch.js?v=11"><\/script>\n';
       if (html.indexOf('card-actions-fix.js') === -1) inject += '<script src="card-actions-fix.js?v=2"><\/script>\n';
       if (inject) html = html.replace('</body>', inject + '</body>');
       document.open();
