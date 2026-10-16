@@ -3,7 +3,7 @@
   if (window.__logoMarkPatch) return;
   window.__logoMarkPatch = true;
 
-  var LOGO = 'logo-white.svg?v=4';
+  var LOGO = 'logo-white.svg?v=8';
   var scanning = false;
 
   function logoUrl() {
@@ -105,5 +105,5 @@
     obs.observe(document.documentElement, { childList: true, subtree: true, characterData: true });
   } catch (e) {}
 
-  console.log('[logo-mark] active (safe HQ)');
+  console.log('[logo-mark] active v8');
 })();
