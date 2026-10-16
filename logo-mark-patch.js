@@ -1,25 +1,28 @@
-/* logo-mark-patch.js */
+/* logo-mark-patch.js v18 — logo HQ em todos os pontos */
 (function () {
   if (window.__logoMarkPatch) return;
   window.__logoMarkPatch = true;
-  var LOGO = 'logo-white.svg?v=11';
+  var LOGO = 'logo-white.svg?v=18';
   var scanning = false;
   function logoUrl() {
     if (window.EscandinavoLogos && window.EscandinavoLogos.white) return window.EscandinavoLogos.white;
     return LOGO;
   }
   function ensureCss() {
-    if (document.getElementById('logo-mark-css')) return;
     var url = logoUrl();
-    var s = document.createElement('style');
-    s.id = 'logo-mark-css';
+    var s = document.getElementById('logo-mark-css');
+    if (!s) {
+      s = document.createElement('style');
+      s.id = 'logo-mark-css';
+      document.head.appendChild(s);
+    }
     s.textContent = [
-      '.avatar.avatar-logo, .ag-card .avatar:not(.has-foto){background-image:url("'+url+'")!important;background-size:62% 62%!important;background-position:center!important;background-repeat:no-repeat!important;color:transparent!important;font-size:0!important;}',
-      '.brand .logo, span.logo, .logo-mark{display:inline-block;width:1.15em;height:1.15em;vertical-align:-0.15em;background:url("'+url+'") center/contain no-repeat;font-size:0!important;color:transparent!important;}',
+      '.avatar.avatar-logo, .ag-card .avatar:not(.has-foto){background-image:url("'+url+'")!important;background-size:62% 62%!important;background-position:center!important;background-repeat:no-repeat!important;color:transparent!important;font-size:0!important;image-rendering:-webkit-optimize-contrast;}',
+      '.brand .logo, span.logo, .logo-mark{display:inline-block;width:1.25em;height:1.25em;vertical-align:-0.2em;background:url("'+url+'") center/contain no-repeat;font-size:0!important;color:transparent!important;image-rendering:-webkit-optimize-contrast;}',
       '.brand > .logo-mark, .brand .logo-mark{margin-right:0.35em;}',
-      '.camp-avatar.camp-avatar-fallback:not([style*="background-image"]){background-image:url("'+url+'")!important;background-size:55% 55%!important;background-position:center!important;background-repeat:no-repeat!important;color:transparent!important;font-size:0!important;}'
+      '.camp-avatar.camp-avatar-fallback:not([style*="background-image"]){background-image:url("'+url+'")!important;background-size:55% 55%!important;background-position:center!important;background-repeat:no-repeat!important;color:transparent!important;font-size:0!important;image-rendering:-webkit-optimize-contrast;}',
+      'img.logo-img, .logo-img{image-rendering:-webkit-optimize-contrast;}'
     ].join('\n');
-    document.head.appendChild(s);
   }
   function replaceGlyph(el) {
     if (!el || el.dataset.logoDone) return;
@@ -76,5 +79,5 @@
     });
     obs.observe(document.documentElement, { childList: true, subtree: true, characterData: true });
   } catch (e) {}
-  console.log('[logo-mark] v11');
+  console.log('[logo-mark] v18 HQ');
 })();
