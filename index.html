@@ -4,18 +4,18 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Escandinavo Fichas — Agentes</title>
-<link rel="icon" href="favicon.svg?v=13" type="image/svg+xml" />
-<link rel="icon" href="favicon.svg?v=13" sizes="any" />
-<link rel="apple-touch-icon" href="apple-touch-icon.svg?v=13" />
+<link rel="icon" href="favicon.svg?v=14" type="image/svg+xml" />
+<link rel="icon" href="favicon.svg?v=14" sizes="any" />
+<link rel="apple-touch-icon" href="apple-touch-icon.svg?v=14" />
 <meta name="theme-color" content="#12121c" />
-<link rel="manifest" href="site.webmanifest?v=13" />
+<link rel="manifest" href="site.webmanifest?v=14" />
 <script>
 (function () {
   var BASE = 'https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@23a4e4d5a478';
   fetch(BASE + '/index.html')
     .then(function (r) { return r.text(); })
     .then(function (html) {
-      var fav = '<link rel="icon" href="favicon.svg?v=13" type="image/svg+xml" />\n<link rel="icon" href="favicon.svg?v=13" sizes="any" />\n<link rel="apple-touch-icon" href="apple-touch-icon.svg?v=13" />\n<meta name="theme-color" content="#12121c" />\n<link rel="manifest" href="site.webmanifest?v=13" />\n';
+      var fav = '<link rel="icon" href="favicon.svg?v=14" type="image/svg+xml" />\n<link rel="icon" href="favicon.svg?v=14" sizes="any" />\n<link rel="apple-touch-icon" href="apple-touch-icon.svg?v=14" />\n<meta name="theme-color" content="#12121c" />\n<link rel="manifest" href="site.webmanifest?v=14" />\n';
       if (html.indexOf('favicon.svg') === -1) html = html.replace('</head>', fav + '</head>');
 
       if (html.indexOf('.rm-ag{') === -1) {
