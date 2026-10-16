@@ -1,30 +1,26 @@
-/* logo-mark-patch.js — troca ◈ pelo logo oficial */
+/* logo-mark-patch.js */
 (function () {
   if (window.__logoMarkPatch) return;
   window.__logoMarkPatch = true;
-
-  var LOGO = 'logo-white.svg?v=10';
+  var LOGO = 'logo-white.svg?v=11';
   var scanning = false;
-
   function logoUrl() {
     if (window.EscandinavoLogos && window.EscandinavoLogos.white) return window.EscandinavoLogos.white;
     return LOGO;
   }
-
   function ensureCss() {
     if (document.getElementById('logo-mark-css')) return;
     var url = logoUrl();
     var s = document.createElement('style');
     s.id = 'logo-mark-css';
     s.textContent = [
-      '.avatar.avatar-logo, .ag-card .avatar:not(.has-foto){background-image:url("' + url + '")!important;background-size:62% 62%!important;background-position:center!important;background-repeat:no-repeat!important;color:transparent!important;font-size:0!important;image-rendering:auto!important;}',
-      '.brand .logo, span.logo, .logo-mark{display:inline-block;width:1.15em;height:1.15em;vertical-align:-0.15em;background:url("' + url + '") center/contain no-repeat;font-size:0!important;color:transparent!important;}',
+      '.avatar.avatar-logo, .ag-card .avatar:not(.has-foto){background-image:url("'+url+'")!important;background-size:62% 62%!important;background-position:center!important;background-repeat:no-repeat!important;color:transparent!important;font-size:0!important;}',
+      '.brand .logo, span.logo, .logo-mark{display:inline-block;width:1.15em;height:1.15em;vertical-align:-0.15em;background:url("'+url+'") center/contain no-repeat;font-size:0!important;color:transparent!important;}',
       '.brand > .logo-mark, .brand .logo-mark{margin-right:0.35em;}',
-      '.camp-avatar.camp-avatar-fallback:not([style*="background-image"]){background-image:url("' + url + '")!important;background-size:55% 55%!important;background-position:center!important;background-repeat:no-repeat!important;color:transparent!important;font-size:0!important;}'
+      '.camp-avatar.camp-avatar-fallback:not([style*="background-image"]){background-image:url("'+url+'")!important;background-size:55% 55%!important;background-position:center!important;background-repeat:no-repeat!important;color:transparent!important;font-size:0!important;}'
     ].join('\n');
     document.head.appendChild(s);
   }
-
   function replaceGlyph(el) {
     if (!el || el.dataset.logoDone) return;
     var txt = (el.textContent || '').trim();
@@ -34,7 +30,6 @@
       el.textContent = '';
     }
   }
-
   function scan() {
     if (scanning) return;
     scanning = true;
@@ -61,20 +56,12 @@
           el.classList.add('avatar-logo');
         }
       });
-    } finally {
-      scanning = false;
-    }
+    } finally { scanning = false; }
   }
-
   var n = 0;
-  var iv = setInterval(function () {
-    scan();
-    if (++n > 24) clearInterval(iv);
-  }, 400);
-
+  var iv = setInterval(function () { scan(); if (++n > 24) clearInterval(iv); }, 400);
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', scan);
   else scan();
-
   try {
     var obs = new MutationObserver(function (mutations) {
       if (scanning) return;
@@ -89,6 +76,5 @@
     });
     obs.observe(document.documentElement, { childList: true, subtree: true, characterData: true });
   } catch (e) {}
-
-  console.log('[logo-mark] v10');
+  console.log('[logo-mark] v11');
 })();
