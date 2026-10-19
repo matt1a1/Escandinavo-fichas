@@ -43,7 +43,9 @@ fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bf
     var extras = '';
     if (html.indexOf('firebase-config.js') === -1) {
       extras += '<script src="firebase-config.js"><\/script>\n';
-      extras += '<script src="auth.js?v=6"><\/script>\n';
+      extras += '<script src="auth.js?v=restore1"><\/script>\n';
+      extras += '<script src="auth-restore-login.js?v=1"><\/script>\n';
+      extras += '<script src="auth-mobile-fix.js?v=restore1"><\/script>\n';
       extras += '<script src="ficha-share.js?v=4"><\/script>\n';
     }
     if (html.indexOf('text-format.js') === -1) extras += '<script src="text-format.js?v=3"><\/script>\n';
