@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Entrar — Escandinavo Fichas</title>
+<meta name="theme-color" content="#12121c" />
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    background: #0b0b10; color: #e8e8f0; padding: 24px;
+  }
+  .card {
+    width: 100%; max-width: 400px; background: #16161f; border: 1px solid #2a2a38;
+    border-radius: 14px; padding: 28px 22px; text-align: center;
+  }
+  h1 { margin: 0 0 8px; font-size: 1.2rem; }
+  p { margin: 0 0 18px; color: #9797a8; font-size: .9rem; line-height: 1.45; }
+  .status {
+    margin: 0 0 16px; padding: 12px; border-radius: 10px; font-size: .88rem;
+    background: #1a1a28; border: 1px solid #2a2a38; color: #c4b5fd;
+  }
+  .status.err { background: #2a1212; border-color: #7f1d1d; color: #fca5a5; }
+  .status.ok { background: #122a1a; border-color: #166534; color: #86efac; }
+  button {
+    width: 100%; padding: 14px 16px; border: none; border-radius: 10px;
+    background: #8b5cf6; color: #fff; font-weight: 700; font-size: 1rem;
+    cursor: pointer;
+  }
+  button:disabled { opacity: .6; cursor: wait; }
+  a.back { display: inline-block; margin-top: 16px; color: #9797a8; font-size: .85rem; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>Entrar com Google</h1>
+    <p>Login para salvar fichas e campanhas na nuvem.</p>
+    <div id="status" class="status">Preparando…</div>
+    <button type="button" id="btn">Continuar com Google</button>
+    <a class="back" href="./" id="back">← Voltar ao site</a>
+  </div>
+
+  <script src="firebase-config.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-auth-compat.js"></script>
+  <script>
+(function () {
+  var statusEl = document.getElementById('status');
+  var btn = document.getElementById('btn');
+  var INDEX = './';
+
+  function setStatus(msg, type) {
+    statusEl.textContent = msg;
+    statusEl.className = 'status' + (type ? ' ' + type : '');
+  }
+
+  function goHome(flag) {
+    var url = INDEX + (flag ? ('?auth=' + encodeURIComponent(flag)) : '');
+    location.replace(url);
+  }
+
+  function friendly(e) {
+    var c = (e && e.code) || '';
+    if (c === 'auth/unauthorized-domain') {
+      return 'Domínio não autorizado no Firebase. Em Authentication → Settings → Authorized domains, adicione: matt1a1.github.io';
+    }
+    if (c === 'auth/popup-blocked') return 'Popup bloqueado pelo navegador.';
+    if (c === 'auth/popup-closed-by-user' || c === 'auth/redirect-cancelled-by-user') return 'Login cancelado.';
+    if (c === 'auth/network-request-failed') return 'Sem conexão com a internet.';
+    if (c === 'auth/operation-not-allowed') return 'Login Google desativado no console Firebase.';
+    return (e && e.message) || c || 'erro desconhecido';
+  }
+
+  async function startLogin() {
+    btn.disabled = true;
+    setStatus('Redirecionando para o Google…');
+    try {
+      var auth = firebase.auth();
+      try { await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); } catch (e) {}
+      var provider = new firebase.auth.GoogleAuthProvider();
+      provider.addScope('email');
+      provider.addScope('profile');
+      provider.setCustomParameters({ prompt: 'select_account' });
+      try { sessionStorage.setItem('escandinavo-auth-redirect', '1'); } catch (e) {}
+      await auth.signInWithRedirect(provider);
+    } catch (e) {
+      console.error(e);
+      btn.disabled = false;
+      setStatus('Falha: ' + friendly(e), 'err');
+    }
+  }
+
+  async function init() {
+    try {
+      if (!window.FIREBASE_ENABLED || !window.FIREBASE_CONFIG) {
+        setStatus('Firebase não configurado.', 'err');
+        btn.disabled = true;
+        return;
+      }
+      if (!firebase.apps.length) firebase.initializeApp(window.FIREBASE_CONFIG);
+      var auth = firebase.auth();
+      try { await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); } catch (e) {}
+
+      // Resultado do redirect (volta do Google)
+      try {
+        var result = await auth.getRedirectResult();
+        if (result && result.user) {
+          setStatus('Login ok: ' + (result.user.displayName || result.user.email) + '. Abrindo o site…', 'ok');
+          try { sessionStorage.removeItem('escandinavo-auth-redirect'); } catch (e) {}
+          setTimeout(function () { goHome('ok'); }, 600);
+          return;
+        }
+      } catch (e) {
+        console.warn('redirectResult', e);
+        if (e && e.code !== 'auth/redirect-cancelled-by-user') {
+          setStatus('Erro no login: ' + friendly(e), 'err');
+          btn.disabled = false;
+          return;
+        }
+      }
+
+      // Já logado
+      if (auth.currentUser) {
+        setStatus('Já logado como ' + (auth.currentUser.displayName || auth.currentUser.email), 'ok');
+        setTimeout(function () { goHome('ok'); }, 500);
+        return;
+      }
+
+      // Se veio de um redirect que não trouxe user
+      try {
+        if (sessionStorage.getItem('escandinavo-auth-redirect')) {
+          sessionStorage.removeItem('escandinavo-auth-redirect');
+          setStatus('Login não concluído (sessão vazia). Toque de novo em Continuar. Se repetir, confira o domínio matt1a1.github.io no Firebase.', 'err');
+          btn.disabled = false;
+          return;
+        }
+      } catch (e) {}
+
+      setStatus('Toque no botão para entrar com sua conta Google.');
+      btn.disabled = false;
+
+      // Auto-start se ?auto=1
+      if (/[?&]auto=1/.test(location.search)) {
+        startLogin();
+      }
+    } catch (e) {
+      console.error(e);
+      setStatus('Erro ao iniciar: ' + friendly(e), 'err');
+      btn.disabled = false;
+    }
+  }
+
+  btn.addEventListener('click', function () { startLogin(); });
+  init();
+})();
+  </script>
+</body>
+</html>
