@@ -1,8 +1,8 @@
-/* logo-mark-patch.js v18 — logo HQ em todos os pontos */
+/* logo-mark-patch.js v20 — logos do usuario (Logo_branca / logo_preta) HQ */
 (function () {
-  if (window.__logoMarkPatch) return;
-  window.__logoMarkPatch = true;
-  var LOGO = 'logo-white.svg?v=18';
+  if (window.__logoMarkPatchV20) return;
+  window.__logoMarkPatchV20 = true;
+  var LOGO = 'logo-white.svg?v=20';
   var scanning = false;
   function logoUrl() {
     if (window.EscandinavoLogos && window.EscandinavoLogos.white) return window.EscandinavoLogos.white;
@@ -79,5 +79,5 @@
     });
     obs.observe(document.documentElement, { childList: true, subtree: true, characterData: true });
   } catch (e) {}
-  console.log('[logo-mark] v18 HQ');
+  console.log('[logo-mark] v20 HQ user logos');
 })();
