@@ -21,6 +21,10 @@
   .ag-nav .brand{font-weight:700;letter-spacing:.02em;margin-right:auto;}
   .ag-nav a{color:var(--ag-text-dim);text-decoration:none;font-size:.95rem;padding-bottom:4px;border-bottom:2px solid transparent;cursor:pointer;}
   .ag-nav a.active{color:var(--ag-text);border-bottom-color:var(--ag-accent);}
+  #auth-bar{display:flex;align-items:center;gap:8px;margin-left:12px;flex-shrink:0;}
+  #btn-auth-login{padding:8px 14px;font-size:.82rem;white-space:nowrap;}
+  #btn-auth-logout{padding:8px 12px;font-size:.82rem;display:none;}
+  #auth-user{font-size:.8rem;color:#c4b5fd;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:transparent;border:none;cursor:pointer;padding:4px 6px;border-radius:6px;display:none;}
   .ag-wrap{max-width:1100px;margin:0 auto;padding:32px;}
   .ag-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;gap:16px;flex-wrap:wrap;}.ag-header-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
   .ag-header h1{font-size:1.1rem;font-weight:600;margin:0;color:var(--ag-text-dim);}
@@ -65,13 +69,18 @@
   .modal-box-body{padding:20px;overflow:auto;}
 </style>
 </head>
-<body data-build="2026-10-20-full2">
+<body data-build="2026-10-20-full3">
 <nav class="ag-nav">
   <span class="brand">◈ Escandinavo Fichas</span>
   <a data-view="agentes" class="active">Agentes</a>
   <a data-view="campanhas">Campanhas</a>
   <a data-view="npc">NPC</a>
   <a data-view="criaturas">Criatura/Ameaça</a>
+  <div id="auth-bar">
+    <button type="button" id="auth-user" title="Clique para alterar o nome"></button>
+    <button type="button" id="btn-auth-login" class="btn-primary">Entrar com Google</button>
+    <button type="button" id="btn-auth-logout" class="btn-ghost">Sair</button>
+  </div>
 </nav>
 <div class="ag-wrap">
   <section id="view-agentes">
@@ -83,7 +92,7 @@
       </div>
     </div>
     <input type="text" class="ag-search" id="ag-search" placeholder="Buscar agente..." />
-    <div class="ag-grid" id="ag-grid"></div>
+    <div class="ag-grid" id="ag-grid"><div class="ag-empty">Nenhum agente ainda. Clique em &quot;+ Novo Agente&quot; para criar sua primeira ficha.</div></div>
   </section>
 
   <section id="view-campanhas" hidden>
@@ -172,20 +181,20 @@
 </div>
 
 <script src="firebase-config.js"></script>
-<script src="auth.js?v=real2"></script>
-<script src="auth-restore-login.js?v=2"></script>
+<script src="auth.js?v=full3"></script>
+<script src="auth-restore-login.js?v=3"></script>
 <script src="auth-mobile-fix.js?v=restore1"></script>
 <script src="data.js"></script>
 <script src="foto-util.js?v=8"></script>
 <script src="ficha-share.js?v=4"></script>
 <script src="ui-dialog.js?v=3"></script>
-<script src="wizard.js?v=full2"></script>
+<script src="wizard.js?v=full3"></script>
 <script src="wizard-ui-dialog-patch.js?v=2"></script>
 <script src="npc-criatura.js?v=real2"></script>
 <script src="agent-menu-patch.js?v=2"></script>
 <script src="npc-menu-patch.js?v=2"></script>
 <script src="card-actions-fix.js?v=2"></script>
-<script src="campanhas.js?v=full2"></script>
+<script src="campanhas.js?v=full3"></script>
 <script src="campanhas-owner-fix.js?v=3"></script>
 <script src="campanhas-invite.js?v=3"></script>
 <script src="campanhas-sync-fix.js?v=3"></script>
