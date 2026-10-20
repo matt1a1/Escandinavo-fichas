@@ -4,22 +4,21 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Escandinavo Fichas — Agentes</title>
-<link rel="icon" href="favicon.svg?v=20" type="image/svg+xml" />
-<link rel="icon" href="favicon.svg?v=20" sizes="any" />
-<link rel="apple-touch-icon" href="apple-touch-icon.svg?v=20" />
+<link rel="icon" href="favicon.svg?v=21" type="image/svg+xml" />
+<link rel="icon" href="favicon.svg?v=21" sizes="any" />
+<link rel="apple-touch-icon" href="apple-touch-icon.svg?v=21" />
 <meta name="theme-color" content="#12121c" />
-<link rel="manifest" href="site.webmanifest?v=20" />
+<link rel="manifest" href="site.webmanifest?v=21" />
 <script>
 (function () {
   var BASE = 'https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@23a4e4d5a478';
   fetch(BASE + '/index.html')
     .then(function (r) { return r.text(); })
     .then(function (html) {
-      // Sempre forcar favicon HQ (v=20) — sobrescreve links do CDN
       html = html.replace(/<link[^>]*rel=["'](?:shortcut )?icon["'][^>]*>/gi, '');
       html = html.replace(/<link[^>]*rel=["']apple-touch-icon["'][^>]*>/gi, '');
       html = html.replace(/<link[^>]*rel=["']manifest["'][^>]*>/gi, '');
-      var fav = '<link rel="icon" href="favicon.svg?v=20" type="image/svg+xml" />\n<link rel="icon" href="favicon.svg?v=20" sizes="any" />\n<link rel="apple-touch-icon" href="apple-touch-icon.svg?v=20" />\n<meta name="theme-color" content="#12121c" />\n<link rel="manifest" href="site.webmanifest?v=20" />\n';
+      var fav = '<link rel="icon" href="favicon.svg?v=21" type="image/svg+xml" />\n<link rel="icon" href="favicon.svg?v=21" sizes="any" />\n<link rel="apple-touch-icon" href="apple-touch-icon.svg?v=21" />\n<meta name="theme-color" content="#12121c" />\n<link rel="manifest" href="site.webmanifest?v=21" />\n';
       html = html.replace('</head>', fav + '</head>');
 
       if (html.indexOf('.rm-ag{') === -1) {
@@ -48,7 +47,7 @@
       inject += '<script src="ui-dialog.js?v=3"><\/script>\n';
       inject += '<script src="wizard-ui-dialog-patch.js?v=2"><\/script>\n';
       inject += '<script src="camp-ameacas.js?v=1"><\/script>\n';
-      inject += '<script src="logo-mark-patch.js?v=20"><\/script>\n';
+      inject += '<script src="logo-mark-patch.js?v=21"><\/script>\n';
       inject += '<script src="camp-card-fix.js?v=1"><\/script>\n';
       inject += '<script src="auth-restore-login.js?v=2"><\/script>\n';
       if (html.indexOf('card-actions-fix.js') === -1) inject += '<script src="card-actions-fix.js?v=2"><\/script>\n';
