@@ -1,8 +1,16 @@
-// Campanhas: carrega versão completa estável + protege contra wizard (card 📋)
+/**
+ * campanhas.js — carrega versão completa com fallback (não trava se CDN falhar)
+ */
 (function () {
-  var s = document.createElement('script');
-  s.src = 'https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@fd05ebb6e802/campanhas.js';
-  s.onload = function () {
+  if (window.__escCampanhasLoading) return;
+  window.__escCampanhasLoading = true;
+
+  var SOURCES = [
+    'https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@fd05ebb6e802/campanhas.js',
+    'https://raw.githubusercontent.com/matt1a1/Escandinavo-fichas/fd05ebb6e802/campanhas.js'
+  ];
+
+  function onReady() {
     if (typeof window.renderCampanhas === 'function') {
       window.__escCampanhasRender = window.renderCampanhas;
     }
@@ -11,30 +19,30 @@
       if (typeof window.__escCampanhasRender === 'function') {
         if (window.renderCampanhas !== window.__escCampanhasRender) {
           window.renderCampanhas = window.__escCampanhasRender;
-          try {
-            var v = document.getElementById('view-campanhas');
-            var grid = document.getElementById('camp-grid');
-            if (v && !v.hidden) {
-              if (!grid || grid.innerHTML.indexOf('📋') !== -1 || grid.querySelector('.camp-cover') === null) {
-                window.__escCampanhasRender();
-              }
-            }
-          } catch (e) {}
         }
-      }
-      if (++n > 80) clearInterval(iv);
-    }, 300);
-    setTimeout(function () {
-      try {
-        if (typeof window.__escCampanhasRender === 'function') {
-          window.renderCampanhas = window.__escCampanhasRender;
+        try {
           var v = document.getElementById('view-campanhas');
           if (v && !v.hidden) window.__escCampanhasRender();
-        }
-      } catch (e) {}
-    }, 600);
-    console.log('[campanhas] stable+protected loaded');
-  };
-  s.onerror = function () { console.error('[campanhas] fail CDN load'); };
-  document.head.appendChild(s);
+        } catch (e) {}
+      }
+      if (++n > 40) clearInterval(iv);
+    }, 300);
+    console.log('[campanhas] full loaded');
+  }
+
+  function tryLoad(i) {
+    if (i >= SOURCES.length) {
+      console.warn('[campanhas] CDN/raw falhou — usando render básico do wizard');
+      return;
+    }
+    var s = document.createElement('script');
+    s.src = SOURCES[i] + (SOURCES[i].indexOf('?') >= 0 ? '&' : '?') + 't=' + Date.now();
+    s.onload = onReady;
+    s.onerror = function () {
+      console.warn('[campanhas] falha fonte', i);
+      tryLoad(i + 1);
+    };
+    document.head.appendChild(s);
+  }
+  tryLoad(0);
 })();
