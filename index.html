@@ -7,9 +7,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Escandinavo Fichas — Agentes</title>
 <link rel="icon" href="Logo_branca?v=22" type="image/png" sizes="any" />
-<link rel="stylesheet" href="styles.css?v=restore" onerror="this.remove()" />
-<link rel="stylesheet" href="wizard-styles.css?v=restore" />
-<link rel="stylesheet" href="mobile.css?v=restore" />
+<link rel="stylesheet" href="styles.css?v=ui1" onerror="this.remove()" />
+<link rel="stylesheet" href="agentes-page.css?v=ui1" />
+<link rel="stylesheet" href="wizard-styles.css?v=ui1" />
+<link rel="stylesheet" href="mobile.css?v=ui1" />
+<link rel="stylesheet" href="compact.css?v=ui1" />
 <style>
   :root{--ag-bg:#0b0b10;--ag-panel:#16161f;--ag-panel-2:#1d1d29;--ag-border:#2a2a38;--ag-accent:#8b5cf6;--ag-accent-2:#a855f7;--ag-text:#f2f2f6;--ag-text-dim:#9797a8;--ag-danger:#ef4444;}
   *{box-sizing:border-box;} body{background:var(--ag-bg);color:var(--ag-text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;margin:0;min-height:100vh;}
@@ -17,42 +19,57 @@
   .ag-nav .brand{font-weight:700;letter-spacing:.02em;margin-right:auto;}
   .ag-nav a{color:var(--ag-text-dim);text-decoration:none;font-size:.95rem;padding-bottom:4px;border-bottom:2px solid transparent;cursor:pointer;}
   .ag-nav a.active{color:var(--ag-text);border-bottom-color:var(--ag-accent);}
+  #auth-bar{display:flex;align-items:center;gap:8px;margin-left:12px;flex-shrink:0;}
   .ag-wrap{max-width:1100px;margin:0 auto;padding:32px;}
-  .ag-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;gap:16px;flex-wrap:wrap;}.ag-header-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  .ag-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;gap:16px;flex-wrap:wrap;}
+  .ag-header-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
   .ag-header h1{font-size:1.1rem;font-weight:600;margin:0;color:var(--ag-text-dim);}
   .ag-header h1 b{color:var(--ag-text);}
   .btn-primary{background:var(--ag-accent);color:#fff;border:none;border-radius:8px;padding:10px 18px;font-weight:600;font-size:.9rem;cursor:pointer;}
   .btn-primary:hover{background:var(--ag-accent-2);}
   .btn-ghost{background:transparent;color:var(--ag-text-dim);border:1px solid var(--ag-border);border-radius:8px;padding:9px 16px;font-size:.9rem;cursor:pointer;}
+  .btn-outline{background:transparent;color:var(--ag-text);border:1px solid var(--ag-border);border-radius:8px;padding:9px 14px;font-size:.85rem;cursor:pointer;}
   .ag-search{width:100%;padding:11px 14px;border-radius:8px;border:1px solid var(--ag-border);background:var(--ag-panel);color:var(--ag-text);margin-bottom:22px;font-size:.9rem;}
   .ag-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px;}
-  .ag-card{background:var(--ag-panel);border:1px solid var(--ag-border);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;position:relative;}
+  .ag-card{background:var(--ag-panel);border:1px solid var(--ag-border);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;position:relative;transition:border-color .15s,transform .15s;}
+  .ag-card:hover{border-color:rgba(139,92,246,.45);}
   .ag-card button{background:transparent;color:var(--ag-text-dim);border:none;cursor:pointer;}
   .ag-card a{color:inherit;}
-  .ag-card .avatar{width:100%;height:90px;border-radius:8px;background:var(--ag-panel-2);display:flex;align-items:center;justify-content:center;font-size:1.6rem;color:var(--ag-text-dim);}
+  .ag-card .avatar{width:100%;height:90px;border-radius:8px;background:var(--ag-panel-2);display:flex;align-items:center;justify-content:center;font-size:1.6rem;color:var(--ag-text-dim);cursor:pointer;position:relative;overflow:hidden;background-size:cover;background-position:center;}
   .ag-card h3{margin:0;font-size:1rem;}
   .ag-card .meta{font-size:.78rem;color:var(--ag-text-dim);}
-  .ag-card .del{position:absolute;top:10px;right:10px;}
+  .ag-card .del{position:absolute;top:10px;right:10px;background:transparent !important;border:none !important;color:var(--ag-text-dim) !important;cursor:pointer;font-size:1rem;padding:4px 8px;border-radius:6px;z-index:2;}
+  .ag-card .del:hover{color:var(--ag-danger) !important;background:rgba(239,68,68,.12) !important;}
   .ag-card .acessar{margin-top:auto;background:var(--ag-accent) !important;color:#fff !important;text-align:center;text-decoration:none !important;padding:9px;border-radius:8px;font-size:.85rem;font-weight:600;display:block;}
+  .ag-card .acessar:hover{background:var(--ag-accent-2) !important;}
+  .ag-tipo-badge{display:inline-block;align-self:flex-start;font-size:.68rem;font-weight:700;padding:3px 8px;border-radius:999px;letter-spacing:.02em;}
+  .ag-tipo-badge.tipo-custom{background:rgba(56,189,248,.15);color:#7dd3fc;border:1px solid rgba(56,189,248,.35);}
+  .ag-tipo-badge.tipo-mascaras{background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.4);}
   .ag-empty{grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--ag-text-dim);border:1px dashed var(--ag-border);border-radius:12px;}
   .camp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;}
-  .wizard-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;display:flex;flex-direction:column;}
+  .camp-card{background:var(--ag-panel);border:1px solid var(--ag-border);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;}
+  .camp-cover{height:100px;background:var(--ag-panel-2) center/cover no-repeat;}
+  .camp-body{padding:14px;display:flex;flex-direction:column;gap:8px;flex:1;}
+  .camp-body h3{margin:0;font-size:1.05rem;}
+  .camp-body .meta{font-size:.78rem;color:var(--ag-text-dim);}
+  .camp-body .btn-acessar{margin-top:auto;align-self:flex-end;background:var(--ag-accent);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-weight:600;cursor:pointer;}
+  .wizard-overlay{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:1000;display:flex;flex-direction:column;}
   .wizard-overlay[hidden]{display:none!important;}
   .wizard-top{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;border-bottom:1px solid var(--ag-border);background:var(--ag-panel);}
   .wizard-steps{display:flex;gap:8px;padding:12px 24px;border-bottom:1px solid var(--ag-border);background:var(--ag-panel);overflow-x:auto;}
   .wizard-body{flex:1;overflow:auto;padding:24px;max-width:720px;margin:0 auto;width:100%;}
 </style>
 </head>
-<body data-build="2026-10-20-RESTORE">
+<body data-build="2026-10-20-UI1">
 <nav class="ag-nav">
   <span class="brand">◈ Escandinavo Fichas</span>
   <a data-view="agentes" class="active">Agentes</a>
   <a data-view="campanhas">Campanhas</a>
   <a data-view="npc">NPC</a>
   <a data-view="criaturas">Criatura/Ameaça</a>
-  <div id="auth-bar" style="display:flex;align-items:center;gap:8px;margin-left:12px;">
-    <button type="button" id="auth-user" style="display:none;font-size:.8rem;color:#c4b5fd;background:transparent;border:none;cursor:pointer;"></button>
-    <button type="button" id="btn-auth-login" class="btn-primary" style="padding:8px 14px;font-size:.82rem;">Entrar com Google</button>
+  <div id="auth-bar">
+    <button type="button" id="auth-user" style="display:none;font-size:.8rem;color:#c4b5fd;background:transparent;border:none;cursor:pointer;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></button>
+    <button type="button" id="btn-auth-login" class="btn-primary" style="padding:8px 14px;font-size:.82rem;white-space:nowrap;">Entrar com Google</button>
     <button type="button" id="btn-auth-logout" class="btn-ghost" style="padding:8px 12px;font-size:.82rem;display:none;">Sair</button>
   </div>
 </nav>
@@ -80,13 +97,15 @@
       <h1>NPCs: <b id="npc-count">0</b></h1>
       <button class="btn-primary" id="btn-novo-npc-tab">+ Novo NPC</button>
     </div>
+    <input type="text" class="ag-search" id="npc-search" placeholder="Buscar NPC..." />
     <div class="ag-grid" id="npc-grid"><div class="ag-empty">Nenhum NPC ainda.</div></div>
   </section>
   <section id="view-criaturas" hidden>
     <div class="ag-header">
-      <h1>Criaturas: <b id="criatura-count">0</b></h1>
+      <h1>Criaturas / Ameaças: <b id="criatura-count">0</b></h1>
       <button class="btn-primary" id="btn-nova-criatura">+ Nova Criatura</button>
     </div>
+    <input type="text" class="ag-search" id="criatura-search" placeholder="Buscar criatura..." />
     <div class="ag-grid" id="criatura-grid"></div>
   </section>
 </div>
@@ -99,11 +118,12 @@
   <div class="wizard-body" id="wizard-body"></div>
 </div>
 <script src="firebase-config.js"></script>
-<script src="auth.js?v=restore"></script>
+<script src="auth.js?v=ui1"></script>
 <script src="data.js"></script>
-<script src="wizard.js?v=restore"></script>
-<script src="npc-criatura.js?v=restore"></script>
-<script src="campanhas.js?v=restore"></script>
-<script src="mobile-nav.js?v=restore"></script>
+<script src="wizard.js?v=ui1"></script>
+<script src="npc-criatura.js?v=ui1"></script>
+<script src="campanhas.js?v=ui1"></script>
+<script src="mobile-nav.js?v=ui1"></script>
+<script src="logo-mark-patch.js?v=ui1"></script>
 </body>
 </html>
