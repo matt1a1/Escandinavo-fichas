@@ -4,54 +4,88 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Escandinavo Fichas</title>
-<link rel="icon" href="Logo_branca?v=22" type="image/png" sizes="any" />
-<meta name="theme-color" content="#12121c" />
 <script>
 (function () {
   var done = false;
   var t = setTimeout(function () {
     if (done) return;
-    document.body.innerHTML = '<div style="font-family:sans-serif;padding:40px;background:#0b0b10;color:#eee;min-height:100vh"><p style="color:#f87171">Demorou demais.</p><p><a href="index.html" style="color:#a78bfa">← Agentes</a></p></div>';
+    document.body.innerHTML = '<div style="font-family:sans-serif;padding:40px;background:#0b0b10;color:#eee;min-height:100vh"><p style="color:#f87171">Demorou demais para carregar.</p><p><a href="index.html" style="color:#a78bfa">← Agentes</a> · <a href="javascript:location.reload()" style="color:#a78bfa">Tentar de novo</a></p></div>';
   }, 12000);
+  function markDone() { done = true; clearTimeout(t); }
 
-  var n = 3;
-  var loaded = 0;
-  window.__FICHA_PARTS = [];
-
-  function tryFinish() {
-    if (loaded < n) return;
-    var html = '';
-    for (var i = 0; i < n; i++) {
-      if (!window.__FICHA_PARTS[i]) {
-        done = true; clearTimeout(t);
-        document.body.innerHTML = '<div style="padding:40px;background:#0b0b10;color:#f87171;font-family:sans-serif">Falha ao montar a ficha (parte ' + i + ').</div>';
-        return;
-      }
-      html += window.__FICHA_PARTS[i];
+fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bfb207669552c837164b121a/index.html')
+  .then(function (r) { if (!r.ok) throw new Error('HTTP '+r.status); return r.text(); })
+  .then(function (html) {
+    markDone();
+    if (html.indexOf('btn-voltar-agentes') === -1) {
+      html = html.replace(
+        '<button id="btn-new" class="btn secondary">Nova Ficha</button>',
+        '<button id="btn-voltar-agentes" class="btn secondary">\u2190 Agentes</button>\n        <button id="btn-new" class="btn secondary">Nova Ficha</button>'
+      );
     }
-    done = true;
-    clearTimeout(t);
-    document.open();
-    document.write(html);
-    document.close();
-  }
-
-  for (var i = 0; i < n; i++) {
-    (function (idx) {
-      var s = document.createElement('script');
-      s.src = 'ficha-html-part-' + idx + '.js?v=solid1';
-      s.onload = function () { loaded++; tryFinish(); };
-      s.onerror = function () {
-        done = true; clearTimeout(t);
-        document.body.innerHTML = '<div style="padding:40px;background:#0b0b10;color:#f87171;font-family:sans-serif">Erro ao carregar parte ' + idx + ' da ficha. <a href="index.html" style="color:#a78bfa">← Agentes</a></div>';
-      };
-      document.head.appendChild(s);
-    })(i);
-  }
+    html = html.replace(/href="styles\.css[^"]*"/g, 'href="styles.css?v=fix7"');
+    if (html.indexOf('styles-hab.css') === -1) html = html.replace('</head>', '  <link rel="stylesheet" href="styles-hab.css?v=habmine4" />\n</head>');
+    else html = html.replace(/styles-hab\.css\?v=[^"]*/g, 'styles-hab.css?v=habmine4');
+    if (html.indexOf('mobile.css') === -1) html = html.replace('</head>', '  <link rel="stylesheet" href="mobile.css?v=5" />\n</head>');
+    else html = html.replace(/mobile\.css\?v=[^"]*/g, 'mobile.css?v=5');
+    if (html.indexOf('compact.css') === -1) html = html.replace('</head>', '  <link rel="stylesheet" href="compact.css?v=fix7" />\n</head>');
+    else html = html.replace(/compact\.css\?v=[^"]*/g, 'compact.css?v=fix7');
+    html = html.replace(/rituais-catalog\.js[^"]*/g, 'rituais-catalog.js?v=livro1');
+    html = html.replace(/rituais-extra\.js[^"]*/g, 'rituais-extra.js?v=livro1');
+    html = html.replace(/itens-catalog\.js[^"]*/g, 'itens-catalog.js?v=livro1');
+    html = html.replace(/habilidades-catalog\.js[^"]*/g, 'habilidades-catalog.js?v=livro1');
+    html = html.replace(/data\.js[^"]*/g, 'data.js?v=hell1');
+    html = html.replace(/origens-poderes\.js[^"]*/g, 'origens-poderes.js?v=hell1');
+    html = html.replace(/app\.js[^"]*/g, 'app.js?v=solid1');
+    html = html.replace(/catalog-ui\.js[^"]*/g, 'catalog-ui.js?v=ritui2');
+    html = html.replace(/<textarea/g, '<textarea spellcheck="true" lang="pt-BR"');
+    var extras = '';
+    if (html.indexOf('firebase-config.js') === -1) {
+      extras += '<script src="firebase-config.js"><\/script>\n';
+      extras += '<script src="auth.js?v=full3"><\/script>\n';
+    }
+    if (html.indexOf('text-format.js') === -1) extras += '<script src="text-format.js?v=1"><\/script>\n';
+    if (html.indexOf('ui-dialog.js') === -1) extras += '<script src="ui-dialog.js?v=3"><\/script>\n';
+    if (html.indexOf('logo-mark-patch.js') === -1) extras += '<script src="logo-mark-patch.js?v=22"><\/script>\n';
+    if (html.indexOf('arquivos-secretos-ui.js') === -1) {
+      extras += '<script src="arquivos-secretos-catalog.js?v=1"><\/script>\n';
+      extras += '<script src="arquivos-secretos-trilhas.js?v=1"><\/script>\n';
+      extras += '<script src="arquivos-secretos-rituais.js?v=2"><\/script>\n';
+      extras += '<script src="arquivos-secretos-poderes-a.js?v=2"><\/script>\n';
+      extras += '<script src="arquivos-secretos-poderes-b.js?v=2"><\/script>\n';
+      extras += '<script src="arquivos-secretos-poderes-c.js?v=2"><\/script>\n';
+      extras += '<script src="arquivos-secretos-poderes-d.js?v=2"><\/script>\n';
+      extras += '<script src="arquivos-secretos-hellhunters.js?v=2"><\/script>\n';
+      extras += '<script src="arquivos-secretos-ui.js?v=trilha1"><\/script>\n';
+    }
+    if (html.indexOf('habilidades-bridge.js') === -1) extras += '<script src="habilidades-bridge.js?v=9"><\/script>\n';
+    if (html.indexOf('origem-classe-reset.js') === -1) extras += '<script src="origem-classe-reset.js?v=2"><\/script>\n';
+    if (html.indexOf('combat-stats-fix.js') === -1) extras += '<script src="combat-stats-fix.js?v=7"><\/script>\n';
+    if (html.indexOf('ficha-custom.js') === -1) extras += '<script src="ficha-custom.js?v=6"><\/script>\n';
+    if (html.indexOf('ficha-custom-limits.js') === -1) extras += '<script src="ficha-custom-limits.js?v=6"><\/script>\n';
+    html = html.replace(/<script[^>]*ficha-mascaras\.js[^>]*><\/script>/g, '');
+    if (html.indexOf('app-hotfix.js') === -1) extras += '<script src="app-hotfix.js?v=1"><\/script>\n';
+    if (html.indexOf('tabs-fix.js') === -1) extras += '<script src="tabs-fix.js?v=4"><\/script>\n';
+    extras += '<script src="controls-fix.js?v=6"><\/script>\n';
+    extras += '<script src="app-res-fix.js?v=3"><\/script>\n';
+    extras += '<script src="mascara-fix.js?v=14"><\/script>\n';
+    html = html.replace(/habilidades-ui\.js[^"]*/g, 'habilidades-ui.js?v=card2');
+    html = html.replace(/habilidades-catalog\.js[^"]*/g, 'habilidades-catalog.js?v=livro1');
+    if (extras) html = html.replace('</body>', extras + '</body>');
+    document.open(); document.write(html); document.close();
+    setTimeout(function () {
+      var b = document.getElementById('btn-voltar-agentes');
+      if (b) b.onclick = function () { location.href = 'index.html'; };
+    }, 600);
+  })
+  .catch(function (e) {
+    markDone();
+    document.body.innerHTML = '<div style="font-family:sans-serif;padding:40px;background:#0b0b10;color:#eee"><p style="color:#f87171">Não foi possível carregar a ficha.</p><p style="color:#9797a8">'+(e&&e.message?e.message:'')+'</p><p><a href="index.html" style="color:#a78bfa">← Agentes</a></p></div>';
+  });
 })();
 </script>
 </head>
-<body style="background:#0b0b10;color:#888;font-family:sans-serif;padding:40px;margin:0">
-Carregando ficha…
+<body>
+<p style="font-family:sans-serif;padding:40px;color:#888">Carregando ficha…</p>
 </body>
 </html>
