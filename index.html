@@ -4,19 +4,24 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Escandinavo Fichas — Agentes</title>
-<link rel="icon" href="favicon.svg?v=17" type="image/svg+xml" />
-<link rel="icon" href="favicon.svg?v=17" sizes="any" />
-<link rel="apple-touch-icon" href="apple-touch-icon.svg?v=17" />
+<link rel="icon" href="favicon.svg?v=20" type="image/svg+xml" />
+<link rel="icon" href="favicon.svg?v=20" sizes="any" />
+<link rel="apple-touch-icon" href="apple-touch-icon.svg?v=20" />
 <meta name="theme-color" content="#12121c" />
-<link rel="manifest" href="site.webmanifest?v=18" />
+<link rel="manifest" href="site.webmanifest?v=20" />
 <script>
 (function () {
   var BASE = 'https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@23a4e4d5a478';
   fetch(BASE + '/index.html')
     .then(function (r) { return r.text(); })
     .then(function (html) {
-      var fav = '<link rel="icon" href="favicon.svg?v=17" type="image/svg+xml" />\n<link rel="icon" href="favicon.svg?v=17" sizes="any" />\n<link rel="apple-touch-icon" href="apple-touch-icon.svg?v=17" />\n<meta name="theme-color" content="#12121c" />\n<link rel="manifest" href="site.webmanifest?v=18" />\n';
+      var fav = '<link rel="icon" href="favicon.svg?v=20" type="image/svg+xml" />\n<link rel="icon" href="favicon.svg?v=20" sizes="any" />\n<link rel="apple-touch-icon" href="apple-touch-icon.svg?v=20" />\n<meta name="theme-color" content="#12121c" />\n<link rel="manifest" href="site.webmanifest?v=20" />\n';
       if (html.indexOf('favicon.svg') === -1) html = html.replace('</head>', fav + '</head>');
+      else {
+        html = html.replace(/favicon\.svg\?v=[^"]*/g, 'favicon.svg?v=20');
+        html = html.replace(/apple-touch-icon\.svg\?v=[^"]*/g, 'apple-touch-icon.svg?v=20');
+        html = html.replace(/site\.webmanifest\?v=[^"]*/g, 'site.webmanifest?v=20');
+      }
 
       if (html.indexOf('.rm-ag{') === -1) {
         var css = '<style id="rm-ag-css">.camp-ag-card{position:relative;}.rm-ag{position:absolute;top:8px;right:8px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:transparent!important;border:none!important;color:#9797a8!important;font-size:1.15rem;line-height:1;cursor:pointer;border-radius:6px;padding:0;z-index:2;}.rm-ag:hover{color:#f87171!important;background:rgba(248,113,113,.12)!important;}.camp-avatar{width:56px;height:56px;border-radius:10px;background:#1d1d29 center/cover no-repeat;margin-bottom:8px;}.camp-avatar-fallback{display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.2rem;color:#a78bfa;}.camp-role-mestre{color:#a78bfa;font-weight:600;}.camp-role-jogador{color:#9797a8;}@media(max-width:720px){.camp-detail-actions{flex-direction:column;}.camp-detail-actions .btn-outline,.camp-detail-actions button{width:100%;min-width:0;}.camp-tabs{overflow-x:auto;-webkit-overflow-scrolling:touch;}.camp-tab{padding:10px 12px;white-space:nowrap;}.camp-agentes-grid{grid-template-columns:1fr!important;}}</style>';
@@ -44,7 +49,7 @@
       inject += '<script src="ui-dialog.js?v=3"><\/script>\n';
       inject += '<script src="wizard-ui-dialog-patch.js?v=2"><\/script>\n';
       inject += '<script src="camp-ameacas.js?v=1"><\/script>\n';
-      inject += '<script src="logo-mark-patch.js?v=18"><\/script>\n';
+      inject += '<script src="logo-mark-patch.js?v=20"><\/script>\n';
       inject += '<script src="camp-card-fix.js?v=1"><\/script>\n';
       inject += '<script src="auth-restore-login.js?v=2"><\/script>\n';
       if (html.indexOf('card-actions-fix.js') === -1) inject += '<script src="card-actions-fix.js?v=2"><\/script>\n';

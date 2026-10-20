@@ -1,8 +1,9 @@
-/* logo-mark-patch.js v20 — logos do usuario (Logo_branca / logo_preta) HQ */
+/* logo-mark-patch.js v20 — Logo_branca original 1378px do usuario */
 (function () {
   if (window.__logoMarkPatchV20) return;
   window.__logoMarkPatchV20 = true;
-  var LOGO = 'logo-white.svg?v=20';
+  // Arquivos originais do usuario no repo (PNG 1378x1378)
+  var LOGO = 'Logo_branca?v=20';
   var scanning = false;
   function logoUrl() {
     if (window.EscandinavoLogos && window.EscandinavoLogos.white) return window.EscandinavoLogos.white;
@@ -79,5 +80,5 @@
     });
     obs.observe(document.documentElement, { childList: true, subtree: true, characterData: true });
   } catch (e) {}
-  console.log('[logo-mark] v20 HQ user logos');
+  console.log('[logo-mark] v20 Logo_branca original');
 })();
