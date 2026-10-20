@@ -4,112 +4,39 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Escandinavo Fichas</title>
+<link rel="icon" href="Logo_branca?v=22" type="image/png" sizes="any" />
 <link rel="icon" href="favicon.svg" type="image/svg+xml" />
-<link rel="icon" href="favicon.svg" sizes="any" />
-<link rel="apple-touch-icon" href="logo-white.svg" />
 <meta name="theme-color" content="#12121c" />
-<link rel="manifest" href="site.webmanifest" />
 <script>
-fetch('https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@c8381d064de81055bfb207669552c837164b121a/index.html')
-  .then(function (r) { return r.text(); })
-  .then(function (html) {
-    var fav = '<link rel="icon" href="favicon.svg" type="image/svg+xml" />\n<link rel="icon" href="favicon.svg" sizes="any" />\n<link rel="apple-touch-icon" href="logo-white.svg" />\n<meta name="theme-color" content="#12121c" />\n<link rel="manifest" href="site.webmanifest" />\n';
-    if (html.indexOf('favicon.svg') === -1) html = html.replace('</head>', fav + '</head>');
-    if (html.indexOf('btn-voltar-agentes') === -1) {
-      html = html.replace(
-        '<button id="btn-new" class="btn secondary">Nova Ficha</button>',
-        '<button id="btn-voltar-agentes" class="btn secondary">\u2190 Agentes</button>\n        <button id="btn-new" class="btn secondary">Nova Ficha</button>'
-      );
-    }
-    html = html.replace(/href="styles\.css[^"]*"/g, 'href="styles.css?v=fix7"');
-    if (html.indexOf('styles-hab.css') === -1) html = html.replace('</head>', '  <link rel="stylesheet" href="styles-hab.css?v=habmine4" />\n</head>');
-    else html = html.replace(/styles-hab\.css\?v=[^"]*/g, 'styles-hab.css?v=habmine4');
-    if (html.indexOf('mobile.css') === -1) html = html.replace('</head>', '  <link rel="stylesheet" href="mobile.css?v=5" />\n</head>');
-    else html = html.replace(/mobile\.css\?v=[^"]*/g, 'mobile.css?v=5');
-    if (html.indexOf('compact.css') === -1) html = html.replace('</head>', '  <link rel="stylesheet" href="compact.css?v=fix9" />\n</head>');
-    else html = html.replace(/compact\.css\?v=[^"]*/g, 'compact.css?v=fix9');
-    html = html.replace(/rituais-catalog\.js[^"]*/g, 'rituais-catalog.js?v=livro1');
-    html = html.replace(/rituais-extra\.js[^"]*/g, 'rituais-extra.js?v=livro1');
-    html = html.replace(/itens-catalog\.js[^"]*/g, 'itens-catalog.js?v=livro1');
-    html = html.replace(/habilidades-catalog\.js[^"]*/g, 'habilidades-catalog.js?v=livro6');
-    html = html.replace(/data\.js[^"]*/g, 'data.js?v=hell4');
-    html = html.replace(/origens-poderes\.js[^"]*/g, 'origens-poderes.js?v=oficial1');
-    html = html.replace(/app\.js[^"]*/g, 'https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@843b6316775cfe32a5b0826ee97d310dd7d0aff9/app.js');
-    html = html.replace(/catalog-ui\.js[^"]*/g, 'catalog-ui.js?v=ritui3');
-    html = html.replace(/text-format\.js\?v=[^"]*/g, 'text-format.js?v=3');
-    html = html.replace(/habilidades-ui\.js[^"]*/g, 'habilidades-ui.js?v=card3');
-    html = html.replace(/arquivos-secretos-ui\.js\?v=[^"]*/g, 'arquivos-secretos-ui.js?v=trilha4');
-    html = html.replace(/<textarea/g, '<textarea spellcheck="true" lang="pt-BR"');
-    var extras = '';
-    if (html.indexOf('firebase-config.js') === -1) {
-      extras += '<script src="firebase-config.js"><\/script>\n';
-      extras += '<script src="auth.js?v=restore1"><\/script>\n';
-      extras += '<script src="auth-restore-login.js?v=2"><\/script>\n';
-      extras += '<script src="auth-mobile-fix.js?v=restore1"><\/script>\n';
-      extras += '<script src="ficha-share.js?v=4"><\/script>\n';
-    }
-    if (html.indexOf('text-format.js') === -1) extras += '<script src="text-format.js?v=3"><\/script>\n';
-    extras += '<script src="arquivos-secretos-catalog.js?v=9"><\/script>\n';
-    extras += '<script src="arquivos-secretos-catalog-q1.js?v=1"><\/script>\n';
-    extras += '<script src="arquivos-secretos-catalog-q2.js?v=1"><\/script>\n';
-    extras += '<script src="arquivos-secretos-catalog-q3.js?v=1"><\/script>\n';
-    extras += '<script src="arquivos-secretos-catalog-q4.js?v=1"><\/script>\n';
-    extras += '<script src="arquivos-secretos-catalog-b.js?v=3"><\/script>\n';
-    extras += '<script src="arquivos-secretos-part2.js?v=3"><\/script>\n';
-    extras += '<script src="arquivos-secretos-trilhas.js?v=3"><\/script>\n';
-    extras += '<script src="arquivos-secretos-rituais.js?v=3"><\/script>\n';
-    extras += '<script src="arquivos-secretos-poderes-a.js?v=3"><\/script>\n';
-    extras += '<script src="arquivos-secretos-poderes-b.js?v=3"><\/script>\n';
-    extras += '<script src="arquivos-secretos-poderes-c.js?v=3"><\/script>\n';
-    extras += '<script src="arquivos-secretos-poderes-d.js?v=3"><\/script>\n';
-    extras += '<script src="arquivos-secretos-hellhunters.js?v=4"><\/script>\n';
-    extras += '<script src="arquivos-secretos-ui.js?v=trilha4"><\/script>\n';
-    extras += '<script src="arquivos-secretos-origens-ensure.js?v=1"><\/script>\n';
-    if (html.indexOf('habilidades-bridge.js') === -1) extras += '<script src="habilidades-bridge.js?v=9"><\/script>\n';
-    if (html.indexOf('origem-classe-reset.js') === -1) extras += '<script src="origem-classe-reset.js?v=2"><\/script>\n';
-    html = html.replace(/combat-stats-fix\.js[^"]*/g, 'combat-stats-fix.js?v=7');
-    if (html.indexOf('combat-stats-fix.js') === -1) extras += '<script src="combat-stats-fix.js?v=7"><\/script>\n';
-    if (html.indexOf('ficha-custom.js') === -1) extras += '<script src="ficha-custom.js?v=6"><\/script>\n';
-    if (html.indexOf('ficha-custom-limits.js') === -1) extras += '<script src="ficha-custom-limits.js?v=6"><\/script>\n';
-    html = html.replace(/<script[^>]*ficha-mascaras\.js[^>]*><\/script>/g, '');
-    if (html.indexOf('app-hotfix.js') === -1) extras += '<script src="app-hotfix.js?v=2"><\/script>\n';
-    if (html.indexOf('tabs-fix.js') === -1) extras += '<script src="tabs-fix.js?v=4"><\/script>\n';
-    extras += '<script src="controls-fix.js?v=6"><\/script>\n';
-    extras += '<script src="app-res-fix.js?v=3"><\/script>\n';
-    extras += '<script src="ui-dialog.js?v=3"><\/script>\n';
-    extras += '<script src="mascara-fix.js?v=14"><\/script>\n';
-    extras += '<script src="mascara-btn-fix.js?v=2"><\/script>\n';
-    extras += '<script src="logo-mark-patch.js?v=5"><\/script>\n';
-    extras += '<script src="mascara-ui-dialog-patch.js?v=2"><\/script>\n';
-    extras += '<script src="habilidades-catalog-extra.js?v=7"><\/script>\n';
-    extras += '<script src="origens-poderes.js?v=oficial1"><\/script>\n';
-    extras += '<script src="poderes-paranormais-oficiais.js?v=1"><\/script>\n';
-    extras += '<script src="desc-format.js?v=1"><\/script>\n';
-    extras += '<script src="desc-ui-patch.js?v=1"><\/script>\n';
-    extras += '<script src="hab-oficial-expand.js?v=1"><\/script>\n';
-    extras += '<script src="origens-ferido-transtornado.js?v=3"><\/script>\n';
-    extras += '<script src="arquivos-secretos-origens-oficiais.js?v=3"><\/script>\n';
-    extras += '<script src="arquivos-secretos-textos-oficiais-a.js?v=1"><\/script>\n';
-    extras += '<script src="arquivos-secretos-textos-oficiais-b.js?v=2"><\/script>\n';
-    extras += '<script src="arquivos-secretos-poderes-ocultista.js?v=1"><\/script>\n';
-    extras += '<script src="hab-full-text-fix.js?v=2"><\/script>\n';
-    extras += '<script src="rituais-form.js?v=3"><\/script>\n';
-    if (html.indexOf('attrs-wheel.js') === -1) extras += '<script src="attrs-wheel.js?v=3"><\/script>\n';
-    html = html.replace(/habilidades-ui\.js[^"]*/g, 'habilidades-ui.js?v=card3');
-    html = html.replace(/habilidades-catalog\.js[^"]*/g, 'habilidades-catalog.js?v=livro6');
-    if (extras) html = html.replace('</body>', extras + '</body>');
-    document.open(); document.write(html); document.close();
-    setTimeout(function () {
-      var b = document.getElementById('btn-voltar-agentes');
-      if (b) b.onclick = function () { location.href = 'index.html'; };
-    }, 600);
-  })
-  .catch(function () {
-    document.body.innerHTML = '<p style="font-family:sans-serif;padding:40px;color:#c00">N\u00e3o foi poss\u00edvel carregar a ficha. Tente Ctrl+F5.</p>';
-  });
+(function () {
+  var qs = location.search || '';
+  // Same-origin only — never jsDelivr
+  fetch('ficha-content.html?v=solid3')
+    .then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.text();
+    })
+    .then(function (html) {
+      document.open();
+      document.write(html);
+      document.close();
+      setTimeout(function () {
+        var b = document.getElementById('btn-voltar-agentes');
+        if (b) b.onclick = function () { location.href = 'index.html'; };
+      }, 400);
+    })
+    .catch(function (e) {
+      document.body.innerHTML =
+        '<div style="font-family:sans-serif;padding:40px;color:#eee;background:#0b0b10;min-height:100vh">' +
+        '<p style="color:#f87171">Não foi possível carregar a ficha.</p>' +
+        '<p style="color:#9797a8;font-size:.9rem">' + (e && e.message ? e.message : '') + '</p>' +
+        '<p><a href="index.html" style="color:#a78bfa">← Voltar aos Agentes</a> · <a href="javascript:location.reload()" style="color:#a78bfa">Tentar de novo</a></p>' +
+        '</div>';
+    });
+})();
 </script>
 </head>
-<body>
-<p style="font-family:sans-serif;padding:40px;color:#888">Carregando ficha…</p>
+<body style="background:#0b0b10;color:#888;font-family:sans-serif;padding:40px;margin:0">
+Carregando ficha…
 </body>
 </html>
