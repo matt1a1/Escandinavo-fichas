@@ -9,60 +9,166 @@
 <link rel="apple-touch-icon" href="Logo_branca?v=22" />
 <meta name="theme-color" content="#12121c" />
 <link rel="manifest" href="site.webmanifest?v=22" />
-<script>
-(function () {
-  var BASE = 'https://cdn.jsdelivr.net/gh/matt1a1/Escandinavo-fichas@23a4e4d5a478';
-  fetch(BASE + '/index.html')
-    .then(function (r) { return r.text(); })
-    .then(function (html) {
-      html = html.replace(/<link[^>]*rel=["'](?:shortcut )?icon["'][^>]*>/gi, '');
-      html = html.replace(/<link[^>]*rel=["']apple-touch-icon["'][^>]*>/gi, '');
-      html = html.replace(/<link[^>]*rel=["']manifest["'][^>]*>/gi, '');
-      var fav = '<link rel="icon" href="Logo_branca?v=22" type="image/png" sizes="any" />\n<link rel="icon" href="favicon.svg?v=22" type="image/svg+xml" />\n<link rel="apple-touch-icon" href="Logo_branca?v=22" />\n<meta name="theme-color" content="#12121c" />\n<link rel="manifest" href="site.webmanifest?v=22" />\n';
-      html = html.replace('</head>', fav + '</head>');
 
-      if (html.indexOf('.rm-ag{') === -1) {
-        var css = '<style id="rm-ag-css">.camp-ag-card{position:relative;}.rm-ag{position:absolute;top:8px;right:8px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:transparent!important;border:none!important;color:#9797a8!important;font-size:1.15rem;line-height:1;cursor:pointer;border-radius:6px;padding:0;z-index:2;}.rm-ag:hover{color:#f87171!important;background:rgba(248,113,113,.12)!important;}.camp-avatar{width:56px;height:56px;border-radius:10px;background:#1d1d29 center/cover no-repeat;margin-bottom:8px;}.camp-avatar-fallback{display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.2rem;color:#a78bfa;}.camp-role-mestre{color:#a78bfa;font-weight:600;}.camp-role-jogador{color:#9797a8;}@media(max-width:720px){.camp-detail-actions{flex-direction:column;}.camp-detail-actions .btn-outline,.camp-detail-actions button{width:100%;min-width:0;}.camp-tabs{overflow-x:auto;-webkit-overflow-scrolling:touch;}.camp-tab{padding:10px 12px;white-space:nowrap;}.camp-agentes-grid{grid-template-columns:1fr!important;}}</style>';
-        html = html.replace('</head>', css + '</head>');
-      }
-      html = html.replace(/campanhas\.js\?v=[^"]*/g, 'campanhas.js?v=11');
-      html = html.replace(/campanhas-invite\.js\?v=[^"]*/g, 'campanhas-invite.js?v=4');
-      html = html.replace(/campanhas-owner-fix\.js\?v=[^"]*/g, 'campanhas-owner-fix.js?v=3');
-      html = html.replace(/foto-util\.js\?v=[^"]*/g, 'foto-util.js?v=8');
-      html = html.replace(/wizard\.js[^"]*/g, 'wizard.js?v=uidlg1');
-      html = html.replace(/npc-criatura\.js[^"]*/g, 'npc-criatura.js?v=uidlg1');
-      html = html.replace(/mobile-nav\.js[^"]*/g, 'mobile-nav.js?v=uidlg1');
-      html = html.replace(/auth-mobile-fix\.js[^"]*/g, 'auth-mobile-fix.js?v=restore1');
-      html = html.replace(/auth\.js\?v=[^"]*/g, 'auth.js?v=restore1');
-      html = html.replace(/ficha-share\.js\?v=[^"]*/g, 'ficha-share.js?v=4');
-      html = html.replace(/card-actions-fix\.js\?v=[^"]*/g, 'card-actions-fix.js?v=2');
-      var inject = '';
-      if (html.indexOf('rm-ag-fix.js') === -1) inject += '<script src="rm-ag-fix.js?v=1"><\/script>\n';
-      if (html.indexOf('campanhas-sync-fix.js') === -1) inject += '<script src="campanhas-sync-fix.js?v=3"><\/script>\n';
-      if (html.indexOf('camp-join-fix.js') === -1) inject += '<script src="camp-join-fix.js?v=1"><\/script>\n';
-      if (html.indexOf('camp-render-guard.js') === -1) inject += '<script src="camp-render-guard.js?v=1"><\/script>\n';
-      if (html.indexOf('camp-members-sync.js') === -1) inject += '<script src="camp-members-sync.js?v=1"><\/script>\n';
-      if (html.indexOf('camp-no-overwrite-agentes.js') === -1) inject += '<script src="camp-no-overwrite-agentes.js?v=1"><\/script>\n';
-      if (html.indexOf('camp-agentes-sync.js') === -1) inject += '<script src="camp-agentes-sync.js?v=2"><\/script>\n';
-      inject += '<script src="ui-dialog.js?v=3"><\/script>\n';
-      inject += '<script src="wizard-ui-dialog-patch.js?v=2"><\/script>\n';
-      inject += '<script src="camp-ameacas.js?v=1"><\/script>\n';
-      inject += '<script src="logo-mark-patch.js?v=22"><\/script>\n';
-      inject += '<script src="camp-card-fix.js?v=1"><\/script>\n';
-      inject += '<script src="auth-restore-login.js?v=2"><\/script>\n';
-      if (html.indexOf('card-actions-fix.js') === -1) inject += '<script src="card-actions-fix.js?v=2"><\/script>\n';
-      if (inject) html = html.replace('</body>', inject + '</body>');
-      document.open();
-      document.write(html);
-      document.close();
-    })
-    .catch(function () {
-      document.body.innerHTML = '<p style="font-family:sans-serif;padding:40px;color:#c00">Erro ao carregar. Tente Ctrl+F5.</p>';
-    });
-})();
-</script>
+<link rel="stylesheet" href="styles.css" onerror="this.remove()" />
+<link rel="stylesheet" href="wizard-styles.css?v=tipo1" />
+<link rel="stylesheet" href="mobile.css?v=6" />
+<style>
+  :root{--ag-bg:#0b0b10;--ag-panel:#16161f;--ag-panel-2:#1d1d29;--ag-border:#2a2a38;--ag-accent:#8b5cf6;--ag-accent-2:#a855f7;--ag-text:#f2f2f6;--ag-text-dim:#9797a8;--ag-danger:#ef4444;}
+  *{box-sizing:border-box;} body{background:var(--ag-bg);color:var(--ag-text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;margin:0;min-height:100vh;}
+  .ag-nav{display:flex;align-items:center;gap:28px;padding:18px 32px;border-bottom:1px solid var(--ag-border);background:linear-gradient(180deg, rgba(139,92,246,.08), transparent);}
+  .ag-nav .brand{font-weight:700;letter-spacing:.02em;margin-right:auto;}
+  .ag-nav a{color:var(--ag-text-dim);text-decoration:none;font-size:.95rem;padding-bottom:4px;border-bottom:2px solid transparent;cursor:pointer;}
+  .ag-nav a.active{color:var(--ag-text);border-bottom-color:var(--ag-accent);}
+  .ag-wrap{max-width:1100px;margin:0 auto;padding:32px;}
+  .ag-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;gap:16px;flex-wrap:wrap;}.ag-header-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  .ag-header h1{font-size:1.1rem;font-weight:600;margin:0;color:var(--ag-text-dim);}
+  .ag-header h1 b{color:var(--ag-text);}
+  .btn-primary{background:var(--ag-accent);color:#fff;border:none;border-radius:8px;padding:10px 18px;font-weight:600;font-size:.9rem;cursor:pointer;}
+  .btn-primary:hover{background:var(--ag-accent-2);}
+  .btn-ghost{background:transparent;color:var(--ag-text-dim);border:1px solid var(--ag-border);border-radius:8px;padding:9px 16px;font-size:.9rem;cursor:pointer;}
+  .ag-search{width:100%;padding:11px 14px;border-radius:8px;border:1px solid var(--ag-border);background:var(--ag-panel);color:var(--ag-text);margin-bottom:22px;font-size:.9rem;}
+  .ag-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px;}
+  .ag-card{background:var(--ag-panel);border:1px solid var(--ag-border);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;position:relative;}
+  .ag-card button{background:transparent;color:var(--ag-text-dim);border:none;cursor:pointer;}
+  .ag-card a{color:inherit;}
+  .ag-card .avatar{width:100%;height:90px;border-radius:8px;background:var(--ag-panel-2);display:flex;align-items:center;justify-content:center;font-size:1.6rem;color:var(--ag-text-dim);}
+  .ag-card .avatar{cursor:pointer;position:relative;overflow:hidden;background-size:cover;background-position:center;background-repeat:no-repeat;}
+  .ag-card h3{margin:0;font-size:1rem;}
+  .ag-card .meta{font-size:.78rem;color:var(--ag-text-dim);}
+  .ag-card .del{position:absolute;top:10px;right:10px;background:transparent !important;border:none !important;color:var(--ag-text-dim) !important;cursor:pointer;font-size:1rem;line-height:1;padding:4px 8px;border-radius:6px;z-index:2;}
+  .ag-card .del:hover{color:var(--ag-danger) !important;background:rgba(239,68,68,.12) !important;}
+  .ag-card .acessar{margin-top:auto;background:var(--ag-accent) !important;color:#fff !important;text-align:center;text-decoration:none !important;padding:9px;border-radius:8px;font-size:.85rem;font-weight:600;display:block;}
+  .ag-card .acessar:hover{background:var(--ag-accent-2) !important;color:#fff !important;}
+  .ag-tipo-badge{display:inline-block;align-self:flex-start;font-size:.68rem;font-weight:700;padding:3px 8px;border-radius:999px;letter-spacing:.02em;}
+  .ag-tipo-badge.tipo-custom{background:rgba(56,189,248,.15);color:#7dd3fc;border:1px solid rgba(56,189,248,.35);}
+  .ag-tipo-badge.tipo-mascaras{background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.4);}
+  .ag-empty{grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--ag-text-dim);border:1px dashed var(--ag-border);border-radius:12px;}
+  .camp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;}
+</style>
+<style id="rm-ag-css">.camp-ag-card{position:relative;}.rm-ag{position:absolute;top:8px;right:8px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:transparent!important;border:none!important;color:#9797a8!important;font-size:1.15rem;line-height:1;cursor:pointer;border-radius:6px;padding:0;z-index:2;}.rm-ag:hover{color:#f87171!important;background:rgba(248,113,113,.12)!important;}.camp-avatar{width:56px;height:56px;border-radius:10px;background:#1d1d29 center/cover no-repeat;margin-bottom:8px;}.camp-avatar-fallback{display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.2rem;color:#a78bfa;}.camp-role-mestre{color:#a78bfa;font-weight:600;}.camp-role-jogador{color:#9797a8;}@media(max-width:720px){.camp-detail-actions{flex-direction:column;}.camp-detail-actions .btn-outline,.camp-detail-actions button{width:100%;min-width:0;}.camp-tabs{overflow-x:auto;-webkit-overflow-scrolling:touch;}.camp-tab{padding:10px 12px;white-space:nowrap;}.camp-agentes-grid{grid-template-columns:1fr!important;}}</style>
 </head>
 <body>
-<p style="font-family:sans-serif;padding:40px;color:#888">Carregando…</p>
+<nav class="ag-nav">
+  <span class="brand"><span class="logo-mark"></span> Escandinavo</span>
+  <a href="#" class="active" data-view="agentes">Agentes</a>
+  <a href="#" data-view="campanhas">Campanhas</a>
+  <a href="#" data-view="npcs">NPCs</a>
+  <span style="margin-left:auto"></span>
+  <button class="btn-ghost" id="btn-auth-login" type="button">Entrar</button>
+  <span id="auth-user" style="display:none;align-items:center;gap:8px;font-size:.9rem;color:var(--ag-text-dim)"></span>
+</nav>
+
+<div class="ag-wrap" id="view-agentes">
+  <div class="ag-header">
+    <h1>Meus <b>Agentes</b></h1>
+    <div class="ag-header-actions">
+      <button class="btn-primary" id="btn-novo-agente">+ Novo Agente</button>
+    </div>
+  </div>
+  <input class="ag-search" id="search-agentes" placeholder="Buscar agente…" />
+  <div class="ag-grid" id="agentes-grid"></div>
+</div>
+
+<div class="ag-wrap" id="view-campanhas" hidden>
+  <div class="ag-header">
+    <h1>Minhas <b>Campanhas</b></h1>
+    <div class="ag-header-actions">
+      <button class="btn-ghost" id="btn-entrar-convite">Entrar com convite</button>
+      <button class="btn-primary" id="btn-nova-campanha">+ Nova Campanha</button>
+    </div>
+  </div>
+  <div class="camp-grid" id="campanhas-grid"></div>
+</div>
+
+<div class="ag-wrap" id="view-npcs" hidden>
+  <div class="ag-header">
+    <h1>NPCs & <b>Criaturas</b></h1>
+    <div class="ag-header-actions">
+      <button class="btn-primary" id="btn-novo-npc">+ Novo NPC</button>
+    </div>
+  </div>
+  <input class="ag-search" id="search-npcs" placeholder="Buscar NPC…" />
+  <div class="ag-grid" id="npcs-grid"></div>
+</div>
+
+<div class="ag-wrap" id="view-campanha-detail" hidden>
+  <div class="ag-header">
+    <h1 id="camp-detail-title">Campanha</h1>
+    <div class="ag-header-actions camp-detail-actions">
+      <button class="btn-ghost" id="btn-voltar-campanhas">← Voltar</button>
+      <button class="btn-ghost" id="btn-camp-invite">Convite</button>
+      <button class="btn-ghost" id="btn-camp-add-agente">+ Personagem</button>
+    </div>
+  </div>
+  <div class="camp-tabs">
+    <button class="camp-tab active" data-tab="agentes">Agentes</button>
+    <button class="camp-tab" data-tab="ameacas">Ameaças</button>
+    <button class="camp-tab" data-tab="npcs">NPCs</button>
+  </div>
+  <section id="camp-tab-agentes" class="camp-tab-panel">
+    <div class="camp-agentes-grid" id="camp-agentes-grid"></div>
+  </section>
+  <section id="camp-tab-ameacas" class="camp-tab-panel" hidden>
+    <div id="camp-ameacas-root"></div>
+  </section>
+  <section id="camp-tab-npcs" class="camp-tab-panel" hidden>
+    <div class="camp-agentes-grid" id="camp-npcs-grid"></div>
+  </section>
+</div>
+
+<div class="wizard-overlay" id="wizard" hidden>
+  <div class="wizard-top">
+    <span class="brand">◈ Novo Agente</span>
+    <button class="btn-ghost" id="wizard-close">Cancelar</button>
+  </div>
+  <div class="wizard-steps" id="wizard-steps"></div>
+  <div class="wizard-body" id="wizard-body"></div>
+</div>
+
+<div class="wizard-overlay" id="modal-add-agentes" hidden>
+  <div class="modal-box">
+    <div class="wizard-top">
+      <span class="brand">Adicionar Personagens</span>
+      <button type="button" class="btn-ghost" id="modal-add-agentes-close">Fechar</button>
+    </div>
+    <div class="modal-box-body">
+      <p style="color:var(--ag-text-dim);margin:0 0 14px">Selecione as fichas para vincular a esta campanha. Jogadores só controlam as próprias.</p>
+      <div id="modal-agentes-lista" class="modal-agentes-lista"></div>
+      <div style="display:flex;justify-content:flex-end;margin-top:18px">
+        <button type="button" class="btn-primary" id="btn-confirmar-agentes">Confirmar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="firebase-config.js"></script>
+<script src="auth.js?v=restore1"></script>
+<script src="auth-restore-login.js?v=2"></script>
+<script src="auth-mobile-fix.js?v=restore1"></script>
+<script src="data.js"></script>
+<script src="foto-util.js?v=8"></script>
+<script src="ficha-share.js?v=4"></script>
+<script src="ui-dialog.js?v=3"></script>
+<script src="wizard.js?v=uidlg1"></script>
+<script src="wizard-ui-dialog-patch.js?v=2"></script>
+<script src="npc-criatura.js?v=uidlg1"></script>
+<script src="agent-menu-patch.js?v=2"></script>
+<script src="npc-menu-patch.js?v=2"></script>
+<script src="card-actions-fix.js?v=2"></script>
+<script src="campanhas.js?v=8"></script>
+<script src="campanhas-owner-fix.js?v=3"></script>
+<script src="campanhas-invite.js?v=3"></script>
+<script src="campanhas-sync-fix.js?v=3"></script>
+<script src="camp-join-fix.js?v=1"></script>
+<script src="camp-render-guard.js?v=1"></script>
+<script src="camp-members-sync.js?v=1"></script>
+<script src="camp-no-overwrite-agentes.js?v=1"></script>
+<script src="camp-agentes-sync.js?v=2"></script>
+<script src="camp-ameacas.js?v=1"></script>
+<script src="camp-card-fix.js?v=1"></script>
+<script src="rm-ag-fix.js?v=1"></script>
+<script src="mobile-nav.js?v=uidlg1"></script>
+<script src="logo-mark-patch.js?v=22"></script>
 </body>
 </html>
