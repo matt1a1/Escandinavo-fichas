@@ -6,24 +6,19 @@
 <meta http-equiv="Pragma" content="no-cache" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Escandinavo Fichas — Agentes</title>
-<link rel="icon" href="Logo_branca?v=logo1" type="image/png" sizes="any" />
-<link rel="apple-touch-icon" href="Logo_branca?v=logo1" />
-<link rel="stylesheet" href="styles.css?v=logo1" onerror="this.remove()" />
-<link rel="stylesheet" href="wizard-styles.css?v=logo1" />
-<link rel="stylesheet" href="mobile.css?v=logo1" />
+<link rel="icon" href="Logo_branca" type="image/png" sizes="any" />
+<link rel="stylesheet" href="styles.css" onerror="this.remove()" />
+<link rel="stylesheet" href="wizard-styles.css" />
+<link rel="stylesheet" href="mobile.css" />
 <style>
   :root{--ag-bg:#0b0b10;--ag-panel:#16161f;--ag-panel-2:#1d1d29;--ag-border:#2a2a38;--ag-accent:#8b5cf6;--ag-accent-2:#a855f7;--ag-text:#f2f2f6;--ag-text-dim:#9797a8;--ag-danger:#ef4444;}
-  *{box-sizing:border-box;}
-  body{background:var(--ag-bg);color:var(--ag-text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;margin:0;min-height:100vh;}
+  *{box-sizing:border-box;} body{background:var(--ag-bg);color:var(--ag-text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;margin:0;min-height:100vh;}
   .ag-nav{display:flex;align-items:center;gap:28px;padding:18px 32px;border-bottom:1px solid var(--ag-border);background:linear-gradient(180deg, rgba(139,92,246,.08), transparent);}
-  .ag-nav .brand{font-weight:700;letter-spacing:.02em;margin-right:auto;display:flex;align-items:center;gap:10px;}
-  .ag-nav .brand img{width:28px;height:28px;object-fit:contain;display:block;}
+  .ag-nav .brand{font-weight:700;letter-spacing:.02em;margin-right:auto;}
   .ag-nav a{color:var(--ag-text-dim);text-decoration:none;font-size:.95rem;padding-bottom:4px;border-bottom:2px solid transparent;cursor:pointer;}
   .ag-nav a.active{color:var(--ag-text);border-bottom-color:var(--ag-accent);}
-  #auth-bar{display:flex;align-items:center;gap:8px;margin-left:12px;flex-shrink:0;}
   .ag-wrap{max-width:1100px;margin:0 auto;padding:32px;}
-  .ag-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;gap:16px;flex-wrap:wrap;}
-  .ag-header-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  .ag-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;gap:16px;flex-wrap:wrap;}.ag-header-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
   .ag-header h1{font-size:1.1rem;font-weight:600;margin:0;color:var(--ag-text-dim);}
   .ag-header h1 b{color:var(--ag-text);}
   .btn-primary{background:var(--ag-accent);color:#fff;border:none;border-radius:8px;padding:10px 18px;font-weight:600;font-size:.9rem;cursor:pointer;}
@@ -32,34 +27,30 @@
   .ag-search{width:100%;padding:11px 14px;border-radius:8px;border:1px solid var(--ag-border);background:var(--ag-panel);color:var(--ag-text);margin-bottom:22px;font-size:.9rem;}
   .ag-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px;}
   .ag-card{background:var(--ag-panel);border:1px solid var(--ag-border);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;position:relative;}
-  .ag-card:hover{border-color:rgba(139,92,246,.45);}
   .ag-card button{background:transparent;color:var(--ag-text-dim);border:none;cursor:pointer;}
-  .ag-card .avatar{width:100%;height:90px;border-radius:8px;background:var(--ag-panel-2) center/62% no-repeat;background-image:url("Logo_branca?v=logo1");display:flex;align-items:center;justify-content:center;font-size:0;color:transparent;}
+  .ag-card a{color:inherit;}
+  .ag-card .avatar{width:100%;height:90px;border-radius:8px;background:var(--ag-panel-2);display:flex;align-items:center;justify-content:center;font-size:1.6rem;color:var(--ag-text-dim);}
   .ag-card h3{margin:0;font-size:1rem;}
   .ag-card .meta{font-size:.78rem;color:var(--ag-text-dim);}
-  .ag-card .del{position:absolute;top:10px;right:10px;z-index:2;padding:4px 8px;border-radius:6px;}
-  .ag-card .del:hover{color:var(--ag-danger)!important;background:rgba(239,68,68,.12)!important;}
-  .ag-card .acessar{margin-top:auto;background:var(--ag-accent)!important;color:#fff!important;text-align:center;text-decoration:none!important;padding:9px;border-radius:8px;font-size:.85rem;font-weight:600;display:block;}
-  .ag-tipo-badge{display:inline-block;align-self:flex-start;font-size:.68rem;font-weight:700;padding:3px 8px;border-radius:999px;}
-  .ag-tipo-badge.tipo-custom{background:rgba(56,189,248,.15);color:#7dd3fc;border:1px solid rgba(56,189,248,.35);}
-  .ag-tipo-badge.tipo-mascaras{background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.4);}
+  .ag-card .del{position:absolute;top:10px;right:10px;}
+  .ag-card .acessar{margin-top:auto;background:var(--ag-accent) !important;color:#fff !important;text-align:center;text-decoration:none !important;padding:9px;border-radius:8px;font-size:.85rem;font-weight:600;display:block;}
   .ag-empty{grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--ag-text-dim);border:1px dashed var(--ag-border);border-radius:12px;}
   .camp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;}
-  .wizard-overlay{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:1000;display:flex;flex-direction:column;}
+  .wizard-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;display:flex;flex-direction:column;}
   .wizard-overlay[hidden]{display:none!important;}
   .wizard-top{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;border-bottom:1px solid var(--ag-border);background:var(--ag-panel);}
   .wizard-steps{display:flex;gap:8px;padding:12px 24px;border-bottom:1px solid var(--ag-border);background:var(--ag-panel);overflow-x:auto;}
   .wizard-body{flex:1;overflow:auto;padding:24px;max-width:720px;margin:0 auto;width:100%;}
 </style>
 </head>
-<body data-build="2026-10-20-LOGO">
+<body data-build="stable">
 <nav class="ag-nav">
-  <span class="brand"><img src="Logo_branca?v=logo1" alt="" width="28" height="28" /> Escandinavo Fichas</span>
+  <span class="brand"><img src="Logo_branca" width="28" height="28" alt="" style="vertical-align:middle;margin-right:8px;object-fit:contain;" />Escandinavo Fichas</span>
   <a data-view="agentes" class="active">Agentes</a>
   <a data-view="campanhas">Campanhas</a>
   <a data-view="npc">NPC</a>
   <a data-view="criaturas">Criatura/Ameaça</a>
-  <div id="auth-bar">
+  <div id="auth-bar" style="display:flex;align-items:center;gap:8px;margin-left:12px;">
     <button type="button" id="auth-user" style="display:none;font-size:.8rem;color:#c4b5fd;background:transparent;border:none;cursor:pointer;"></button>
     <button type="button" id="btn-auth-login" class="btn-primary" style="padding:8px 14px;font-size:.82rem;">Entrar com Google</button>
     <button type="button" id="btn-auth-logout" class="btn-ghost" style="padding:8px 12px;font-size:.82rem;display:none;">Sair</button>
@@ -101,18 +92,18 @@
 </div>
 <div class="wizard-overlay" id="wizard" hidden>
   <div class="wizard-top">
-    <span class="brand"><img src="Logo_branca?v=logo1" alt="" width="22" height="22" style="vertical-align:middle;margin-right:8px;" /> Novo Agente</span>
+    <span class="brand">◈ Novo Agente</span>
     <button class="btn-ghost" id="wizard-close">Cancelar</button>
   </div>
   <div class="wizard-steps" id="wizard-steps"></div>
   <div class="wizard-body" id="wizard-body"></div>
 </div>
 <script src="firebase-config.js"></script>
-<script src="auth.js?v=logo1"></script>
+<script src="auth.js"></script>
 <script src="data.js"></script>
-<script src="wizard.js?v=logo1"></script>
-<script src="npc-criatura.js?v=logo1"></script>
-<script src="campanhas.js?v=logo1"></script>
-<script src="mobile-nav.js?v=logo1"></script>
+<script src="wizard.js"></script>
+<script src="npc-criatura.js"></script>
+<script src="campanhas.js"></script>
+<script src="mobile-nav.js"></script>
 </body>
 </html>
